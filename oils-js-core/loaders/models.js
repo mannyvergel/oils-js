@@ -19,7 +19,12 @@ function getModelsFromDir(dir, callback) {
 			var absPath = opts.absolutePath;
 			var modelJs = require(absPath);
 			var conn = connections.mainDb;
-			var model = conn.model(opts.name, new Schema(modelJs.schema));
+
+			var schema = new Schema(modelJs.schema);
+			if (modelJs.initSchema) {
+				modelJs.initSchema(schema);
+			}
+			var model = conn.model(opts.name, schema);
 
 			if (callback) {
 				callback(null, model, opts);

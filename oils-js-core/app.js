@@ -2,6 +2,9 @@ require('./include.js');
 var express = require('express');
 var swig = require('swig');
 
+var log4js = require('log4js');
+log4js.replaceConsole();
+
 var App = function() {
 	var self = this;
 

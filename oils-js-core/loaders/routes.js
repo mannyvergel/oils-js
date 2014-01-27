@@ -4,10 +4,10 @@ module.exports = function(app) {
 	customRoutes(app);
 
 	//automatically route controllers
-	getControllerRoutes(app, '/controllers');
+	setControllerRoutes(app, '/controllers');
 };
 
-function getControllerRoutes(app, dir) {
+function setControllerRoutes(app, dir) {
 
 	fileUtils.recurseJs(dir, function(err, opts) {
 		if (!opts.isDirectory()) {
@@ -20,21 +20,26 @@ function getControllerRoutes(app, dir) {
 			var absPath = opts.absolutePath;
 			var controller = require(absPath);
 			var subPathWithoutExt;
-			if (file == 'index.js') {
-			 	subPathWithoutExt = subPath.slice(0, -8);
-			} else {
-				subPathWithoutExt = subPath.slice(0, -3);
-			}
-			if (oils.isDebug) {
-				console.log(subPathWithoutExt + ' :: ' + subPath);
-			}
-			if (controller.get) {
-				app.get(subPathWithoutExt, controller.get);
+
+			if (controller.autoRoute !== false) {
+				if (file == 'index.js') {
+				 	subPathWithoutExt = subPath.slice(0, -8);
+				} else {
+					subPathWithoutExt = subPath.slice(0, -3);
+				}
+				if (oils.isDebug) {
+					console.log(subPathWithoutExt + ' :: ' + subPath);
+				}
+				if (controller.get) {
+					app.get(subPathWithoutExt, controller.get);
+				}
+
+				if (controller.post) {	
+					app.post(subPathWithoutExt, controller.post);
+				}
 			}
 
-			if (controller.post) {	
-				app.post(subPathWithoutExt, controller.post);
-			}
+			
 		}
 	})
 
