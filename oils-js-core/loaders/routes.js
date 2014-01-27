@@ -20,6 +20,7 @@ function setControllerRoutes(app, dir) {
 			var absPath = opts.absolutePath;
 			var controller = require(absPath);
 			var subPathWithoutExt;
+			var server = app.server;
 
 			if (controller.autoRoute !== false) {
 				if (file == 'index.js') {
@@ -31,11 +32,11 @@ function setControllerRoutes(app, dir) {
 					console.log(subPathWithoutExt + ' :: ' + subPath);
 				}
 				if (controller.get) {
-					app.get(subPathWithoutExt, controller.get);
+					server.get(subPathWithoutExt, controller.get);
 				}
 
 				if (controller.post) {	
-					app.post(subPathWithoutExt, controller.post);
+					post(subPathWithoutExt, controller.post);
 				}
 			}
 

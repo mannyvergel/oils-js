@@ -46,12 +46,12 @@ var App = function() {
         server.engine('html', swig.renderFile);
 
         server.set('view engine', 'html');
-        server.set('views', __dirname + '/views');
+        server.set('views', global.base_dir + '/views');
 
 
-        require('./loaders/routes.js')(server);
+        require('./loaders/routes.js')(self);
 
-        server.use(express.static(__dirname + '/public'));
+        server.use(express.static(global.base_dir + '/public'));
 
 
         server.configure('development', function(){
@@ -80,9 +80,9 @@ var App = function() {
      */
     self.start = function() {
         //  Start the app on the specific interface (and port).
-        self.server.listen(self.port, self.ipaddress, function() {
+        self.server.listen(self.conf.port, self.conf.ipaddress, function() {
             console.log('%s: Node server started on %s:%d ...',
-                        Date(Date.now() ), self.ipaddress, self.port);
+                        Date(Date.now() ), self.conf.ipAddress, self.conf.port);
         });
     };
 }
