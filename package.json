@@ -1,0 +1,41 @@
+{
+  "name": "oils",
+  "version": "0.1.0",
+  "description": "Oils Js framework built on top of Express.",
+  "keywords": [
+  	"OilsJs",
+    "Oils",
+    "Node.js",
+    "application",
+    "openshift"
+  ],
+  "author": {
+    "name": "Manny Vergel",
+    "email": "manny@mvergel.com",
+    "url": "http://www.mvergel.com/"
+  },
+  "homepage": "https://github.com/mannyvergel/oils-js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mannyvergel/oils-js.git"
+  },
+
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+
+  "dependencies": {
+    "express": "~3.4.4",
+    "mongoose": "3.8.x",
+    "swig": "1.3.x",
+    "log4js" : "0.6.x"
+  },
+  "devDependencies": {},
+  "bundleDependencies": [],
+
+  "private": false,
+  "main": "oils-js-core/app.js",
+  "bin": {
+    "oils": "./bin/oils.js"
+  }
+}

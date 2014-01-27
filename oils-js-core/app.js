@@ -1,0 +1,101 @@
+require('./include.js');
+var express = require('express');
+var swig = require('swig');
+
+var App = function() {
+	var self = this;
+
+    /**
+     *  terminator === the termination handler
+     *  Terminate server on receipt of the specified signal.
+     *  @param {string} sig  Signal to terminate on.
+     */
+    self.terminator = function(sig){
+        if (typeof sig === "string") {
+           console.log('%s: Received %s - terminating sample app ...',
+                       Date(Date.now()), sig);
+           process.exit(1);
+        }
+        console.log('%s: Node server stopped.', Date(Date.now()) );
+    };
+
+
+    /**
+     *  Setup termination handlers (for exit and a list of signals).
+     */
+    self._setupTerminationHandlers = function(){
+        //  Process on exit and signals.
+        process.on('exit', function() { self.terminator(); });
+
+        // Removed 'SIGPIPE' from the list - bugz 852598.
+        ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
+         'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
+        ].forEach(function(element, index, array) {
+            process.on(element, function() { self.terminator(element); });
+        });
+    };
+
+
+	self._initializeServer = function() {
+        
+        self.server = express();
+        var server = self.server;
+        server.engine('html', swig.renderFile);
+
+        server.set('view engine', 'html');
+        server.set('views', __dirname + '/views');
+
+
+        require('./loaders/routes.js')(server);
+
+        server.use(express.static(__dirname + '/public'));
+
+
+        server.configure('development', function(){
+            console.log("Application is in Development mode!");
+            server.set('view cache', false);
+            // To disable Swig's cache, do the following:
+            swig.setDefaults({ cache: false });
+        });
+
+    };
+
+
+    /**
+     *  Initializes the sample application.
+     */
+    self.initialize = function() {
+        self._setupTerminationHandlers();
+
+        // Create the express server and routes.
+        self._initializeServer();
+    };
+
+
+    /**
+     *  Start the server (starts up the sample application).
+     */
+    self.start = function() {
+        //  Start the app on the specific interface (and port).
+        self.server.listen(self.port, self.ipaddress, function() {
+            console.log('%s: Node server started on %s:%d ...',
+                        Date(Date.now() ), self.ipaddress, self.port);
+        });
+    };
+}
+
+var app = new App();
+
+require('./loaders/conf.js')(app);
+global.oils = app;
+
+require('./loaders/connections.js')(app);
+require('./loaders/models.js')(app);
+
+
+global.models = app.models;
+global.connections = app.connections;
+
+app.initialize();
+
+module.exports = app;
