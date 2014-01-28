@@ -20,29 +20,47 @@ function setControllerRoutes(app, dir) {
 			var subPath = subfolder + '/' + file;
 			var absPath = opts.absolutePath;
 			var controller = require(absPath);
-			var subPathWithoutExt;
+		
 			var server = app.server;
 
 			if (controller.autoRoute !== false) {
 				if (file == 'index.js') {
-				 	subPathWithoutExt = subPath.slice(0, -8);
-				} else {
-					subPathWithoutExt = subPath.slice(0, -3);
-				}
-				if (oils.isDebug) {
-					console.log(subPathWithoutExt + ' :: ' + subPath);
-				}
-				if (controller.get) {
-					server.get(subPathWithoutExt, controller.get);
-				}
+				 	var subPathWithoutExt = subPath.slice(0, -8);
+					applyRoute(server, subPathWithoutExt, controller);
 
-				if (controller.post) {	
-					post(subPathWithoutExt, controller.post);
+					if (opts.subfolder) {
+						//for non root index.js apply no '/'
+						//e.g. http://localhost/admin/ and http://localhost/admi 
+						subPathWithoutExt = subPath.slice(0, -9);
+						applyRoute(server, subPathWithoutExt, controller);
+					}
+					
+				} else {
+					var subPathWithoutExt = subPath.slice(0, -3);
+					applyRoute(server, subPathWithoutExt, controller);
 				}
+				
+				
 			}
 
 			
 		}
 	})
 
+}
+
+function applyRoute(server, route, controller) {
+	if (controller.get) {
+		if (oils.isDebug) {
+			console.log('[route] GET ' + route);
+		}
+		server.get(route, controller.get);
+	}
+
+	if (controller.post) {	
+		if (oils.isDebug) {
+			console.log('[route] POST ' + route);
+		}
+		post(route, controller.post);
+	}
 }
