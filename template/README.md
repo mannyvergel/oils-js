@@ -1,43 +1,19 @@
 oils-js-quickstart
 ==================
 
-### Oils JS
+### Oils JS Template
 
-Oils is a simple framework to create Openshift Node JS Applications. You can also use this for non Openshift projects as the variable dependencies are just very few and it will work even if it's not in an Openshift environment.
-
-It will automatically read models and controllers. Also features automatic routing for created controllers.
-
-Directory Structure:
-
-    |-- controllers
-    |-- models
-    |-- views
-    |-- public
-    |-- lib
+[Oils JS](https://github.com/mannyvergel/oils-js) is a web framework and this is the template used to create a basic oils js application.
 
 ### Set-Up
 
-For OpenShift apps, after creating your node js + mongodb application, clone the project to your local and go to that directory. In the command line, do the ff:
+Please see [Oils JS](https://github.com/mannyvergel/oils-js) documentation for the set-up.
 
-```
-git remote add upstream -m master https://github.com/mannyvergel/oils-js-quickstart.git
-```
-
-```
-git pull -s recursive -X theirs upstream master
-```
-
-```
-git push
-```
-
-or you can just simply Download the zip version of this project and copy-paste it to your node js application.
+Alternatively, you can also clone this repository, then do an npm install and run server.js.
 
 ### Usage
 
-This sample app is self explanatory. Just browse through the directories and files and you will get the hang of it.
-
-It uses Mongoose for ORM. Mongo DB for the database. Swig for templating.
+Go to [Oils JS](https://github.com/mannyvergel/oils-js) for more information.
 
 ### Contact
 
@@ -45,4 +21,24 @@ If you have questions, feel free to drop me an email: manny@mvergel.com
 
 ### License
 
-MIT
+The MIT License (MIT)
+
+Copyright (c) 2014 Manny
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

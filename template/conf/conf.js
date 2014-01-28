@@ -1,9 +1,12 @@
 /*
  Global variables:
- global.isProd - checks if running in openshift server
+ global.isProd - checks if running in openshift server, will expose this later
  connections.mainDb - main mongoose db, convenience for oils.connections.mainDb
  models.[model name] - returns a Mongoose Model, convenience for oils.models
  oils.isDebug - setting to true usually means more logging
+
+ configuration below is accessible view oils.conf.[name]
+ e.g. oils.conf.ipAddress
 */
 
 module.exports = {

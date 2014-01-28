@@ -17,6 +17,11 @@ if (myArgs[0] == 'new') {
 				if (err) {
 					console.error('Error copying: ' + err);
 				} else {
+					try {
+					  fs.renameSync(folderName + '/template.gitignore', folderName + '/.gitignore');
+					} catch(e) {
+						//ignore
+					}
 					console.log(folderName + ' project created.');
 				}
 			})

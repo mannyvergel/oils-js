@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var fileUtils = require('../utils/fileUtils');
 var Schema = mongoose.Schema;
+var stringUtils = require('../utils/stringUtils');
 
 module.exports = function(app) {
 	app.models = new Object();
@@ -14,7 +15,7 @@ module.exports = function(app) {
 function getModelsFromDir(dir, callback) {
 	var models = [];
 	fileUtils.recurseJs(dir, function(err, opts) {
-		if (!opts.isDirectory()) {
+		if (!opts.isDirectory() && stringUtils.endsWith(opts.file, '.js')) {
 
 			var absPath = opts.absolutePath;
 			var modelJs = require(absPath);

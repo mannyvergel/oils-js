@@ -1,5 +1,5 @@
 var fs = require('fs');
-var stringUtils = require('./stringUtils');
+
 exports.recurseJs = function(dir, callback, subfolder) {
 	subfolder = subfolder || '';
 	var pathToSearch = global.base_dir + dir + subfolder;
@@ -13,9 +13,8 @@ exports.recurseJs = function(dir, callback, subfolder) {
 		} else {
 			for (var i in files) {
 				var file = files[i];
-				if (stringUtils.endsWith(file, '.js')) {
-					handleFile(dir, subfolder, file, callback);
-				}
+				handleFile(dir, subfolder, file, callback);
+				
 			}
 			
 		}

@@ -1,5 +1,6 @@
 var fileUtils = require('../utils/fileUtils');
 var customRoutes = include('/conf/routes.js');
+var stringUtils = require('../utils/stringUtils');
 module.exports = function(app) {
 	customRoutes(app);
 
@@ -10,7 +11,7 @@ module.exports = function(app) {
 function setControllerRoutes(app, dir) {
 
 	fileUtils.recurseJs(dir, function(err, opts) {
-		if (!opts.isDirectory()) {
+		if (!opts.isDirectory() && stringUtils.endsWith(opts.file, '.js')) {
 			var file = opts.file;
 			var subfolder = opts.subfolder;
 			if (oils.isDebug) {
