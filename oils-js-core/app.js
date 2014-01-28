@@ -80,7 +80,7 @@ var App = function() {
      */
     self.start = function() {
         //  Start the app on the specific interface (and port).
-        self.server.listen(self.conf.port, self.conf.ipaddress, function() {
+        self.server.listen(self.conf.port, self.conf.ipAddress, function() {
             console.log('%s: Node server started on %s:%d ...',
                         Date(Date.now() ), self.conf.ipAddress, self.conf.port);
         });
