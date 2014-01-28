@@ -7,10 +7,11 @@ Oils is a web framework built on top of Express framework. It's very flexible an
 
 The reason why Oils framework was created is because the author wants a framework that just works; framework that is very close to Express, organized, highly intuitive and uses basic html, css, and javascript.
 
-The author is not a fan of the ff:
+The author is **NOT** a fan of the ff:
 
 * using non-html syntax on the front-end
 * forcing to use sass / other css frameworks
+* forcing non standard javascript syntax
 * complicated build procedures before you can run the app
 
 The default configuration is for running on local machine and on Openshift servers but it's configurable in conf.js.

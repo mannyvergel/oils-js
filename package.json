@@ -1,7 +1,7 @@
 {
   "name": "oils",
   "version": "0.1.7",
-  "description": "Oils Js framework built on top of Express.",
+  "description": "Oils js framework built on top of Express.",
   "keywords": [
   	"OilsJs",
     "Oils",
@@ -14,7 +14,7 @@
     "email": "manny@mvergel.com",
     "url": "http://www.mvergel.com/"
   },
-  "homepage": "https://github.com/mannyvergel/oils-js",
+  "homepage": "http://mannyvergel.github.io/oils-js",
   "repository": {
     "type": "git",
     "url": "https://github.com/mannyvergel/oils-js.git"
