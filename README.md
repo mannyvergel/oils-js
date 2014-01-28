@@ -75,10 +75,10 @@ Example:
 
 After you have set-up a new oils project. 
 
-Go to controllers folder
-Create a controller. e.g. test.js
-Restart server
-Access your controller with your browser: http://localhost:8080/test
+* Go to controllers folder.
+* Create a controller. e.g. test.js
+* Restart server.
+* Access your controller with your browser: http://localhost:8080/test
 
 ### Contact
 
