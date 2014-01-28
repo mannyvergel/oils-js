@@ -28,6 +28,37 @@ Directory Structure:
 
 You can see the README.md's of each directory above for more information.
 
+#### Important
+You can use ```include``` function which is basically like ```require``` except that it's always based on the the project directory.
+
+E.g. Consider the ff structure:
+
+    |-- controllers
+    |   |--folder
+    |      |--subfolder
+    |         |--controller1.js    
+    |-- lib
+    |   |--folder
+    |      |--subfolder
+    |         |--lib1.js  
+    
+    
+
+If you are in controller1.js and you want to import lib1.js
+
+Instead of using:
+
+````
+var lib1 = require('../../../lib/folder/subfolder/lib1.js');
+```
+
+Use 
+
+```
+var lib1 = include('/lib/folder/subfolder/lib1.js');
+````
+
+
 ### Components
 Oils js uses Mongoose for ORM, Mongo DB for the database and Swig for templating. Only Mongo DB is supported for now but this may change in the future depending on the needs.
 
@@ -40,6 +71,7 @@ The follow are motivations behind creating Oils Js Framework:
 + Intuitive MVC approach
 + Automatic routing of controllers
 + Organized folder structure
++ Organized importing of js files using "include"
 + Automatic creation of models and controllers
 + Uninterrupted Mongo DB Connection (auto reconnect)
 + Support for multiple database connections
