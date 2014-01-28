@@ -32,31 +32,63 @@
 <a name="oils" class="anchor" href="#oils"><span class="octicon octicon-link"></span></a>oils</h1>
 
 <h3>
-<a name="oils-js" class="anchor" href="#oils-js"><span class="octicon octicon-link"></span></a>Oils JS</h3>
+<a name="what-is-oils-js" class="anchor" href="#what-is-oils-js"><span class="octicon octicon-link"></span></a>What is Oils JS</h3>
 
-<p>Oils is a web framework built on top of Express framework. It's very flexible and very simple to use, you'll love it! </p>
+<p>Oils is a web framework built on top of Express framework. It's very flexible and very simple to use, you'll love it!</p>
 
-<p>It is primarily used to create Openshift Node JS Applications. You can also use this for other projects as the variable dependencies are just very few and are all in the configuration file.</p>
+<p>The reason why Oils framework was created is because the author wants a framework that just works; framework that is very close to Express, organized, highly intuitive and uses basic html, css, and javascript.</p>
 
-<p>It will automatically read models and controllers. Also features automatic routing for created controllers.</p>
+<p>The author is <strong>NOT</strong> a fan of the ff:</p>
+
+<ul>
+<li>using non-html syntax on the front-end</li>
+<li>forcing to use sass / other css frameworks</li>
+<li>forcing non standard javascript syntax</li>
+<li>complicated build procedures before you can run the app</li>
+</ul><p>The default configuration is for running on local machine and on Openshift servers but it's configurable in conf.js.</p>
 
 <p>Directory Structure:</p>
 
-<pre><code>|-- controllers
-|-- models
-|-- views
-|-- public
-|-- lib
+<pre><code>|-- conf          //configuration
+|-- controllers   //controllers
+|-- lib           //custom modules
+|-- models        //models
+|-- public        //assets like css, js, images
+|-- views         //uses swig
 </code></pre>
 
 <p>You can see the README.md's of each directory above for more information.</p>
 
 <h3>
+<a name="components" class="anchor" href="#components"><span class="octicon octicon-link"></span></a>Components</h3>
+
+<p>Oils js uses Mongoose for ORM, Mongo DB for the database and Swig for templating. Only Mongo DB is supported for now but this may change in the future depending on the needs.</p>
+
+<p>For the default templating, Swig has been chosen because it doesn't mess much with the html syntax. You can override this by setting the attributes of app.server before calling app.start(), however, do this at your own risk as future features may not support custom template engines (e.g. scaffolding).</p>
+
+<h3>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h3>
+
+<p>The follow are motivations behind creating Oils Js Framework:</p>
+
+<ul>
+<li>Intuitive MVC approach</li>
+<li>Automatic routing of controllers</li>
+<li>Organized folder structure</li>
+<li>Automatic creation of models and controllers</li>
+<li>Uninterrupted Mongo DB Connection (auto reconnect)</li>
+<li>Support for multiple database connections</li>
+<li>Uninterrupted server when there's an exception</li>
+</ul><p>Future Features:</p>
+
+<ul>
+<li>Scaffolding</li>
+<li>Helper Functions</li>
+<li>Support for SQL DB</li>
+</ul><h3>
 <a name="set-up" class="anchor" href="#set-up"><span class="octicon octicon-link"></span></a>Set-Up</h3>
 
-<p>For OpenShift apps, after creating your node js + mongodb application, clone the project to your local and go to that directory.</p>
-
-<p>Example:</p>
+<p>This assumes you already have Node JS v0.10.x (or higher) installed.</p>
 
 <pre><code>&gt; npm install oils -g
 
@@ -69,16 +101,21 @@
 &gt; node server.js
 </code></pre>
 
-<p>or you can just simply Download the zip version of this project and copy-paste it to your node js application.</p>
-
 <h3>
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h3>
 
 <p>This sample app is self explanatory. Just browse through the directories and files and you will get the hang of it.</p>
 
-<p>It uses Mongoose for ORM. Mongo DB for the database. Swig for templating.</p>
+<p>Example:</p>
 
-<h3>
+<p>After you have set-up a new oils project. </p>
+
+<ul>
+<li>Go to controllers folder.</li>
+<li>Create a controller. e.g. test.js</li>
+<li>Restart server.</li>
+<li>Access your controller with your browser: http://localhost:8080/test</li>
+</ul><h3>
 <a name="contact" class="anchor" href="#contact"><span class="octicon octicon-link"></span></a>Contact</h3>
 
 <p>If you have questions, feel free to drop me an email: <a href="mailto:manny@mvergel.com">manny@mvergel.com</a></p>
