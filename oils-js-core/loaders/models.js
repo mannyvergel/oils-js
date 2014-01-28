@@ -13,13 +13,32 @@ module.exports = function(app) {
 
 
 function getModelsFromDir(dir, callback) {
+	//do not load models if there's DB
+	if (!connections) {
+		return;
+	}
 	var models = [];
 	fileUtils.recurseJs(dir, function(err, opts) {
 		if (!opts.isDirectory() && stringUtils.endsWith(opts.file, '.js')) {
 
 			var absPath = opts.absolutePath;
 			var modelJs = require(absPath);
-			var conn = connections.mainDb;
+			var conn;
+
+			if (modelJs.connection) {
+				conn = connections.mainDb;
+			} else {
+				if (connections.mainDb) {
+					conn = connections.mainDb;	
+				} else {
+					for (var i in connections) {
+						//get the first connection
+						conn = connections[i];
+						break;
+					}
+				}
+				
+			}
 
 			var schema = new Schema(modelJs.schema);
 			if (modelJs.initSchema) {
