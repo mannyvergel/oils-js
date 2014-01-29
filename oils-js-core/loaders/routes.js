@@ -1,12 +1,21 @@
 var fileUtils = require('../utils/fileUtils');
-var customRoutes = include('/conf/routes.js');
 var stringUtils = require('../utils/stringUtils');
 module.exports = function(app) {
-	customRoutes(app);
+	processCustomRoutes(app);
 
 	//automatically route controllers
-	setControllerRoutes(app, '/controllers');
+	setControllerRoutes(app, app.constants.CONTROLLERS_DIR);
 };
+
+function processCustomRoutes(app) {
+	var customRoutes = include(app.constants.ROUTES_FILE);
+	var server = app.server;
+	for (var routeKey in customRoutes) {
+		var customRoute = customRoutes[i];
+
+		applyRoute(app, routeKey, customRoute);
+	}
+}
 
 function setControllerRoutes(app, dir) {
 
@@ -14,30 +23,28 @@ function setControllerRoutes(app, dir) {
 		if (!opts.isDirectory() && stringUtils.endsWith(opts.file, '.js')) {
 			var file = opts.file;
 			var subfolder = opts.subfolder;
-			if (oils.isDebug) {
+			if (app.isDebug) {
 				console.log(opts.absolutePath + '[file]');
 			}
 			var subPath = subfolder + '/' + file;
 			var absPath = opts.absolutePath;
 			var controller = require(absPath);
 		
-			var server = app.server;
-
 			if (controller.autoRoute !== false) {
 				if (file == 'index.js') {
 				 	var subPathWithoutExt = subPath.slice(0, -8);
-					applyRoute(server, subPathWithoutExt, controller);
+					applyRoute(app, subPathWithoutExt, controller);
 
 					if (opts.subfolder) {
 						//for non root index.js apply no '/'
 						//e.g. http://localhost/admin/ and http://localhost/admi 
 						subPathWithoutExt = subPath.slice(0, -9);
-						applyRoute(server, subPathWithoutExt, controller);
+						applyRoute(app, subPathWithoutExt, controller);
 					}
 					
 				} else {
 					var subPathWithoutExt = subPath.slice(0, -3);
-					applyRoute(server, subPathWithoutExt, controller);
+					applyRoute(app, subPathWithoutExt, controller);
 				}
 				
 				
@@ -49,18 +56,30 @@ function setControllerRoutes(app, dir) {
 
 }
 
-function applyRoute(server, route, controller) {
-	if (controller.get) {
-		if (oils.isDebug) {
-			console.log('[route] GET ' + route);
-		}
-		server.get(route, controller.get);
-	}
+function applyRoute(app, route, obj) {
 
-	if (controller.post) {	
-		if (oils.isDebug) {
-			console.log('[route] POST ' + route);
+	var server = app.server;
+	if (obj instanceof Function) {
+		
+		if (app.isDebug) {
+			console.log('[route] ALL ' + route);
 		}
-		post(route, controller.post);
+		server.all(route, obj);
+		
+	} else {
+		if (obj.get) {
+			if (oils.isDebug) {
+				console.log('[route] GET ' + route);
+			}
+			server.get(route, obj.get);
+		}
+
+		if (obj.post) {	
+			if (oils.isDebug) {
+				console.log('[route] POST ' + route);
+			}
+			post(route, obj.post);
+		}
 	}
+	
 }

@@ -7,6 +7,7 @@ lib-cov
 *.pid
 *.gz
 template/.git
+test/tmp
 
 pids
 logs

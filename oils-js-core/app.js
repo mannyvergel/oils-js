@@ -1,12 +1,16 @@
-require('./include.js');
+require('./include.js')();
+require('./includeController.js')();
+
 var express = require('express');
 var swig = require('swig');
 
 var log4js = require('log4js');
 log4js.replaceConsole();
 
-var App = function() {
+var App = function(opts) {
 	var self = this;
+
+    self.constants = require('./constants');
 
     /**
      *  terminator === the termination handler
@@ -46,12 +50,12 @@ var App = function() {
         server.engine('html', swig.renderFile);
 
         server.set('view engine', 'html');
-        server.set('views', global.base_dir + '/views');
+        server.set('views', global.BASE_DIR  + self.constants.VIEWS_DIR);
 
 
         require('./loaders/routes.js')(self);
 
-        server.use(express.static(global.base_dir + '/public'));
+        server.use(express.static(global.BASE_DIR + self.constants.PUBLIC_DIR));
 
 
         server.configure('development', function(){
@@ -63,42 +67,66 @@ var App = function() {
 
     };
 
+    self._initLoaders = function() {
+        require('./loaders/conf.js')(self);
+        for (var i in opts) {
+            var opt = opts[i];
+            console.log('Override conf %s from %s to %s', i, self.conf[i], opt);
+            
+            self.conf[i] = opt;
+        }
+        //convenience
+        self.isDebug = self.conf.isDebug;
+
+        require('./loaders/connections.js')(self);
+        require('./loaders/models.js')(self);
+    }
+
+    self._initConvenience = function() {
+
+
+        //convenience methods
+        global.oils = self;
+        global.models = self.models;
+        global.connections = self.connections;
+
+
+        
+    }
+
 
     /**
      *  Initializes the sample application.
      */
     self.initialize = function() {
+
+        self._initLoaders();
         self._setupTerminationHandlers();
 
         // Create the express server and routes.
         self._initializeServer();
+
+        self._initConvenience();
     };
 
 
     /**
      *  Start the server (starts up the sample application).
      */
-    self.start = function() {
+    self.start = function(callback) {
         //  Start the app on the specific interface (and port).
-        self.server.listen(self.conf.port, self.conf.ipAddress, function() {
+        self.server.listen(self.conf.port, self.conf.ipAddress, function(err, result) {
             console.log('%s: Node server started on %s:%d ...',
                         Date(Date.now() ), self.conf.ipAddress, self.conf.port);
+
+            if (callback) {
+                callback(err, result);
+            }
         });
     };
+
+
+    self.initialize();
 }
 
-var app = new App();
-
-require('./loaders/conf.js')(app);
-global.oils = app;
-
-require('./loaders/connections.js')(app);
-require('./loaders/models.js')(app);
-
-
-global.models = app.models;
-global.connections = app.connections;
-
-app.initialize();
-
-module.exports = app;
+module.exports = App;

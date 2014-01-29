@@ -9,7 +9,7 @@
  e.g. oils.conf.ipAddress
 */
 
-module.exports = {
+var conf = {
 	ipAddress: process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
 	port: process.env.OPENSHIFT_NODEJS_PORT || 8080,
 	connections: {
@@ -20,6 +20,11 @@ module.exports = {
 			url: (process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME) || 'mongodb://localhost/test'
 		}
 	},
-	isDebug: false
+	isDebug: false,
+	plugins: {
+		//enable/disable plugins here
+		//or override their configuration
+	}
 }
 
+module.exports = conf;

@@ -1,6 +1,4 @@
 module.exports = function(app) {
-	var conf = include('/conf/conf.js');
+	var conf = include(app.constants.CONF_FILE);
 	app.conf = conf;
-	//convenience
-	app.isDebug = conf.isDebug;
 }

@@ -1,9 +1,12 @@
 var fs = require('fs');
 
 exports.recurseJs = function(dir, callback, subfolder) {
+	if (!dir) {
+		throw new Error('dir cannot be null');
+	}
 	subfolder = subfolder || '';
-	var pathToSearch = global.base_dir + dir + subfolder;
-	if (oils.isDebug) {
+	var pathToSearch = global.BASE_DIR + dir + subfolder;
+	if (global.isDebug) {
 		console.log('Path to search: ' + pathToSearch);
 	}
 
@@ -25,7 +28,7 @@ exports.recurseJs = function(dir, callback, subfolder) {
 
 
 function handleFile(dir, subfolder, file, callback) {
-	var pathToSearch = global.base_dir + dir + subfolder;
+	var pathToSearch = global.BASE_DIR + dir + subfolder;
 	var absPath = pathToSearch + '/' + file;
 	
 	fs.stat(absPath, function(err, stat) {

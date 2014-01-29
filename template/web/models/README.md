@@ -5,7 +5,7 @@ All models created here are accessible via Models.[Name]. It is a Mongoose Model
 
 e.g.
 
-/models/Book.js ==> models.Book
+/web/models/Book.js ==> models.Book
 
 ###schema [required]
 

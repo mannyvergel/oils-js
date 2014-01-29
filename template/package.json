@@ -25,7 +25,7 @@
   },
 
   "dependencies": {
-    "oils": "0.1.x"
+    "oils": "0.2.x"
   },
   "devDependencies": {},
   "bundleDependencies": [],

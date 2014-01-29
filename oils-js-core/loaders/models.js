@@ -2,10 +2,10 @@ var mongoose = require('mongoose');
 var fileUtils = require('../utils/fileUtils');
 var Schema = mongoose.Schema;
 var stringUtils = require('../utils/stringUtils');
-
-module.exports = function(app) {
+var constants = require('../constants.js');
+module.exports = function(app, callback) {
 	app.models = new Object();
-	getModelsFromDir('/models', app, function(err, model, opts) {
+	getModelsFromDir(app.constants.MODELS_DIR, app, function(err, model, opts) {
 		var name = opts.name;
 		app.models[name] = model;
 	});
@@ -28,6 +28,10 @@ function getModelsFromDir(dir, app, callback) {
 			console.log('No connections found. Ignoring models.');
 		}
 		return;
+	}
+
+	if (app.isDebug) {
+		console.log("Scanning models in %s", dir);
 	}
 	var models = [];
 	fileUtils.recurseJs(dir, function(err, opts) {

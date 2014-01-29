@@ -5,7 +5,15 @@ module.exports =  {
 		var book = new Book();
 		book.title = "Oils JS";
 		book.author = "Manny Vergel"
-		res.render('index.html', {book: book});
+		res.render('index', {book: book});
 		//res.end('HELLO WORLD!');
 	}
 }
+
+/** Another sample
+
+module.exports =  function(req, res) {
+	res.end('Hello World');
+}
+
+**/
