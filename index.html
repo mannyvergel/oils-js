@@ -49,12 +49,15 @@
 
 <p>Directory Structure:</p>
 
-<pre><code>|-- conf          //configuration
-|-- controllers   //controllers
-|-- lib           //custom modules
-|-- models        //models
-|-- public        //assets like css, js, images
-|-- views         //uses swig
+<pre><code>|-- lib               //custom js
+|-- oils          
+|   |-- conf          //configuration and routes    
+|   |-- plugins       //plugins   
+|-- web          
+|   |-- controllers   //controllers    
+|   |-- models        //models for mongoose db  
+|   |-- public        //assets like css, js, images
+|   |-- views         //uses swig for templating
 </code></pre>
 
 <p>You can see the README.md's of each directory above for more information.</p>
@@ -66,10 +69,11 @@
 
 <p>E.g. Consider the ff structure:</p>
 
-<pre><code>|-- controllers
-|   |--folder
-|      |--subfolder
-|         |--controller1.js    
+<pre><code>|-- web          
+|   |-- controllers  
+|       |--folder
+|          |--subfolder
+|             |--controller1.js    
 |-- lib
 |   |--folder
 |      |--subfolder
@@ -80,7 +84,7 @@
 
 <p>Instead of using:</p>
 
-<pre><code>var lib1 = require('../../../lib/folder/subfolder/lib1.js');
+<pre><code>var lib1 = require('../../../../lib/folder/subfolder/lib1.js');
 </code></pre>
 
 <p>Use </p>
