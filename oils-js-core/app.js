@@ -78,6 +78,8 @@ var App = function(opts) {
     //convenience
     self.isDebug = self.conf.isDebug;
 
+    require('./loaders/plugins.js')(self);
+
     require('./loaders/connections.js')(self);
     require('./loaders/models.js')(self);
   }

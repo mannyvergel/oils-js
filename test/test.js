@@ -17,7 +17,7 @@ var overrideConf = {
 
 var app;
 describe('app', function () {
- 
+  this.timeout(15000);
   before (function (done) {
   	var ncp = require('ncp');
   	ncp('./template', './test/tmp', function(err) {
@@ -63,8 +63,9 @@ describe('app', function () {
     assert.notStrictEqual(app.conf, undefined, 'app.conf not found');
     assert.notStrictEqual(app.connections, undefined, 'app.connections not found');
     assert.notStrictEqual(app.models, undefined, 'app.models not found');
+    assert.notStrictEqual(app.plugins, undefined, 'app.plugins not found');
     assert.notStrictEqual(app.isDebug, undefined, 'app.isDebug not found');
-    
+
     done();
   });
 

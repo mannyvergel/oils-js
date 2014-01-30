@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var fileUtils = require('../utils/fileUtils');
+var pluginUtils = require('../utils/pluginUtils');
 var Schema = mongoose.Schema;
 var stringUtils = require('../utils/stringUtils');
 var constants = require('../constants.js');
@@ -35,7 +36,7 @@ function getModelsFromDir(dir, app, callback) {
 	}
 	var models = [];
 
-  fileUtils.recurseJs(dir, function(err, opts) {
+  fileUtils.recurseDir(dir, function(err, opts) {
     if (!opts.isDirectory() && stringUtils.endsWith(opts.file, '.js')) {
 
       var absPath = opts.absolutePath;
@@ -61,10 +62,12 @@ function getModelsFromDir(dir, app, callback) {
       if (modelJs.initSchema) {
         modelJs.initSchema(schema);
       }
+      
+      var model = conn.model(opts.name, schema);
+      pluginUtils.execDoAfterLoadModel(app, model);
       if (app.isDebug) {
         console.log("[model] " + opts.name)
       }
-      var model = conn.model(opts.name, schema);
 
       if (callback) {
         callback(null, model, opts);

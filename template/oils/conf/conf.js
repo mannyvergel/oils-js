@@ -20,11 +20,7 @@ var conf = {
 			url: (process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME) || 'mongodb://localhost/test'
 		}
 	},
-	isDebug: false,
-	plugins: {
-		//enable/disable plugins here
-		//or override their configuration
-	}
+	isDebug: false
 }
 
 module.exports = conf;

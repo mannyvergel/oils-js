@@ -7,7 +7,8 @@ This is prioritized over automatic controller routing.
 var routes = {
 
 	/** Example:
-	'/' : function(req, res, next) { res.end('Hello World')}, //defaults to all GET, POST, DELETE, etc
+  
+	'/test' : function(req, res, next) { res.end('Hello World')}, //defaults to all GET, POST, DELETE, etc
 	'/sample' : {
 		//more specific
 		get: function(req, res, next) {
@@ -17,9 +18,9 @@ var routes = {
 			res.end('Hello Sample Post');
 		}
 	},
-	'/controller-sample' : includeController('/contact-us.js'), 
-	'/any-js-sample' : include('/lib/sample.js')
-	**/
+	'/controller-sample' : includeController('/index.js'), 
+	'/any-js-sample' : include('/web/controllers/index.js')
+	*/
 }
 
 module.exports = routes;

@@ -40,7 +40,10 @@ module.exports = function(app) {
 			}
 
 			app.connections[i] = mongoose.createConnection();
-			console.log('connections.' + i + ' created.');
+      if (app.isDebug) {
+        console.log('connections.' + i + ' created.');
+      }
+			
 			app.connections[i].on('error', errFunc);
 			app.connections[i].on('open', function() {
 				counter = 0;

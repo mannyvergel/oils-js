@@ -7,6 +7,7 @@ constants.MODELS_DIR = '/web/models';
 
 constants.CONF_FILE = '/oils/conf/conf.js';
 constants.ROUTES_FILE = '/oils/conf/routes.js';
+constants.PLUGINS_DIR = '/oils/plugins';
 
 
 

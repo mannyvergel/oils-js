@@ -1,4 +1,3 @@
-var Book = models.Book;
 module.exports =  {
 	get : function(req, res) {
 		

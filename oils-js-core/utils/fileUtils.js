@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-exports.recurseJs = function(dir, callback, subfolder) {
+exports.recurseDir = function(dir, callback, subfolder) {
 	if (!dir) {
 		throw new Error('dir cannot be null');
 	}
@@ -16,7 +16,7 @@ exports.recurseJs = function(dir, callback, subfolder) {
 		} else {
 			for (var i in files) {
 				var file = files[i];
-				handleFile(dir, subfolder, file, callback);
+				handleFile(true, dir, subfolder, file, callback);
 				
 			}
 			
@@ -25,9 +25,67 @@ exports.recurseJs = function(dir, callback, subfolder) {
 	});
 }
 
+exports.isHidden = function(path) {
+  //unix support
+  return isUnixHiddenPath(path);
+}
 
 
-function handleFile(dir, subfolder, file, callback) {
+exports.readRootDirOnly = function(dir, callback, subfolder) {
+  if (!dir) {
+    throw new Error('dir cannot be null');
+  }
+  subfolder = subfolder || '';
+  var pathToSearch = global.BASE_DIR + dir + subfolder;
+  if (global.isDebug) {
+    console.log('Path to search: ' + pathToSearch);
+  }
+
+  fs.readdir(pathToSearch, function(err, files) {
+    if (err) {
+      throw new Error('Error reading dir ' + pathToSearch);
+    } else {
+      for (var i in files) {
+        var file = files[i];
+        
+        handleFile(false, dir, subfolder, file, callback);
+        
+        
+      }
+      
+    }
+    
+  });
+}
+
+exports.readRootDirOnlySync = function(dir, callback) {
+  if (!dir) {
+    throw new Error('dir cannot be null');
+  }
+
+  var pathToSearch = global.BASE_DIR + dir;
+  if (global.isDebug) {
+    console.log('Path to search: ' + pathToSearch);
+  }
+
+  var filteredFiles = [];
+  var arrFiles = fs.readdirSync(pathToSearch);
+  for (var i in arrFiles) {
+    var file = arrFiles[i];
+    if (!exports.isHidden(file)) {
+      filteredFiles.push(file);
+    }
+  }
+
+  return filteredFiles;
+}
+
+
+
+function handleFile(recurse, dir, subfolder, file, callback) {
+  if (exports.isHidden(dir)) {
+    return;
+  }
 	var pathToSearch = global.BASE_DIR + dir + subfolder;
 	var absPath = pathToSearch + '/' + file;
 	
@@ -44,7 +102,10 @@ function handleFile(dir, subfolder, file, callback) {
 			opts.isDirectory = function() {
 				return true;
 			}
-			exports.recurseJs(dir, callback, subfolder + '/' + file);
+      if (recurse) {
+        exports.recurseDir(dir, callback, subfolder + '/' + file);
+      }
+			
 			callback(null, opts);
 		} else {
 			opts.isDirectory = function() {
@@ -54,3 +115,7 @@ function handleFile(dir, subfolder, file, callback) {
 		}
 	});
 }
+
+function isUnixHiddenPath(path) {
+  return (/(^|.\/)\.+[^\/\.]/g).test(path);
+};
