@@ -18,13 +18,16 @@ The default configuration is for running on local machine and on Openshift serve
 
 
 Directory Structure:
+    |-- lib               //place your js files here
+    |-- oils          
+    |   |-- conf          //configuration, custom routes    
+    |   |-- plugins       //plugins directory   
+    |-- web          
+    |   |-- controllers   //controllers    
+    |   |-- models        //models for mongoose db  
+    |   |-- public        //assets like css, js, images
+    |   |-- views         //uses swig for templating
 
-    |-- conf          //configuration
-    |-- controllers   //controllers
-    |-- lib           //custom modules
-    |-- models        //models
-    |-- public        //assets like css, js, images
-    |-- views         //uses swig
 
 You can see the README.md's of each directory above for more information.
 
@@ -33,10 +36,11 @@ You can use ```include``` function which is basically like ```require``` except 
 
 E.g. Consider the ff structure:
 
-    |-- controllers
-    |   |--folder
-    |      |--subfolder
-    |         |--controller1.js    
+    |-- web          
+    |   |-- controllers  
+    |       |--folder
+    |          |--subfolder
+    |             |--controller1.js    
     |-- lib
     |   |--folder
     |      |--subfolder
@@ -49,7 +53,7 @@ If you are in controller1.js and you want to import lib1.js
 Instead of using:
 
 ````
-var lib1 = require('../../../lib/folder/subfolder/lib1.js');
+var lib1 = require('../../../../lib/folder/subfolder/lib1.js');
 ```
 
 Use 
