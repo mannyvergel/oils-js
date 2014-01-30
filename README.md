@@ -16,12 +16,12 @@ The author is **NOT** a fan of the ff:
 
 The default configuration is for running on local machine and on Openshift servers but it's configurable in conf.js.
 
-
 Directory Structure:
-    |-- lib               //place your js files here
+
+    |-- lib               //custom js
     |-- oils          
-    |   |-- conf          //configuration, custom routes    
-    |   |-- plugins       //plugins directory   
+    |   |-- conf          //configuration and routes    
+    |   |-- plugins       //plugins   
     |-- web          
     |   |-- controllers   //controllers    
     |   |-- models        //models for mongoose db  
