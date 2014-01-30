@@ -22,45 +22,31 @@
   {% endblock %}
 </head>
 <body>
+  <header>
+    <div class="row">
+     <ul class="menu">
+      <li><a href="/">Home</a></li>
+      <li><a href="/examples">Examples</a></li>
+    </ul>
+  </div>
+</header>
+
+<!-- End Header and Nav -->
+<div class="main-body">
   <div class="row">
-  	<ul class="menu">
-  		<li><a href="/">Home</a></li>
-  		<li><a href="/examples">Examples</a></li>
-  	</ul>
+
+    {% block content %}{% endblock %}
   </div>
+</div>
+
+<!-- Footer -->
+
+<footer class="row">
+
+  <p>Brought to you by <a href="http://www.juansolution.com">JuanSolution</a> 2013</p>
+  
+</footer>
 
 
-{% if error || messsage %}
-  <div class="row">
-    
-     {% if error  %}
-    <p style="color: red;">{{error}}</p>
-    {% endif %}
-
-     {% if message  %}
-    <p style="color: green;">{{message}}</p>
-    {% endif %}
-   
-  </div>
-  {% endif %}
-
-  
-  <!-- End Header and Nav -->
-  <div class="main-body">
-  <div class="row">
-  
-  {% block content %}{% endblock %}
-  </div>
-  </div>
-  
-  <!-- Footer -->
-  
-  <footer class="row">
-   
-          <p>Brought to you by <a href="http://www.juansolution.com">JuanSolution</a> 2013</p>
-        
-  </footer>
-  
-  
 </body>
 </html>

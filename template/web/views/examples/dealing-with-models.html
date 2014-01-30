@@ -7,10 +7,10 @@
 
 {% block content %}
 
-             
-    <h3>{{book.title}} by {{book.author}}</h3>
-    <div>ISBN #: {{book.isbn}}</div>
-    <div>Publish Date: {{book.publishDt|date('F jS, Y')}}</div>
-          
+
+<h3>Book: {{book.title}} by {{book.author}}</h3>
+<div>ISBN #: {{book.isbn}}</div>
+<div>Publish Date: {{book.publishDt|date('F jS, Y')}}</div>
+
 
 {% endblock %}

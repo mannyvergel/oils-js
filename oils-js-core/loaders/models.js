@@ -34,43 +34,44 @@ function getModelsFromDir(dir, app, callback) {
 		console.log("Scanning models in %s", dir);
 	}
 	var models = [];
-	fileUtils.recurseJs(dir, function(err, opts) {
-		if (!opts.isDirectory() && stringUtils.endsWith(opts.file, '.js')) {
 
-			var absPath = opts.absolutePath;
-			var modelJs = require(absPath);
-			var conn;
+  fileUtils.recurseJs(dir, function(err, opts) {
+    if (!opts.isDirectory() && stringUtils.endsWith(opts.file, '.js')) {
 
-			if (modelJs.connection) {
-				conn = app.connections.mainDb;
-			} else {
-				if (connections.mainDb) {
-					conn = app.connections.mainDb;	
-				} else {
-					for (var i in app.connections) {
-						//get the first connection
-						conn = app.connections[i];
-						break;
-					}
-				}
-				
-			}
+      var absPath = opts.absolutePath;
+      var modelJs = require(absPath);
+      var conn;
 
-			var schema = new Schema(modelJs.schema);
-			if (modelJs.initSchema) {
-				modelJs.initSchema(schema);
-			}
-			if (app.isDebug) {
-				console.log("[model] " + opts.name)
-			}
-			var model = conn.model(opts.name, schema);
+      if (modelJs.connection) {
+        conn = app.connections.mainDb;
+      } else {
+        if (connections.mainDb) {
+          conn = app.connections.mainDb; 
+        } else {
+          for (var i in app.connections) {
+          //get the first connection
+          conn = app.connections[i];
+          break;
+          }
+        }
 
-			if (callback) {
-				callback(null, model, opts);
-			}
-		}
-	})
+      }
 
-	return models;
+      var schema = new Schema(modelJs.schema);
+      if (modelJs.initSchema) {
+        modelJs.initSchema(schema);
+      }
+      if (app.isDebug) {
+        console.log("[model] " + opts.name)
+      }
+      var model = conn.model(opts.name, schema);
+
+      if (callback) {
+        callback(null, model, opts);
+      }
+    }
+  })
+
+  return models;
 
 }

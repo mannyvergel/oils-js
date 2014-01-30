@@ -29,10 +29,10 @@ function setControllerRoutes(app, dir) {
 			var subPath = subfolder + '/' + file;
 			var absPath = opts.absolutePath;
 			var controller = require(absPath);
-		
+			
 			if (controller.autoRoute !== false) {
 				if (file == 'index.js') {
-				 	var subPathWithoutExt = subPath.slice(0, -8);
+					var subPathWithoutExt = subPath.slice(0, -8);
 					applyRoute(app, subPathWithoutExt, controller);
 
 					if (opts.subfolder) {
