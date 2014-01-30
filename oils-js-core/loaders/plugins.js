@@ -15,36 +15,13 @@ var pluginsLoader = function(app) {
   if (app.isDebug) {
     console.log('Done reading plugins directory.');
   }
-  /*
-  fileUtils.readRootDirOnly(app.constants.PLUGINS_DIR, function(err, opts) {
-    if (opts.isDirectory()) {
-      var pluginConf = getPluginConf(opts.absolutePath);
-      var pluginName = opts.file; //later might get from conf
-      if (pluginConf.enabled) {
-        if (app.isDebug) {
-          console.log('[plugin] %s', pluginName);
-        }
-        
-        app.plugins[pluginName] = require(opts.absolutePath);
-      } else {
-        if (app.isDebug) {
-          console.log('Plugin %s is NOT enabled. Skipping.', pluginName);
-        }
-      }
-    }
-  });
-*/
 }
 
 function handleFile(app, file) {
-  var pluginDir = global.BASE_DIR + app.constants.PLUGINS_DIR;
-
-  var stat = fs.statSync(pluginDir);
-
+  var absolutePath = global.BASE_DIR + app.constants.PLUGINS_DIR + '/' + file;
+  var stat = fs.statSync(absolutePath);
+  
   if (stat && stat.isDirectory()) {
-    
-    var absolutePath = pluginDir + '/' + file;
-    //console.log('!!!' + absolutePath);
 
     var pluginConf = getPluginConf(absolutePath);
     var pluginName = file; //later might get from conf
