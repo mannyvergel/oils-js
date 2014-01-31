@@ -9,6 +9,7 @@ log4js.replaceConsole();
 
 var App = function(opts) {
 	var self = this;
+  global.oils = self;
 
   self.constants = require('./constants');
 
@@ -86,7 +87,6 @@ var App = function(opts) {
 
   self._initConvenience = function() {
     //convenience methods
-    global.oils = self;
     global.models = self.models;
     global.connections = self.connections;
   }
