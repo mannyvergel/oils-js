@@ -16,7 +16,12 @@ The author is **NOT** a fan of the ff:
 
 The default configuration is for running on local machine and on Openshift servers but it's configurable in conf.js.
 
-Directory Structure:
+#### Latest Release(s)
+
+Version 0.2.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.1.zip))
+* models are now accessed through ```models('ModelName')```
+
+#### Directory Structure
 
     |-- lib               //custom js
     |-- oils          
