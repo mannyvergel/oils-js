@@ -1,4 +1,4 @@
-var Book = models.Book;
+var Book = models('Book');
 module.exports =  {
 	get : function(req, res) {
 		//You Mongo DB must be running for this page to work

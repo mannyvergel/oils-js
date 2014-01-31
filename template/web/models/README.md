@@ -1,11 +1,13 @@
 MODELS FOLDER
 ===================
 
-All models created here are accessible via Models.[Name]. It is a Mongoose Model.
+All models created here are accessible via ```Models('ModelName')```. It will return a Mongoose Model.
+
+Models directory do not officially support sub folders as of now.
 
 e.g.
 
-/web/models/Book.js ==> models.Book
+/web/models/Book.js ==> ```models('Book')```
 
 ###schema [required]
 

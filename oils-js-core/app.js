@@ -7,11 +7,61 @@ var swig = require('swig');
 var log4js = require('log4js');
 log4js.replaceConsole();
 
+
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var pluginUtils = require('./utils/pluginUtils');
+
 var App = function(opts) {
 	var self = this;
   global.oils = self;
 
   self.constants = require('./constants');
+
+  self.modelCache = new Object();
+
+  self.models = function(modelName) {
+    if (!self.modelCache[modelName]) {
+      var app = self;
+      var absPath = global.BASE_DIR + app.constants.MODELS_DIR + '/' + modelName;
+      var modelJs = require(absPath);
+        var conn;
+
+        if (modelJs.connection) {
+          conn = app.connections.mainDb;
+        } else {
+          if (connections.mainDb) {
+            conn = app.connections.mainDb; 
+          } else {
+            for (var i in app.connections) {
+            //get the first connection
+            conn = app.connections[i];
+            break;
+            }
+          }
+
+        }
+
+        var schema = new Schema(modelJs.schema);
+        if (modelJs.initSchema) {
+          modelJs.initSchema(schema);
+        }
+        
+        var model = conn.model(modelName, schema);
+        pluginUtils.execDoAfterLoadModel(app, model);
+        if (app.isDebug) {
+          console.log("Loaded model for the first time: " + modelName)
+        }
+
+        self.modelCache[modelName] = model;
+
+    }
+    //console.log("!!!!" + self.modelCache[modelName]);
+    return self.modelCache[modelName];
+    
+  }
+
+  global.models = self.models;
 
   /**
    *  terminator === the termination handler
@@ -82,12 +132,11 @@ var App = function(opts) {
     require('./loaders/plugins.js')(self);
 
     require('./loaders/connections.js')(self);
-    require('./loaders/models.js')(self);
+    //require('./loaders/models.js')(self);
   }
 
   self._initConvenience = function() {
     //convenience methods
-    global.models = self.models;
     global.connections = self.connections;
   }
 

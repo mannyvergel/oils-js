@@ -1,3 +1,5 @@
+/*
+DEPRECATED, replaced by oils.models('model name')
 var mongoose = require('mongoose');
 var fileUtils = require('../utils/fileUtils');
 var pluginUtils = require('../utils/pluginUtils');
@@ -78,3 +80,4 @@ function getModelsFromDir(dir, app, callback) {
   return models;
 
 }
+*/
