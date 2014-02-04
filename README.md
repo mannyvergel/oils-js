@@ -18,6 +18,10 @@ The default configuration is for running on local machine and on Openshift serve
 
 #### Latest Release(s)
 
+Version 0.2.2 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.2.zip))
+* Streamlined plugin support
+* Added authentication plugin [oils-auth-local](https://github.com/mannyvergel/oils-auth-local)
+
 Version 0.2.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.1.zip))
 * models are now accessed through ```models('ModelName')```
 
