@@ -50,7 +50,13 @@
 <h4>
 <a name="latest-releases" class="anchor" href="#latest-releases"><span class="octicon octicon-link"></span></a>Latest Release(s)</h4>
 
-<p>Version 0.2.1 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.2.1.zip">Download</a>)</p>
+<p>Version 0.2.2 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.2.2.zip">Download</a>)</p>
+
+<ul>
+<li>Streamlined plugin support</li>
+<li>Added authentication plugin <a href="https://github.com/mannyvergel/oils-auth-local">oils-auth-local</a>
+</li>
+</ul><p>Version 0.2.1 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.2.1.zip">Download</a>)</p>
 
 <ul>
 <li>models are now accessed through <code>models('ModelName')</code>
@@ -72,9 +78,13 @@
 <p>You can see the README.md's of each directory above for more information.</p>
 
 <h4>
-<a name="important" class="anchor" href="#important"><span class="octicon octicon-link"></span></a>Important</h4>
+<a name="noteworthy-helper-functions" class="anchor" href="#noteworthy-helper-functions"><span class="octicon octicon-link"></span></a>Noteworthy Helper Functions</h4>
 
-<p>You can use <code>include</code> function which is basically like <code>require</code> except that it's always based on the the project directory.</p>
+<h5>
+<a name="includepath" class="anchor" href="#includepath"><span class="octicon octicon-link"></span></a><code>include(path)</code>
+</h5>
+
+<p>You can use <code>include</code> function which is basically like <code>require</code> except that it's based on the the project directory if the path starts with '/'.</p>
 
 <p>E.g. Consider the ff structure:</p>
 
@@ -101,6 +111,28 @@
 <pre><code>var lib1 = include('/lib/folder/subfolder/lib1.js');
 </code></pre>
 
+<h5>
+<a name="includemodelpath" class="anchor" href="#includemodelpath"><span class="octicon octicon-link"></span></a><code>includeModel(path)</code>
+</h5>
+
+<p>loads a model based on the path and returns a Mongoose Model. The path also behaves like <code>include</code> i.e. if it starts with '/' it will base the path on the project's directory.</p>
+
+<p>e.g.</p>
+
+<pre><code>var Book = includeModel('/web/models/Book.js');
+</code></pre>
+
+<h5>
+<a name="modelsmodelname" class="anchor" href="#modelsmodelname"><span class="octicon octicon-link"></span></a><code>models('modelName')</code>
+</h5>
+
+<p>A convenience function for <code>includeModel</code></p>
+
+<p>e.g.</p>
+
+<pre><code>var Book = models('Book');
+</code></pre>
+
 <h3>
 <a name="components" class="anchor" href="#components"><span class="octicon octicon-link"></span></a>Components</h3>
 
@@ -122,12 +154,11 @@
 <li>Uninterrupted Mongo DB Connection (auto reconnect)</li>
 <li>Support for multiple database connections</li>
 <li>Uninterrupted server when there's an exception</li>
+<li>Plugin support</li>
 </ul><p>Future Features:</p>
 
 <ul>
 <li>Scaffolding</li>
-<li>Helper Functions</li>
-<li>Support for SQL DB</li>
 </ul><h3>
 <a name="set-up" class="anchor" href="#set-up"><span class="octicon octicon-link"></span></a>Set-Up</h3>
 
@@ -159,6 +190,16 @@
 <li>Restart server.</li>
 <li>Access your controller with your browser: http://localhost:8080/test</li>
 </ul><h3>
+<a name="plugins" class="anchor" href="#plugins"><span class="octicon octicon-link"></span></a>Plugins</h3>
+
+<p>Check plugin folder's <a href="https://github.com/mannyvergel/oils-js/tree/master/template/oils/plugins">README.md</a> for more information.</p>
+
+<h3>
+<a name="authentication" class="anchor" href="#authentication"><span class="octicon octicon-link"></span></a>Authentication</h3>
+
+<p>Authentication is implemented as a plugin: <a href="http://github.com/mannyvergel/oils-auth-local">oils-auth-local</a>. Just place it in your project's plugin folder. i.e. under <code>/oils/plugins/oils-auth-local</code>.</p>
+
+<h3>
 <a name="contact" class="anchor" href="#contact"><span class="octicon octicon-link"></span></a>Contact</h3>
 
 <p>If you have questions, feel free to drop me an email: <a href="mailto:manny@mvergel.com">manny@mvergel.com</a></p>
