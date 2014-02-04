@@ -40,8 +40,11 @@ Version 0.2.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.1.
 
 You can see the README.md's of each directory above for more information.
 
-#### Important
-You can use ```include``` function which is basically like ```require``` except that it's always based on the the project directory.
+#### Noteworthy Helper Functions
+
+##### ```include(path)```
+
+You can use ```include``` function which is basically like ```require``` except that it's based on the the project directory if the path starts with '/'.
 
 E.g. Consider the ff structure:
 
@@ -54,8 +57,6 @@ E.g. Consider the ff structure:
     |   |--folder
     |      |--subfolder
     |         |--lib1.js  
-    
-    
 
 If you are in controller1.js and you want to import lib1.js
 
@@ -71,6 +72,23 @@ Use
 var lib1 = include('/lib/folder/subfolder/lib1.js');
 ````
 
+##### ```includeModel(path)```
+
+loads a model based on the path and returns a Mongoose Model. The path also behaves like ```include``` i.e. if it starts with '/' it will base the path on the project's directory.
+
+e.g.
+```
+var Book = includeModel('/web/models/Book.js');
+```
+
+##### ```models('modelName')```
+
+A convenience function for ```includeModel```
+
+e.g.
+```
+var Book = models('Book');
+```
 
 ### Components
 Oils js uses Mongoose for ORM, Mongo DB for the database and Swig for templating. Only Mongo DB is supported for now but this may change in the future depending on the needs.
