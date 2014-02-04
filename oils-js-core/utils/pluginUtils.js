@@ -24,6 +24,15 @@ exports.execRoutes = function(app) {
   })
 }
 
+exports.execInitializeServer = function(app, model) {
+  loopPlugins(app, function(plugin) {
+
+    if (plugin.initializeServer) {
+      plugin.initializeServer(app);
+    }
+  })
+  
+}
 
 
 function loopPlugins(app, callback) {

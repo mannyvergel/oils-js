@@ -104,6 +104,8 @@ var App = function(opts) {
     server.set('views', global.BASE_DIR  + self.constants.VIEWS_DIR);
 
 
+    pluginUtils.execInitializeServer(self);
+
     require('./loaders/routes.js')(self);
 
     server.use(express.static(global.BASE_DIR + self.constants.PUBLIC_DIR));
