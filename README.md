@@ -122,11 +122,11 @@ After you have set-up a new oils project.
 
 ### Plugins
 
-Check plugin folder's (README.md)[https://github.com/mannyvergel/oils-js/tree/master/template/oils/plugins] for more information.
+Check plugin folder's [README.md](https://github.com/mannyvergel/oils-js/tree/master/template/oils/plugins) for more information.
 
 ### Authentication
 
-Authentication is implemented as a plugin: (oils-auth-local)[http://github.com/mannyvergel/oils-auth-local]. Just place it in your project's plugin folder. i.e. under ```/oils/plugins/oils-auth-local```.
+Authentication is implemented as a plugin: [oils-auth-local](http://github.com/mannyvergel/oils-auth-local). Just place it in your project's plugin folder. i.e. under ```/oils/plugins/oils-auth-local```.
 
 
 ### Contact
