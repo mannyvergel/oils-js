@@ -24,12 +24,33 @@
 <body>
   <header>
     <div class="row">
-     <ul class="menu">
+     <ul class="menu clearfix">
       <li><a href="/">Home</a></li>
       <li><a href="/examples">Examples</a></li>
     </ul>
   </div>
 </header>
+
+{% if _errors %}
+  <div class="row">
+    <div class="small-12 columns">
+     {% for err in _errors %}
+    <p style="color: #FF4C4C;">{{err}}</p>
+    {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+{% if _infos %}
+    <div class="row">
+    <div class="small-12 columns">
+
+     {% for msg in _infos %}
+    <p style="color: green;">{{msg}}</p>
+    {% endfor %}
+    </div>
+  </div>
+{% endif %}
 
 <!-- End Header and Nav -->
 <div class="main-body">

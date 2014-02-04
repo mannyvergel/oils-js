@@ -1,4 +1,19 @@
 /*Temporary Style, remove as needed*/
+.clearfix:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+* html .clearfix {
+	height: 1%;
+	padding: 0;
+	margin: 0;
+}
+
+
 body, html {
 	margin: 0;
 	padding: 0;

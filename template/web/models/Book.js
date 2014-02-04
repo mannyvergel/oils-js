@@ -1,4 +1,5 @@
-var Book = {
+module.exports = {
+  name: 'Book',
 	//mongoose schema, see mongoosejs.com for more info
 	schema: {
 		isbn: {type: String, index: true, unique: true},
@@ -19,5 +20,3 @@ var Book = {
 
 	***/
 }
-
-module.exports = Book;

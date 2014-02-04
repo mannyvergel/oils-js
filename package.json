@@ -30,7 +30,8 @@
     "swig": "1.3.x",
     "log4js" : "0.6.x",
     "optimist" : "0.6.x",
-    "ncp" : "0.5.x"
+    "ncp" : "0.5.x",
+    "connect-flash": "0.1.x"
   },
   "devDependencies": {},
   "bundleDependencies": [],

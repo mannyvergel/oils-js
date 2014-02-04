@@ -1,8 +1,14 @@
 require('./include.js')();
 require('./includeController.js')();
 
-var express = require('express');
-var swig = require('swig');
+var express = require('express'),
+  swig = require('swig'),
+  flash = require('connect-flash');
+
+var path = require('path');
+
+require('./workaround.js');
+
 
 var log4js = require('log4js');
 log4js.replaceConsole();
@@ -20,17 +26,21 @@ var App = function(opts) {
 
   self.modelCache = new Object();
 
-  self.models = function(modelName) {
-    if (!self.modelCache[modelName]) {
-      var app = self;
-      var absPath = global.BASE_DIR + app.constants.MODELS_DIR + '/' + modelName;
-      var modelJs = require(absPath);
+  self.includeModel = function(workingPath) {
+    var app = self;
+
+      var modelJs = include(workingPath);
+      var modelName = modelJs.name;
+      if (!modelName) {
+        modelName = path.basename(workingPath, '.js');
+      }
+      
         var conn;
 
         if (modelJs.connection) {
           conn = app.connections.mainDb;
         } else {
-          if (connections.mainDb) {
+          if (app.connections.mainDb) {
             conn = app.connections.mainDb; 
           } else {
             for (var i in app.connections) {
@@ -53,13 +63,22 @@ var App = function(opts) {
           console.log("Loaded model for the first time: " + modelName)
         }
 
-        self.modelCache[modelName] = model;
+        
+        return model;
+  }
 
+  global.includeModel = self.includeModel;
+
+  self.models = function(modelName) {
+    if (!self.modelCache[modelName]) {
+      var workingPath = self.constants.MODELS_DIR + '/' + modelName;
+      self.modelCache[modelName] = includeModel(workingPath);
     }
     //console.log("!!!!" + self.modelCache[modelName]);
     return self.modelCache[modelName];
     
   }
+
 
   global.models = self.models;
 
@@ -103,6 +122,20 @@ var App = function(opts) {
     server.set('view engine', 'html');
     server.set('views', global.BASE_DIR  + self.constants.VIEWS_DIR);
 
+    server.use(express.json());
+    server.use(express.urlencoded());
+
+    server.use(express.methodOverride());
+
+    server.use(express.cookieParser("hello oils 2014"));
+    var oneDay = 86400000;
+    server.use(express.cookieSession({cookie: {maxAge: oneDay}}));
+
+    server.use(function(req, res, next) {
+      res.request = req;
+      next();
+    });
+    server.use(flash());
 
     pluginUtils.execInitializeServer(self);
 
@@ -131,9 +164,10 @@ var App = function(opts) {
     //convenience
     self.isDebug = self.conf.isDebug;
 
+    require('./loaders/connections.js')(self);
+
     require('./loaders/plugins.js')(self);
 
-    require('./loaders/connections.js')(self);
     //require('./loaders/models.js')(self);
   }
 
