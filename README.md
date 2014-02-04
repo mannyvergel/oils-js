@@ -85,12 +85,11 @@ The follow are motivations behind creating Oils Js Framework:
 + Uninterrupted Mongo DB Connection (auto reconnect)
 + Support for multiple database connections
 + Uninterrupted server when there's an exception
++ Plugin support
 
 Future Features:
 
 + Scaffolding
-+ Helper Functions
-+ Support for SQL DB
 
 ### Set-Up
 
@@ -120,6 +119,15 @@ After you have set-up a new oils project.
 * Create a controller. e.g. test.js
 * Restart server.
 * Access your controller with your browser: http://localhost:8080/test
+
+### Plugins
+
+Check plugin folder's (README.md)[https://github.com/mannyvergel/oils-js/tree/master/template/oils/plugins] for more information.
+
+### Authentication
+
+Authentication is implemented as a plugin: (oils-auth-local)[http://github.com/mannyvergel/oils-auth-local]. Just place it in your project's plugin folder. i.e. under ```/oils/plugins/oils-auth-local```.
+
 
 ### Contact
 
