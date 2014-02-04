@@ -5,7 +5,9 @@ Simple plugin system. This is a WIP. Currently supported is routes and initializ
 
 Each folder here will be read as a plugin of the system.
 
-Example plugin:
+You can check [oils-auth-local](https://github.com/mannyvergel/oils-auth-local) plugin for a concrete example. 
+
+Sample plugin:
 
     |-- plugins          
     |   |-- basic-plugin      //folder name is the plugin name    
