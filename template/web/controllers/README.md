@@ -16,6 +16,7 @@ E.g.
 ```
 module.exports =  {
 	autoRoute: false,
+	route: '/my-custom-route',//override autoroute path
 	
 	get : function(req, res) {
 		...

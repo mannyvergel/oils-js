@@ -1,5 +1,9 @@
 var objectUtils = require('./objectUtils');
 exports.applyRoute = function(app, route, obj) {
+  if (obj.route) {
+    //override autoroute with controller's defined route
+    route = obj.route;
+  }
   var server = app.server;
   if (objectUtils.isObject(obj)) {
     applyVerbs(app, route, obj, ["get", "put", "post", "delete", "options", "all"]);
