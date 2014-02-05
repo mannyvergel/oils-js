@@ -5,6 +5,9 @@ var myArgs = process.argv.slice(2);
 
 var fs = require('fs');
 
+/**
+Usage: oils new [project_name]
+**/
 if (myArgs[0] == 'new') {
 	var folderName = myArgs[1];
 	if (folderName) {
@@ -18,16 +21,14 @@ if (myArgs[0] == 'new') {
 					console.error('Error copying: ' + err);
 				} else {
 					try {
-					  fs.renameSync(folderName + '/template.gitignore', folderName + '/.gitignore');
-					} catch(e) {
+           fs.renameSync(folderName + '/template.gitignore', folderName + '/.gitignore');
+         } catch(e) {
 						//ignore
 					}
 					console.log(folderName + ' project created.');
 				}
-			})
-			
+			})			
 		}
-
 		
 	} else {
 		console.log('Usage: oils new [folder name]');	
