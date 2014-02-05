@@ -19,8 +19,17 @@ var routes = {
 		}
 	},
 	'/controller-sample' : includeController('/index.js'), 
-	'/any-js-sample' : include('/web/controllers/index.js')
-	*/
+	'/any-js-sample' : include('/web/controllers/index.js'),
+	// sample regex
+  '/^((?!\/static).)*$/' : {
+    isRegexp: true,
+    all: function(req, res, next) {
+      //do stuff here like authentication
+      next();
+    }
+  }
+  
+  */
 }
 
 module.exports = routes;

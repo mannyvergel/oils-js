@@ -1,10 +1,19 @@
 //MOCHA test
 //run the ff before starting this test
 //> npm install
-global.BASE_DIR = __dirname + '/tmp';
-
-var assert = require("assert");
+global.BASE_DIR = __dirname + '/tmp/oils';
 var fs = require('fs');
+
+var OILS_PATH = './test/tmp/oils';
+
+try {
+fs.mkdirSync('./test/tmp');
+fs.mkdirSync('./test/tmp/oils');
+} catch(e) {
+  
+}
+var assert = require("assert");
+
 var oilsBaseDir = global.BASE_DIR + '/node_modules/oils';
 var includeOils = function(dir) {
 	return require(oilsBaseDir + dir);
@@ -20,7 +29,7 @@ describe('app', function () {
   this.timeout(15000);
   before (function (done) {
   	var ncp = require('ncp');
-  	ncp('./template', './test/tmp', function(err) {
+  	ncp('./template', OILS_PATH, function(err) {
   		if (err) {
   			console.log('ERROR! ' + err);
   		}
@@ -28,14 +37,14 @@ describe('app', function () {
   			filter: /^((?!(tmp)).)*$/
   		}
   		try {
-  			fs.mkdirSync('./test/tmp/node_modules');
+  			fs.mkdirSync(OILS_PATH + '/node_modules');
 
-  			fs.mkdirSync('./test/tmp/node_modules/oils')
+  			fs.mkdirSync(OILS_PATH + '/node_modules/oils')
   		} catch(e) {
-  			console.log('./test/tmp/node_modules already exists. Skipping create.')
+  			console.log(OILS_PATH + '/node_modules already exists. Skipping create.')
   		}
   		
-  		ncp('./', './test/tmp/node_modules/oils', opts, function(err) {
+  		ncp('./', OILS_PATH + '/node_modules/oils', opts, function(err) {
 	  		if (err) {
 	  			console.log('ERROR2! ' + err);
 	  		}
