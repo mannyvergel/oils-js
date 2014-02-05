@@ -18,6 +18,9 @@ The default configuration is for running on local machine and on Openshift serve
 
 #### Latest Release(s)
 
+Version 0.2.4 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.4.zip))
+* support for custom routes in controllers
+
 Version 0.2.3 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.3.zip))
 * support for routing verbs: get, post, put, delete, options, all
 * support for regexp in routes
