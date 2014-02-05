@@ -2,20 +2,6 @@ var objectUtils = require('./objectUtils');
 exports.applyRoute = function(app, route, obj) {
   var server = app.server;
   if (objectUtils.isObject(obj)) {
-    /*if (obj.get) {
-      if (app.isDebug) {
-        console.log('[route] GET ' + route);
-      }
-      server.get(route, obj.get);
-    }
-
-    if (obj.post) { 
-      if (app.isDebug) {
-        console.log('[route] POST ' + route);
-      }
-      server.post(route, obj.post);
-    }
-    */
     applyVerbs(app, route, obj, ["get", "put", "post", "delete", "options", "all"]);
   } else if (objectUtils.isFunction(obj) || objectUtils.isArray(obj)) {
     
