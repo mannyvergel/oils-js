@@ -151,6 +151,30 @@ After you have set-up a new oils project.
 
 Check plugin folder's [README.md](https://github.com/mannyvergel/oils-js/tree/master/template/oils/plugins) for more information.
 
+### Event Hooks
+
+Starting v0.2.5
+
+#### ```beforeRender```
+
+```
+app.on('beforeRender', function(view, options, callback) {
+	//called before res.render(...);
+})
+```
+
+#### ```initializeServer```
+
+```
+app.on('initializeServer', function() {
+	var app = this;
+	var server = app.server; //express server
+	...
+})
+```
+
+More hooks to follow.
+
 ### Authentication
 
 Authentication is implemented as a plugin: [oils-auth-local](http://github.com/mannyvergel/oils-auth-local). Just place it in your project's plugin folder. i.e. under ```/oils/plugins/oils-auth-local```.

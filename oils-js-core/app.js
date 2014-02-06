@@ -7,8 +7,6 @@ var express = require('express'),
 
 var path = require('path');
 
-require('./workaround.js');
-
 
 var log4js = require('log4js');
 log4js.replaceConsole();
@@ -17,6 +15,7 @@ log4js.replaceConsole();
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var pluginUtils = require('./utils/pluginUtils');
+var middlewares = require('./middlewares');
 
 var App = function(opts) {
 	var self = this;
@@ -82,6 +81,24 @@ var App = function(opts) {
 
   global.models = self.models;
 
+  self.events = {};
+
+  self.execEvent = function(eventStr, argsArray){
+    var myEvents = self.events[eventStr];
+    for (var i in myEvents) {
+      var myEvent = myEvents[i];
+      myEvent.apply(self, argsArray);
+    }
+  }
+
+  self.on = function(eventStr, callback) {
+    if (!self.events[eventStr]) {
+      self.events[eventStr] = [];
+    }
+
+    self.events[eventStr].push(callback);
+  }
+
   /**
    *  terminator === the termination handler
    *  Terminate server on receipt of the specified signal.
@@ -131,10 +148,11 @@ var App = function(opts) {
     var oneDay = 86400000;
     server.use(express.cookieSession({cookie: {maxAge: oneDay}}));
 
-    server.use(function(req, res, next) {
-      res.request = req;
-      next();
-    });
+    self.execEvent('initializeServer');
+
+    server.use(middlewares.responsePatch(self));
+
+
     server.use(flash());
 
     pluginUtils.execInitializeServer(self);
@@ -185,10 +203,6 @@ var App = function(opts) {
     self._initLoaders();
     self._setupTerminationHandlers();
 
-    // Create the express server and routes.
-    self._initializeServer();
-
-    self._initConvenience();
   };
 
 
@@ -196,6 +210,12 @@ var App = function(opts) {
    *  Start the server (starts up the sample application).
    */
   self.start = function(callback) {
+
+    // Create the express server and routes.
+    self._initializeServer();
+
+    self._initConvenience();
+    
     //  Start the app on the specific interface (and port).
     self.server.listen(self.conf.port, self.conf.ipAddress, function(err, result) {
         console.log('%s: Node server started on %s:%d ...',
