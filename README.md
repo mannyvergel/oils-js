@@ -18,6 +18,12 @@ The default configuration is for running on local machine and on Openshift serve
 
 #### Latest Release(s)
 
+Version 0.2.5 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.5.zip))
+* support for event hooks
+  * ```app.on('beforeRender', ...)``` 
+  * ```app.on('initializeServer', ...)```
+* bug fixes
+
 Version 0.2.4 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.4.zip))
 * support for custom routes in controllers
 
@@ -25,10 +31,6 @@ Version 0.2.3 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.3.
 * support for routing verbs: get, post, put, delete, options, all
 * support for regexp in routes
 * bug fixes
-
-Version 0.2.2 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.2.zip))
-* Streamlined plugin support
-* Added authentication plugin [oils-auth-local](https://github.com/mannyvergel/oils-auth-local)
 
 #### Directory Structure
 
