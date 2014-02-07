@@ -18,8 +18,9 @@ The default configuration is for running on local machine and on Openshift serve
 
 #### Latest Release(s)
 
-Version 0.2.6 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.6.zip))
+Version 0.2.7 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.7.zip))
 * Fix bug regarding ```includeModel``` caching
+* Added ```req, res``` parameters in ```beforeRender``` event hook
 
 Version 0.2.5 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.5.zip))
 * support for event hooks
@@ -163,7 +164,7 @@ Starting v0.2.5
 #### ```beforeRender```
 
 ```
-app.on('beforeRender', function(view, options, callback) {
+app.on('beforeRender', function(view, options, callback, req, res) {
 	//called before res.render(...);
 })
 ```

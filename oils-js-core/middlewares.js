@@ -8,7 +8,7 @@ exports.responsePatch = function(app) {
       //override res.render
       res.render = function(view, options, callback) {
         options = beforeRender(req, res, view, options, callback);
-        app.execEvent('beforeRender', [view, options, callback])
+        app.execEvent('beforeRender', [view, options, callback, req, res])
         _render.call(res, view, options, callback);
       };
 
