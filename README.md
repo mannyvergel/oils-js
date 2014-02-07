@@ -18,6 +18,9 @@ The default configuration is for running on local machine and on Openshift serve
 
 #### Latest Release(s)
 
+Version 0.2.6 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.6.zip))
+* Fix bug regarding ```includeModel``` caching
+
 Version 0.2.5 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.5.zip))
 * support for event hooks
   * ```app.on('beforeRender', ...)``` 

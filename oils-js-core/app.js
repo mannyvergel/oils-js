@@ -33,6 +33,12 @@ var App = function(opts) {
       if (!modelName) {
         modelName = path.basename(workingPath, '.js');
       }
+
+      if (self.modelCache[modelName]) {
+        return self.modelCache[modelName];
+      }
+
+     
       
         var conn;
 
@@ -62,7 +68,7 @@ var App = function(opts) {
           console.log("Loaded model for the first time: " + modelName)
         }
 
-        
+        self.modelCache[modelName] = model;        
         return model;
   }
 
