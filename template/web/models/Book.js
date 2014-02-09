@@ -11,10 +11,9 @@ module.exports = {
 	/*** Optional attributes
 
 	,
-	initSchema: function(schema) {
-		//initialize the schema if needed, 
-		//else this method is optional
-	},
+	options: {
+    //mongoose schema options
+  }
 
 	connection: 'mainDb' //defaults to 'mainDb' or the first defined connection in conf.js
 

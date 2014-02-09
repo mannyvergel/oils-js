@@ -1,5 +1,12 @@
 exports.responsePatch = function(app) {
   return function(req, res, next) {
+
+      //redirect trailing e.g. '/hello/' to '/hello' 
+      if (req.url.substr(-1) == '/' && req.url.length > 1) {
+         res.redirect(301, req.url.slice(0, -1));
+         return;
+      }
+
       res.request = req;
 
       var _render = res.render;
@@ -8,7 +15,7 @@ exports.responsePatch = function(app) {
       //override res.render
       res.render = function(view, options, callback) {
         options = beforeRender(req, res, view, options, callback);
-        app.execEvent('beforeRender', [view, options, callback, req, res])
+        app.callEvent('beforeRender', [view, options, callback, req, res])
         _render.call(res, view, options, callback);
       };
 

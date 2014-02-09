@@ -24,7 +24,7 @@ function handleFile(app, file) {
   if (stat && stat.isDirectory()) {
 
     var pluginConf = getPluginConf(absolutePath);
-    var pluginName = file; //later might get from conf
+    var pluginName = pluginConf.name;
     if ( typeof pluginConf.oils === 'undefined' ) {
       throw new Error('"oils" property not found in package.json of plugin: ' + pluginName);
     }
@@ -39,6 +39,7 @@ function handleFile(app, file) {
       var myPlugin = require(absolutePath);
       
       app.plugins[pluginName] = new myPlugin(pluginConf,app);
+      app.plugins[pluginName].conf = pluginConf;
     } else {
       if (app.isDebug) {
         console.log('Plugin %s is NOT enabled. Skipping.', pluginName);

@@ -9,9 +9,9 @@
     "openshift"
   ],
   "author": {
-    "name": "Juan Solution",
-    "email": "inquire@juansolution.com",
-    "url": "http://www.juansolution.com/"
+    "name": "Manny Vergel",
+    "email": "manny@mvergel.com",
+    "url": "http://www.mvergel.com/"
   },
   "homepage": "http://www.juansolution.com/",
   "repository": {
@@ -25,7 +25,7 @@
   },
 
   "dependencies": {
-    "oils": "0.2.x"
+    "oils": "0.3.x"
   },
   "devDependencies": {},
   "bundleDependencies": [],

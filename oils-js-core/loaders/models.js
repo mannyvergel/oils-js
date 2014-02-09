@@ -1,83 +1,79 @@
-/*
-DEPRECATED, replaced by oils.models('model name')
 var mongoose = require('mongoose');
-var fileUtils = require('../utils/fileUtils');
-var pluginUtils = require('../utils/pluginUtils');
 var Schema = mongoose.Schema;
-var stringUtils = require('../utils/stringUtils');
-var constants = require('../constants.js');
-module.exports = function(app, callback) {
-	app.models = new Object();
-	getModelsFromDir(app.constants.MODELS_DIR, app, function(err, model, opts) {
-		var name = opts.name;
-		app.models[name] = model;
-	});
-}
+var pluginUtils = require('../utils/pluginUtils');
 
-function hasConnection(connections) {
-	for (var i in connections) {
-		return true;
-	}
+module.exports = function(app) {
 
-	return false;
-}
+  app.modelCache = new Object();
+
+  app.includeModel = function(workingPath) {
 
 
-function getModelsFromDir(dir, app, callback) {
-	//do not load models if there's DB
-	
-	if (!hasConnection(app.connections)) {
-		if (app.isDebug) {
-			console.log('No connections found. Ignoring models.');
-		}
-		return;
-	}
+    var modelJs = null;
+    try {
+      modelJs = include(workingPath);
+    } catch (e) {
+      throw new Error('Error loading model ' + workingPath + '. Probably invalid model format ::: ' + e.message);
+    }
+   
+    var modelName = modelJs.name;
+    if (!modelName) {
+      modelName = path.basename(workingPath, '.js');
+    }
 
-	if (app.isDebug) {
-		console.log("Scanning models in %s", dir);
-	}
-	var models = [];
+    if (app.modelCache[modelName]) {
+      return app.modelCache[modelName];
+    }
 
-  fileUtils.recurseDir(dir, function(err, opts) {
-    if (!opts.isDirectory() && stringUtils.endsWith(opts.file, '.js')) {
 
-      var absPath = opts.absolutePath;
-      var modelJs = require(absPath);
-      var conn;
 
-      if (modelJs.connection) {
-        conn = app.connections.mainDb;
-      } else {
-        if (connections.mainDb) {
-          conn = app.connections.mainDb; 
-        } else {
-          for (var i in app.connections) {
+    var conn;
+
+    if (modelJs.connection) {
+      conn = app.connections.mainDb;
+    } else {
+    if (app.connections.mainDb) {
+      conn = app.connections.mainDb; 
+    } else {
+      for (var i in app.connections) {
           //get the first connection
           conn = app.connections[i];
           break;
-          }
         }
-
       }
 
-      var schema = new Schema(modelJs.schema);
-      if (modelJs.initSchema) {
-        modelJs.initSchema(schema);
-      }
-      
-      var model = conn.model(opts.name, schema);
-      pluginUtils.execDoAfterLoadModel(app, model);
-      if (app.isDebug) {
-        console.log("[model] " + opts.name)
-      }
-
-      if (callback) {
-        callback(null, model, opts);
-      }
     }
-  })
+    if (!modelJs.schema) {
+      throw new Error(modelName + '.schema not found.');
+    }
 
-  return models;
+    var schema = new Schema(modelJs.schema, modelJs.options);
+    if (modelJs.initSchema) {
+      modelJs.initSchema(schema);
+    }
 
+    var model = conn.model(modelName, schema);
+    
+    if (app.isDebug) {
+      console.log("Loaded model for the first time: " + modelName)
+    }
+
+    app.modelCache[modelName] = model;        
+    return model;
+  }
+
+  global.includeModel = app.includeModel;
+
+  app.models = function(modelName) {
+
+    if (!app.modelCache[modelName]) {
+      var workingPath = app.constants.MODELS_DIR + '/' + modelName;
+      app.modelCache[modelName] = includeModel(workingPath);
+    }
+    return app.modelCache[modelName];
+
+  }
+
+
+  global.models = app.models;
 }
-*/

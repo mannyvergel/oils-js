@@ -13,6 +13,23 @@ e.g.
 
 Return the attributes of the schema. See Mongoose' Schema for the syntax.
 
+###options [optional]
+
+Mongoose schema options
+
+e.g.
+
+```
+module.exports = {
+  ...
+
+  options: {
+    strict: false
+  }
+}
+```
+
+
 ###initSchema [optional]
 
 You can initialize a Schema by adding an initSchema in your model. The Schema is a Mongoose Schema.

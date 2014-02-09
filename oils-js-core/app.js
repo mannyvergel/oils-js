@@ -7,102 +7,37 @@ var express = require('express'),
 
 var path = require('path');
 
-
 var log4js = require('log4js');
 log4js.replaceConsole();
 
-
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 var pluginUtils = require('./utils/pluginUtils');
 var middlewares = require('./middlewares');
 
 var App = function(opts) {
-	var self = this;
-  global.oils = self;
+  var app = this;
 
-  self.constants = require('./constants');
+  global.oils = app;
 
-  self.modelCache = new Object();
+  app.constants = require('./constants');
 
-  self.includeModel = function(workingPath) {
-    var app = self;
+  require('./loaders/models')(app);
 
-      var modelJs = include(workingPath);
-      var modelName = modelJs.name;
-      if (!modelName) {
-        modelName = path.basename(workingPath, '.js');
-      }
+  app.events = {};
 
-      if (self.modelCache[modelName]) {
-        return self.modelCache[modelName];
-      }
-
-     
-      
-        var conn;
-
-        if (modelJs.connection) {
-          conn = app.connections.mainDb;
-        } else {
-          if (app.connections.mainDb) {
-            conn = app.connections.mainDb; 
-          } else {
-            for (var i in app.connections) {
-            //get the first connection
-            conn = app.connections[i];
-            break;
-            }
-          }
-
-        }
-
-        var schema = new Schema(modelJs.schema);
-        if (modelJs.initSchema) {
-          modelJs.initSchema(schema);
-        }
-        
-        var model = conn.model(modelName, schema);
-        pluginUtils.execDoAfterLoadModel(app, model);
-        if (app.isDebug) {
-          console.log("Loaded model for the first time: " + modelName)
-        }
-
-        self.modelCache[modelName] = model;        
-        return model;
-  }
-
-  global.includeModel = self.includeModel;
-
-  self.models = function(modelName) {
-    if (!self.modelCache[modelName]) {
-      var workingPath = self.constants.MODELS_DIR + '/' + modelName;
-      self.modelCache[modelName] = includeModel(workingPath);
-    }
-    //console.log("!!!!" + self.modelCache[modelName]);
-    return self.modelCache[modelName];
-    
-  }
-
-
-  global.models = self.models;
-
-  self.events = {};
-
-  self.execEvent = function(eventStr, argsArray){
-    var myEvents = self.events[eventStr];
+  app.callEvent = function(eventStr, argsArray){
+    var myEvents = app.events[eventStr];
     for (var i in myEvents) {
       var myEvent = myEvents[i];
-      myEvent.apply(self, argsArray);
+      myEvent.apply(app, argsArray);
     }
   }
 
-  self.on = function(eventStr, callback) {
-    if (!self.events[eventStr]) {
-      self.events[eventStr] = [];
+  app.on = function(eventStr, callback) {
+    if (!app.events[eventStr]) {
+      app.events[eventStr] = [];
     }
 
-    self.events[eventStr].push(callback);
+    app.events[eventStr].push(callback);
   }
 
   /**
@@ -110,7 +45,7 @@ var App = function(opts) {
    *  Terminate server on receipt of the specified signal.
    *  @param {string} sig  Signal to terminate on.
    */
-  self.terminator = function(sig){
+  app.terminator = function(sig){
     if (typeof sig === "string") {
        console.log('%s: Received %s - terminating sample app ...',
                    Date(Date.now()), sig);
@@ -123,27 +58,27 @@ var App = function(opts) {
   /**
    *  Setup termination handlers (for exit and a list of signals).
    */
-  self._setupTerminationHandlers = function(){
+  app._setupTerminationHandlers = function(){
     //  Process on exit and signals.
-    process.on('exit', function() { self.terminator(); });
+    process.on('exit', function() { app.terminator(); });
 
     // Removed 'SIGPIPE' from the list - bugz 852598.
     ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
      'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
     ].forEach(function(element, index, array) {
-        process.on(element, function() { self.terminator(element); });
+        process.on(element, function() { app.terminator(element); });
     });
   };
 
 
-  self._initializeServer = function() {
+  app._initializeServer = function() {
       
-    self.server = express();
-    var server = self.server;
+    app.server = express();
+    var server = app.server;
     server.engine('html', swig.renderFile);
 
     server.set('view engine', 'html');
-    server.set('views', global.BASE_DIR  + self.constants.VIEWS_DIR);
+    server.set('views', global.BASE_DIR  + app.constants.VIEWS_DIR);
 
     server.use(express.json());
     server.use(express.urlencoded());
@@ -154,18 +89,17 @@ var App = function(opts) {
     var oneDay = 86400000;
     server.use(express.cookieSession({cookie: {maxAge: oneDay}}));
 
-    self.execEvent('initializeServer');
+    app.callEvent('initializeServer');
 
-    server.use(middlewares.responsePatch(self));
+    server.use(middlewares.responsePatch(app));
 
 
     server.use(flash());
 
-    pluginUtils.execInitializeServer(self);
+    
+    require('./loaders/routes.js')(app);
 
-    require('./loaders/routes.js')(self);
-
-    server.use(express.static(global.BASE_DIR + self.constants.PUBLIC_DIR));
+    server.use(express.static(global.BASE_DIR + app.constants.PUBLIC_DIR));
 
 
     server.configure('development', function(){
@@ -177,37 +111,36 @@ var App = function(opts) {
 
   };
 
-  self._initLoaders = function() {
-    require('./loaders/conf.js')(self);
+  app._initLoaders = function() {
+    require('./loaders/conf.js')(app);
     for (var i in opts) {
         var opt = opts[i];
-        console.log('Override conf %s from %s to %s', i, self.conf[i], opt);
+        console.log('Override conf %s from %s to %s', i, app.conf[i], opt);
         
-        self.conf[i] = opt;
+        app.conf[i] = opt;
     }
     //convenience
-    self.isDebug = self.conf.isDebug;
+    app.isDebug = app.conf.isDebug;
 
-    require('./loaders/connections.js')(self);
+    require('./loaders/connections.js')(app);
 
-    require('./loaders/plugins.js')(self);
+    require('./loaders/plugins.js')(app);
 
-    //require('./loaders/models.js')(self);
   }
 
-  self._initConvenience = function() {
+  app._initConvenience = function() {
     //convenience methods
-    global.connections = self.connections;
+    global.connections = app.connections;
   }
 
 
   /**
    *  Initializes the sample application.
    */
-  self.initialize = function() {
+  app.initialize = function() {
 
-    self._initLoaders();
-    self._setupTerminationHandlers();
+    app._initLoaders();
+    app._setupTerminationHandlers();
 
   };
 
@@ -215,17 +148,17 @@ var App = function(opts) {
   /**
    *  Start the server (starts up the sample application).
    */
-  self.start = function(callback) {
+  app.start = function(callback) {
 
     // Create the express server and routes.
-    self._initializeServer();
+    app._initializeServer();
 
-    self._initConvenience();
+    app._initConvenience();
     
     //  Start the app on the specific interface (and port).
-    self.server.listen(self.conf.port, self.conf.ipAddress, function(err, result) {
+    app.server.listen(app.conf.port, app.conf.ipAddress, function(err, result) {
         console.log('%s: Node server started on %s:%d ...',
-                    Date(Date.now() ), self.conf.ipAddress, self.conf.port);
+                    Date(Date.now() ), app.conf.ipAddress, app.conf.port);
 
         if (callback) {
             callback(err, result);
@@ -234,7 +167,7 @@ var App = function(opts) {
   };
 
 
-  self.initialize();
+  app.initialize();
 }
 
 module.exports = App;
