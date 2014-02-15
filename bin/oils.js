@@ -16,7 +16,7 @@ if (myArgs[0] == 'new') {
 		} else {
 			//fs.mkdirSync(folderName);
 			var ncp = require('ncp');
-			ncp(__dirname + '/../template', folderName, function(err) {
+			ncp(__dirname + '/../templates/basic', folderName, function(err) {
 				if (err) {
 					console.error('Error copying: ' + err);
 				} else {

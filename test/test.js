@@ -30,7 +30,7 @@ describe('app', function () {
   this.timeout(15000);
   before (function (done) {
   	var ncp = require('ncp');
-  	ncp('./template', global.BASE_DIR, function(err) {
+  	ncp('./templates/basic', global.BASE_DIR, function(err) {
   		if (err) {
   			console.log('ERROR! ' + err);
   		}
