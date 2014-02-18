@@ -18,7 +18,7 @@ The default configuration is for running on local machine and on Openshift serve
 
 #### Latest Release(s)
 
-Version 0.3.0 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.3.0.zip))
+Version 0.3.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.3.1.zip))
 * used domains for error handling
 * added onError in controllers and routes
 * templates, oils new [folder] --template [template e.g. zurb5]

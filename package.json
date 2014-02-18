@@ -1,6 +1,6 @@
 {
   "name": "oils",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Oils js framework built on top of Express.",
   "keywords": [
   	"OilsJs",
@@ -30,7 +30,6 @@
     "swig": "1.3.x",
     "log4js" : "0.6.x",
     "nomnom" : "1.6.x",
-    "ncp" : "0.5.x",
     "connect-flash": "0.1.x",
     "fs-extra": "0.8.x"
   },
