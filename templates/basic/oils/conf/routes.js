@@ -16,7 +16,10 @@ var routes = {
 		},
 		post: function(req, res, next) {
 			res.end('Hello Sample Post');
-		}
+		},
+    onError: function(req, res, err, app) {
+      //optional error handling
+    }
 	},
 	'/controller-sample' : includeController('/index.js'), 
 	'/any-js-sample' : include('/web/controllers/index.js'),

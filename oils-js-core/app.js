@@ -5,6 +5,8 @@ var express = require('express'),
   swig = require('swig'),
   flash = require('connect-flash');
 
+var domain = require('domain');
+
 var path = require('path');
 
 var log4js = require('log4js');
@@ -104,6 +106,7 @@ var App = function(opts) {
 
     server.configure('development', function(){
         console.log("Application is in Development mode!");
+        app.isDev = true;
         server.set('view cache', false);
         // To disable Swig's cache, do the following:
         swig.setDefaults({ cache: false });
@@ -149,20 +152,29 @@ var App = function(opts) {
    *  Start the server (starts up the sample application).
    */
   app.start = function(callback) {
+    var serverDomain = domain.create();
+    serverDomain.on('error', function(err) {
+      console.log('Server caught an exception: ' + err);
+      if (err) {
+        console.error(err.stack);
+      }
+    });
+    serverDomain.run(function() {
 
-    // Create the express server and routes.
-    app._initializeServer();
+      // Create the express server and routes.
+      app._initializeServer();
 
-    app._initConvenience();
-    
-    //  Start the app on the specific interface (and port).
-    app.server.listen(app.conf.port, app.conf.ipAddress, function(err, result) {
-        console.log('%s: Node server started on %s:%d ...',
-                    Date(Date.now() ), app.conf.ipAddress, app.conf.port);
+      app._initConvenience();
+      
+      //  Start the app on the specific interface (and port).
+      app.server.listen(app.conf.port, app.conf.ipAddress, function(err, result) {
+          console.log('%s: Node server started on %s:%d ...',
+                      Date(Date.now() ), app.conf.ipAddress, app.conf.port);
 
-        if (callback) {
-            callback(err, result);
-        }
+          if (callback) {
+              callback(err, result);
+          }
+      });
     });
   };
 

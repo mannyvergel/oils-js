@@ -115,10 +115,12 @@ The follow are motivations behind creating Oils Js Framework:
 + Organized folder structure
 + Organized importing of js files using "include"
 + Automatic creation of models and controllers
-+ Uninterrupted Mongo DB Connection (auto reconnect)
 + Support for multiple database connections
++ Uninterrupted Mongo DB Connection (auto reconnect)
 + Uninterrupted server when there's an exception
++ Graceful error handling per request
 + Plugin support
++ Event hooks
 
 Future Features:
 
@@ -131,14 +133,21 @@ This assumes you already have Node JS v0.10.x (or higher) installed.
 ```
 > npm install oils -g
 
-> oils new HelloWorld
+> oils new HelloWorld --template zurb5
 
+```
+
+template is optional...
+
+```
 > cd HelloWorld
 
 > npm install
 
 > node server.js
 ```
+
+
 
 ### Usage
 

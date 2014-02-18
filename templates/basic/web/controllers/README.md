@@ -20,6 +20,10 @@ module.exports =  {
 	
 	get : function(req, res) {
 		...
+	},
+
+	onError: function(req, res, err, app) {
+		//error handling
 	}
 }
 ```

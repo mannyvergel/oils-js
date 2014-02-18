@@ -1,0 +1,40 @@
+/*Temporary Style, remove as needed*/
+
+body {
+	padding: 12px;
+}
+
+.clearfix:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+* html .clearfix {
+  height: 1%;
+  padding: 0;
+  margin: 0;
+}
+
+ul.menu {
+	padding: 0;
+	margin: 0;
+}
+
+ul.menu li{
+	float: left;
+	list-style: none;
+	margin-right: 12px;
+}
+
+.main-body {
+	clear: both;
+	padding-top: 14px;
+}
+
+footer { 
+	padding-top: 14px;
+}
+

@@ -3,15 +3,17 @@
 //> npm install
 //var TEMP_DIR = 'C:/temp'
 
+
+
+global.BASE_DIR = 'c:/tmp/oils';
+
 try {
-fs.mkdirSync('c:/tmp');
+fs.mkdirsSync(global.BASE_DIR);
 } catch(e) {
   
 }
 
-global.BASE_DIR = 'c:/tmp/oils';
-var fs = require('fs');
-
+var fs = require('fs-extra');
 
 var assert = require("assert");
 
@@ -27,42 +29,37 @@ var overrideConf = {
 
 var app;
 describe('app', function () {
-  this.timeout(15000);
+  this.timeout(20000);
   before (function (done) {
-  	var ncp = require('ncp');
-  	ncp('./templates/basic', global.BASE_DIR, function(err) {
-  		if (err) {
-  			console.log('ERROR! ' + err);
-  		}
-  		var opts = {
-  			filter: /^((?!(tmp)).)*$/
-  		}
-  		try {
-  			fs.mkdirSync(BASE_DIR + '/node_modules');
+  	fs.copySync('./templates/basic', global.BASE_DIR);
+    fs.copySync('./templates/zurb5', global.BASE_DIR);
 
-  			fs.mkdirSync(BASE_DIR + '/node_modules/oils')
-  		} catch(e) {
-  			console.log(BASE_DIR + '/node_modules already exists. Skipping create.')
-  		}
-  		
-  		ncp('./', BASE_DIR + '/node_modules/oils', opts, function(err) {
-	  		if (err) {
-	  			console.log('ERROR2! ' + err);
-	  		}
+    fs.remove(BASE_DIR + '/node_modules', function(err) {
+      try {
+        fs.mkdirSync(BASE_DIR + '/node_modules');
+
+        fs.mkdirSync(BASE_DIR + '/node_modules/oils')
+      } catch(e) {
+        console.log(BASE_DIR + '/node_modules already exists. Skipping create.')
+      }
+
+      fs.copy('./',  BASE_DIR + '/node_modules/oils', function(err) {
         var MyApp = includeOils('/oils-js-core/app.js');
-	  		app = new MyApp(overrideConf);
-		    app.start(function (err, result) {
-		      if (err) {
-		        done(err);
-		      } else {
-		        done();
-		      }
-		  	});
-	  	});
-  		
-  	});
+        app = new MyApp(overrideConf);
+        app.start(function (err, result) {
+          if (err) {
+            done(err);
+          } else {
+            done();
+          }
+        });
+      });
 
-  	
+      
+    });
+
+    
+    
   });
  
   after(function (done) {

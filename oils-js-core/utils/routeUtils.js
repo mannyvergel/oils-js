@@ -1,4 +1,5 @@
 var objectUtils = require('./objectUtils');
+var domain = require('domain');
 exports.applyRoute = function(app, route, obj) {
   if (obj.route) {
     //override autoroute with controller's defined route
@@ -12,7 +13,8 @@ exports.applyRoute = function(app, route, obj) {
     if (app.isDebug) {
       console.log('[route] ALL ' + route);
     }
-    server.all(route, obj);
+    //server.all(route, obj);
+    handleRequest(app, 'all', route, obj);
     
   } else {
     throw new Error('Unsupported route object.');
@@ -41,8 +43,66 @@ function applyVerbs(app, route, obj, verbs) {
           console.log('[route] %s %s', verb, route);
         } 
       }
-       
-      server[verb](route, obj[verb]);
+
+      handleRequest(app, verb, route, obj[verb], obj);
     }
+  }
+}
+
+function handleRequest(app, verb, route, obj, controller) {
+  var server = app.server;
+  server[verb](route, function(req, res, next) {
+    var reqd = domain.create();
+    reqd.add(req);
+    reqd.add(res);
+    reqd.on('error', function(er) {
+      console.error('Error', er, req.url);
+      if (controller && controller.onError) {
+        try {
+          controller.onError(req, res, er, app);
+        } catch (e) {
+          showError(req, res, e, app);
+        }
+        
+      } else {
+        showError(req, res, er, app);
+      }
+      
+    });
+
+    reqd.run(function() {
+      try {
+        obj(req, res, next);
+      } catch(er) {
+        if (controller && controller.onError) {
+          try {
+            controller.onError(req, res, er, app);
+          } catch (e) {
+            showError(req, res, e, app);
+          }
+          
+        } else {
+          showError(req, res, er, app);
+        } 
+      }
+      
+    }) 
+
+  });
+  
+}
+
+function showError(req, res, er, app) {
+  try {
+    res.writeHead(500);
+    if (app.isDev) {
+      res.write(er.stack);
+    } else {
+      //show to end users
+      res.write('An unexpected error has occurred.');
+    }
+    res.end();
+  } catch (er) {
+    console.error('Error sending 500', er, req.url);
   }
 }

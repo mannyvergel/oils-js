@@ -15,6 +15,8 @@
   <link rel="apple-touch-icon" sizes="114x114" href="/images/apple-touch-icon-retina.png" />
 
   <title>{% block title %}Hello World{% endblock %}</title>
+  <link rel="stylesheet" href="/css/foundation.min.css" />
+  <script src="/js/vendor/modernizr.js"></script>
   <link rel="stylesheet" href="/css/main.css">
   
   
@@ -22,36 +24,41 @@
   {% endblock %}
 </head>
 <body>
+
 <header>
     {%include "inc/header.html"%}
 </header>
 
-{% if _errors %}
-  <div class="row">
-    <div class="small-12 columns">
-     {% for err in _errors %}
-    <p style="color: #FF4C4C;">{{err}}</p>
-    {% endfor %}
-    </div>
-  </div>
-{% endif %}
-
-{% if _infos %}
-    <div class="row">
-    <div class="small-12 columns">
-
-     {% for msg in _infos %}
-    <p style="color: green;">{{msg}}</p>
-    {% endfor %}
-    </div>
-  </div>
-{% endif %}
-
 <!-- End Header and Nav -->
 <div class="main-body">
+{% for err in _errors %}
   <div class="row">
+     
+     <div data-alert class="alert-box warning radius">
+      {{err}}
+      <a href="#" class="close">&times;</a>
+    </div>
+    
+  </div>
+{% endfor %}
 
-    {% block content %}{% endblock %}
+{% for info in _infos %}
+  <div class="row">
+     
+     <div data-alert class="alert-box radius">
+      {{info}}
+      <a href="#" class="close">&times;</a>
+    </div>
+    
+  </div>
+{% endfor %}
+
+
+
+  <div class="row">
+    <div class="left-pane">
+      {% block content %}{% endblock %}
+    </div>
   </div>
 </div>
 
@@ -60,6 +67,12 @@
 <footer>
   {%include "inc/footer.html"%} 
 </footer>
+
+<script src="js/vendor/jquery.js"></script>
+<script src="js/foundation.min.js"></script>
+<script>
+  $(document).foundation();
+</script>
 
 {% block beforeEndBody %}{% endblock %}
 </body>

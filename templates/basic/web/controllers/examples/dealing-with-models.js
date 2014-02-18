@@ -15,7 +15,7 @@ module.exports =  {
 			}
 
 			res.render('examples/dealing-with-models.html', {book: book});
-		})
+		});
 
 		
 	}
