@@ -50,18 +50,34 @@
 <h4>
 <a name="latest-releases" class="anchor" href="#latest-releases"><span class="octicon octicon-link"></span></a>Latest Release(s)</h4>
 
-<p>Version 0.2.3 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.2.3.zip">Download</a>)</p>
+<p>Version 0.3.1 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.3.1.zip">Download</a>)</p>
 
 <ul>
-<li>support for routing verbs: get, post, put, delete, options, all</li>
-<li>support for regexp in routes</li>
-<li>bug fixes</li>
-</ul><p>Version 0.2.2 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.2.2.zip">Download</a>)</p>
+<li>used domains for error handling</li>
+<li>added onError in controllers and routes</li>
+<li>templates, oils new [folder] --template [template e.g. zurb5]</li>
+<li>various bug fixes</li>
+</ul><p>Version 0.2.7 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.2.7.zip">Download</a>)</p>
 
 <ul>
-<li>Streamlined plugin support</li>
-<li>Added authentication plugin <a href="https://github.com/mannyvergel/oils-auth-local">oils-auth-local</a>
+<li>Fix bug regarding <code>includeModel</code> caching</li>
+<li>Added <code>req, res</code> parameters in <code>beforeRender</code> event hook</li>
+</ul><p>Version 0.2.5 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.2.5.zip">Download</a>)</p>
+
+<ul>
+<li>support for event hooks
+
+<ul>
+<li>
+<code>app.on('beforeRender', ...)</code> </li>
+<li><code>app.on('initializeServer', ...)</code></li>
+</ul>
 </li>
+<li>bug fixes</li>
+</ul><p>Version 0.2.4 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.2.4.zip">Download</a>)</p>
+
+<ul>
+<li>support for custom routes in controllers</li>
 </ul><h4>
 <a name="directory-structure" class="anchor" href="#directory-structure"><span class="octicon octicon-link"></span></a>Directory Structure</h4>
 
@@ -152,10 +168,12 @@
 <li>Organized folder structure</li>
 <li>Organized importing of js files using "include"</li>
 <li>Automatic creation of models and controllers</li>
-<li>Uninterrupted Mongo DB Connection (auto reconnect)</li>
 <li>Support for multiple database connections</li>
+<li>Uninterrupted Mongo DB Connection (auto reconnect)</li>
 <li>Uninterrupted server when there's an exception</li>
+<li>Graceful error handling per request</li>
 <li>Plugin support</li>
+<li>Event hooks</li>
 </ul><p>Future Features:</p>
 
 <ul>
@@ -167,9 +185,13 @@
 
 <pre><code>&gt; npm install oils -g
 
-&gt; oils new HelloWorld
+&gt; oils new HelloWorld --template zurb5
 
-&gt; cd HelloWorld
+</code></pre>
+
+<p>template is optional...</p>
+
+<pre><code>&gt; cd HelloWorld
 
 &gt; npm install
 
@@ -194,6 +216,33 @@
 <a name="plugins" class="anchor" href="#plugins"><span class="octicon octicon-link"></span></a>Plugins</h3>
 
 <p>Check plugin folder's <a href="https://github.com/mannyvergel/oils-js/tree/master/template/oils/plugins">README.md</a> for more information.</p>
+
+<h3>
+<a name="event-hooks" class="anchor" href="#event-hooks"><span class="octicon octicon-link"></span></a>Event Hooks</h3>
+
+<p>Starting v0.2.5</p>
+
+<h4>
+<a name="beforerender" class="anchor" href="#beforerender"><span class="octicon octicon-link"></span></a><code>beforeRender</code>
+</h4>
+
+<pre><code>app.on('beforeRender', function(view, options, callback, req, res) {
+    //called before res.render(...);
+})
+</code></pre>
+
+<h4>
+<a name="initializeserver" class="anchor" href="#initializeserver"><span class="octicon octicon-link"></span></a><code>initializeServer</code>
+</h4>
+
+<pre><code>app.on('initializeServer', function() {
+    var app = this;
+    var server = app.server; //express server
+    ...
+})
+</code></pre>
+
+<p>More hooks to follow.</p>
 
 <h3>
 <a name="authentication" class="anchor" href="#authentication"><span class="octicon octicon-link"></span></a>Authentication</h3>
