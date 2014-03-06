@@ -18,6 +18,9 @@ The default configuration is for running on local machine and on Openshift serve
 
 #### Latest Release(s)
 
+Version 0.4.0 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.0.zip))
+* restructured paths
+
 Version 0.3.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.3.1.zip))
 * used domains for error handling
 * added onError in controllers and routes
@@ -39,15 +42,14 @@ Version 0.2.4 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.4.
 
 #### Directory Structure
 
-    |-- lib               //custom js
-    |-- oils          
-    |   |-- conf          //configuration and routes    
-    |   |-- plugins       //plugins   
+    |-- conf                  //config files and routes
+    |   |-- plugins           //plugins   
     |-- web          
-    |   |-- controllers   //controllers    
-    |   |-- models        //models for mongoose db  
-    |   |-- public        //assets like css, js, images
-    |   |-- views         //uses swig for templating
+    |   |-- public            //assets like css, js, images
+    |   |-- src               
+    |       |-- controllers   //controllers    
+    |       |-- models        //models for mongoose db 
+    |       |-- views         //uses swig for templating 
 
 
 You can see the README.md's of each directory above for more information.
@@ -60,11 +62,12 @@ You can use ```include``` function which is basically like ```require``` except 
 
 E.g. Consider the ff structure:
 
-    |-- web          
-    |   |-- controllers  
-    |       |--folder
-    |          |--subfolder
-    |             |--controller1.js    
+    |-- web    
+    |   |-- src           
+    |       |-- controllers  
+    |           |--folder
+    |              |--subfolder
+    |                 |--controller1.js    
     |-- lib
     |   |--folder
     |      |--subfolder
@@ -75,7 +78,7 @@ If you are in controller1.js and you want to import lib1.js
 Instead of using:
 
 ````
-var lib1 = require('../../../../lib/folder/subfolder/lib1.js');
+var lib1 = require('../../../../../lib/folder/subfolder/lib1.js');
 ```
 
 Use 
