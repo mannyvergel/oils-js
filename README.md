@@ -16,37 +16,53 @@ The author is **NOT** a fan of the ff:
 
 The default configuration is for running on local machine and on Openshift servers but it's configurable in conf.js.
 
+### Quick Start
+
+This assumes you already have Node JS v0.10.x (or higher) installed.
+
+```
+> npm install oils -g
+
+> oils new HelloWorld --template zurb5
+
+```
+
+template is optional...
+
+```
+> cd HelloWorld
+
+> npm install
+
+> node server.js
+```
+
+
 #### Latest Release(s)
 
-Version 0.2.7 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.7.zip))
-* Fix bug regarding ```includeModel``` caching
-* Added ```req, res``` parameters in ```beforeRender``` event hook
+Version 0.4.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.1.zip))
+* plugins can now extend from main views template.
+* changed swig behavior to retrieve to default views dir.
 
-Version 0.2.5 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.5.zip))
-* support for event hooks
-  * ```app.on('beforeRender', ...)``` 
-  * ```app.on('initializeServer', ...)```
-* bug fixes
+Version 0.4.0 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.0.zip))
+* restructured paths
 
-Version 0.2.4 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.4.zip))
-* support for custom routes in controllers
-
-Version 0.2.3 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.3.zip))
-* support for routing verbs: get, post, put, delete, options, all
-* support for regexp in routes
-* bug fixes
+Version 0.3.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.3.1.zip))
+* used domains for error handling
+* added onError in controllers and routes
+* templates, oils new [folder] --template [template e.g. zurb5]
+* various bug fixes
 
 #### Directory Structure
 
-    |-- lib               //custom js
-    |-- oils          
-    |   |-- conf          //configuration and routes    
-    |   |-- plugins       //plugins   
+    |-- conf                  //config files and routes
+    |   |-- plugins           //plugins   
     |-- web          
-    |   |-- controllers   //controllers    
-    |   |-- models        //models for mongoose db  
-    |   |-- public        //assets like css, js, images
-    |   |-- views         //uses swig for templating
+    |   |-- public            //assets like css, js, images
+    |   |-- src               
+    |       |-- controllers   //controllers    
+    |       |-- models        //models for mongoose db 
+    |       |-- views         //uses swig for templating 
 
 
 You can see the README.md's of each directory above for more information.
@@ -59,11 +75,12 @@ You can use ```include``` function which is basically like ```require``` except 
 
 E.g. Consider the ff structure:
 
-    |-- web          
-    |   |-- controllers  
-    |       |--folder
-    |          |--subfolder
-    |             |--controller1.js    
+    |-- web    
+    |   |-- src           
+    |       |-- controllers  
+    |           |--folder
+    |              |--subfolder
+    |                 |--controller1.js    
     |-- lib
     |   |--folder
     |      |--subfolder
@@ -74,7 +91,7 @@ If you are in controller1.js and you want to import lib1.js
 Instead of using:
 
 ````
-var lib1 = require('../../../../lib/folder/subfolder/lib1.js');
+var lib1 = require('../../../../../lib/folder/subfolder/lib1.js');
 ```
 
 Use 
@@ -126,28 +143,6 @@ Future Features:
 
 + Scaffolding
 
-### Set-Up
-
-This assumes you already have Node JS v0.10.x (or higher) installed.
-
-```
-> npm install oils -g
-
-> oils new HelloWorld --template zurb5
-
-```
-
-template is optional...
-
-```
-> cd HelloWorld
-
-> npm install
-
-> node server.js
-```
-
-
 
 ### Usage
 
@@ -164,7 +159,7 @@ After you have set-up a new oils project.
 
 ### Plugins
 
-Check plugin folder's [README.md](https://github.com/mannyvergel/oils-js/tree/master/template/oils/plugins) for more information.
+Check plugin folder's [README.md](https://github.com/mannyvergel/oils-js/tree/master/templates/basic/conf/plugins) for more information.
 
 ### Event Hooks
 
@@ -192,7 +187,7 @@ More hooks to follow.
 
 ### Authentication
 
-Authentication is implemented as a plugin: [oils-auth-local](http://github.com/mannyvergel/oils-auth-local). Just place it in your project's plugin folder. i.e. under ```/oils/plugins/oils-auth-local```.
+Authentication is implemented as a plugin: [oils-auth-local](http://github.com/mannyvergel/oils-auth-local). Just place it in your project's plugin folder. i.e. under ```/conf/plugins/oils-auth-local```.
 
 
 ### Contact

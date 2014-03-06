@@ -5,7 +5,8 @@
 
 
 
-global.BASE_DIR = 'c:/tmp/oils';
+//global.BASE_DIR = 'c:/tmp/oils';
+global.BASE_DIR = '/Users/azuser/progs/workspace/openshift-apps/tmp';
 
 try {
 fs.mkdirsSync(global.BASE_DIR);

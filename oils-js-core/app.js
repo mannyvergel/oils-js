@@ -22,6 +22,35 @@ var App = function(opts) {
 
   app.constants = require('./constants');
 
+  
+  var overrideSwigFs = function() {
+    var loaderFs = require('swig/lib/loaders/filesystem')();
+    //override swig's file loader
+    //so that when looking for template, it may default to default views dir
+    var _loadSwigFs = loaderFs.load;
+    loaderFs.load  = function(identifier, cb) {
+      try {
+        return _loadSwigFs(identifier, cb);
+      } catch (e) {
+        var viewsKeyToLookFor = '/views/';
+        var viewsIndex = identifier.indexOf(viewsKeyToLookFor);
+        if (e.message.indexOf('ENOENT, no such file or directory') != -1 && viewsIndex != -1) {
+          var newPathname = global.BASE_DIR + app.constants.VIEWS_DIR + identifier.substr(viewsIndex + (viewsKeyToLookFor.length-1));
+          if (app.isDebug) {
+            console.log('resolving new path: %s', newPathname);
+          }
+          
+          return _loadSwigFs(newPathname, cb);
+        } else {
+          throw e;
+        }
+      }
+    }
+    swig.setDefaults({loader:loaderFs});
+  }
+
+  overrideSwigFs();
+
   require('./loaders/models')(app);
 
   app.events = {};
