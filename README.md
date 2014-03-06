@@ -196,7 +196,7 @@ More hooks to follow.
 
 ### Authentication
 
-Authentication is implemented as a plugin: [oils-auth-local](http://github.com/mannyvergel/oils-auth-local). Just place it in your project's plugin folder. i.e. under ```/oils/plugins/oils-auth-local```.
+Authentication is implemented as a plugin: [oils-auth-local](http://github.com/mannyvergel/oils-auth-local). Just place it in your project's plugin folder. i.e. under ```/conf/plugins/oils-auth-local```.
 
 
 ### Contact
