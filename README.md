@@ -40,6 +40,10 @@ template is optional...
 
 #### Latest Release(s)
 
+Version 0.4.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.1.zip))
+* plugins can now extend from main views template.
+* changed swig behavior to retrieve to default views dir.
+
 Version 0.4.0 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.0.zip))
 * restructured paths
 
@@ -48,19 +52,6 @@ Version 0.3.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.3.1.
 * added onError in controllers and routes
 * templates, oils new [folder] --template [template e.g. zurb5]
 * various bug fixes
-
-Version 0.2.7 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.7.zip))
-* Fix bug regarding ```includeModel``` caching
-* Added ```req, res``` parameters in ```beforeRender``` event hook
-
-Version 0.2.5 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.5.zip))
-* support for event hooks
-  * ```app.on('beforeRender', ...)``` 
-  * ```app.on('initializeServer', ...)```
-* bug fixes
-
-Version 0.2.4 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.2.4.zip))
-* support for custom routes in controllers
 
 #### Directory Structure
 
