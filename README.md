@@ -16,6 +16,28 @@ The author is **NOT** a fan of the ff:
 
 The default configuration is for running on local machine and on Openshift servers but it's configurable in conf.js.
 
+### Quick Start
+
+This assumes you already have Node JS v0.10.x (or higher) installed.
+
+```
+> npm install oils -g
+
+> oils new HelloWorld --template zurb5
+
+```
+
+template is optional...
+
+```
+> cd HelloWorld
+
+> npm install
+
+> node server.js
+```
+
+
 #### Latest Release(s)
 
 Version 0.4.0 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.0.zip))
@@ -129,28 +151,6 @@ The follow are motivations behind creating Oils Js Framework:
 Future Features:
 
 + Scaffolding
-
-### Set-Up
-
-This assumes you already have Node JS v0.10.x (or higher) installed.
-
-```
-> npm install oils -g
-
-> oils new HelloWorld --template zurb5
-
-```
-
-template is optional...
-
-```
-> cd HelloWorld
-
-> npm install
-
-> node server.js
-```
-
 
 
 ### Usage
