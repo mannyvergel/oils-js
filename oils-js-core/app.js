@@ -21,7 +21,7 @@ var App = function(opts) {
   global.oils = app;
 
   app.constants = require('./constants');
-
+  app.swig = swig;
   
   var overrideSwigFs = function() {
     var loaderFs = require('swig/lib/loaders/filesystem')();
