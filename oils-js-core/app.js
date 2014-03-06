@@ -32,10 +32,10 @@ var App = function(opts) {
       try {
         return _loadSwigFs(identifier, cb);
       } catch (e) {
-        var viewsKeyToLookFor = '/views/';
+        var viewsKeyToLookFor = 'views';
         var viewsIndex = identifier.indexOf(viewsKeyToLookFor);
         if (e.message.indexOf('ENOENT, no such file or directory') != -1 && viewsIndex != -1) {
-          var newPathname = global.BASE_DIR + app.constants.VIEWS_DIR + identifier.substr(viewsIndex + (viewsKeyToLookFor.length-1));
+          var newPathname = global.BASE_DIR + app.constants.VIEWS_DIR + identifier.substr(viewsIndex + (viewsKeyToLookFor.length));
           if (app.isDebug) {
             console.log('resolving new path: %s', newPathname);
           }
