@@ -168,7 +168,7 @@ After you have set-up a new oils project.
 
 ### Plugins
 
-Check plugin folder's [README.md](https://github.com/mannyvergel/oils-js/tree/master/template/oils/plugins) for more information.
+Check plugin folder's [README.md](https://github.com/mannyvergel/oils-js/tree/master/templates/basic/conf/plugins) for more information.
 
 ### Event Hooks
 
