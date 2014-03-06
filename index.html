@@ -1,34 +1,37 @@
 <!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Oils-js : Oils JS Framework for Node JS. Built on top of Express." />
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>Oils-js by mannyvergel</title>
+    <title>Oils-js</title>
   </head>
 
   <body>
-    <header>
-      <div class="inner">
-        <h1>Oils-js</h1>
-        <h2>Oils JS Framework for Node JS. Built on top of Express.</h2>
-        <a href="https://github.com/mannyvergel/oils-js" class="button"><small>View project on</small>GitHub</a>
-      </div>
-    </header>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h1>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/mannyvergel/oils-js">View on GitHub</a>
+
+          <h1 id="project_title">Oils-js</h1>
+          <h2 id="project_tagline">Oils JS Framework for Node JS. Built on top of Express.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/mannyvergel/oils-js/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/mannyvergel/oils-js/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
 <a name="oils" class="anchor" href="#oils"><span class="octicon octicon-link"></span></a>oils</h1>
 
 <h3>
@@ -47,10 +50,34 @@
 <li>complicated build procedures before you can run the app</li>
 </ul><p>The default configuration is for running on local machine and on Openshift servers but it's configurable in conf.js.</p>
 
+<h3>
+<a name="quick-start" class="anchor" href="#quick-start"><span class="octicon octicon-link"></span></a>Quick Start</h3>
+
+<p>This assumes you already have Node JS v0.10.x (or higher) installed.</p>
+
+<pre><code>&gt; npm install oils -g
+
+&gt; oils new HelloWorld --template zurb5
+
+</code></pre>
+
+<p>template is optional...</p>
+
+<pre><code>&gt; cd HelloWorld
+
+&gt; npm install
+
+&gt; node server.js
+</code></pre>
+
 <h4>
 <a name="latest-releases" class="anchor" href="#latest-releases"><span class="octicon octicon-link"></span></a>Latest Release(s)</h4>
 
-<p>Version 0.3.1 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.3.1.zip">Download</a>)</p>
+<p>Version 0.4.0 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.4.0.zip">Download</a>)</p>
+
+<ul>
+<li>restructured paths</li>
+</ul><p>Version 0.3.1 (<a href="https://github.com/mannyvergel/oils-js/archive/v0.3.1.zip">Download</a>)</p>
 
 <ul>
 <li>used domains for error handling</li>
@@ -81,15 +108,14 @@
 </ul><h4>
 <a name="directory-structure" class="anchor" href="#directory-structure"><span class="octicon octicon-link"></span></a>Directory Structure</h4>
 
-<pre><code>|-- lib               //custom js
-|-- oils          
-|   |-- conf          //configuration and routes    
-|   |-- plugins       //plugins   
+<pre><code>|-- conf                  //config files and routes
+|   |-- plugins           //plugins   
 |-- web          
-|   |-- controllers   //controllers    
-|   |-- models        //models for mongoose db  
-|   |-- public        //assets like css, js, images
-|   |-- views         //uses swig for templating
+|   |-- public            //assets like css, js, images
+|   |-- src               
+|       |-- controllers   //controllers    
+|       |-- models        //models for mongoose db 
+|       |-- views         //uses swig for templating 
 </code></pre>
 
 <p>You can see the README.md's of each directory above for more information.</p>
@@ -105,11 +131,12 @@
 
 <p>E.g. Consider the ff structure:</p>
 
-<pre><code>|-- web          
-|   |-- controllers  
-|       |--folder
-|          |--subfolder
-|             |--controller1.js    
+<pre><code>|-- web    
+|   |-- src           
+|       |-- controllers  
+|           |--folder
+|              |--subfolder
+|                 |--controller1.js    
 |-- lib
 |   |--folder
 |      |--subfolder
@@ -120,7 +147,7 @@
 
 <p>Instead of using:</p>
 
-<pre><code>var lib1 = require('../../../../lib/folder/subfolder/lib1.js');
+<pre><code>var lib1 = require('../../../../../lib/folder/subfolder/lib1.js');
 </code></pre>
 
 <p>Use </p>
@@ -179,26 +206,6 @@
 <ul>
 <li>Scaffolding</li>
 </ul><h3>
-<a name="set-up" class="anchor" href="#set-up"><span class="octicon octicon-link"></span></a>Set-Up</h3>
-
-<p>This assumes you already have Node JS v0.10.x (or higher) installed.</p>
-
-<pre><code>&gt; npm install oils -g
-
-&gt; oils new HelloWorld --template zurb5
-
-</code></pre>
-
-<p>template is optional...</p>
-
-<pre><code>&gt; cd HelloWorld
-
-&gt; npm install
-
-&gt; node server.js
-</code></pre>
-
-<h3>
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h3>
 
 <p>This sample app is self explanatory. Just browse through the directories and files and you will get the hang of it.</p>
@@ -277,25 +284,18 @@ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
-        </section>
-
-        <aside id="sidebar">
-          <a href="https://github.com/mannyvergel/oils-js/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/mannyvergel/oils-js/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
-
-          <p class="repo-owner"><a href="https://github.com/mannyvergel/oils-js"></a> is maintained by <a href="https://github.com/mannyvergel">mannyvergel</a>.</p>
-
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
+      </section>
     </div>
 
-  
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Oils-js maintained by <a href="https://github.com/mannyvergel">mannyvergel</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
   </body>
 </html>
