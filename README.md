@@ -40,12 +40,12 @@ template is optional...
 
 #### Latest Release(s)
 
+Version 0.4.2 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.2.zip))
+* Bug fixes
+
 Version 0.4.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.1.zip))
 * plugins can now extend from main views template.
 * changed swig behavior to retrieve to default views dir.
-
-Version 0.4.0 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.0.zip))
-* restructured paths
 
 Version 0.3.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.3.1.zip))
 * used domains for error handling
