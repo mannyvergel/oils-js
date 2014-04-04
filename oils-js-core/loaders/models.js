@@ -7,20 +7,35 @@ module.exports = function(app) {
 
   app.modelCache = new Object();
 
-  app.includeModelObj = function(modelJs, workingPath) {
+  app.includeModelObj = function(modelJs) {
     var modelName = modelJs.name;
-    if (!modelName) {
-      if (!workingPath) {
-        throw new Error('Model name must be defined.');
+    
+    if (!modelJs.schema) {
+      throw new Error(modelName + '.schema not found.');
+    }
+
+    var collectionName = undefined;
+    if (modelJs.parentModel) {
+      
+      var parentModel = includeModel(modelJs.parentModel);
+      var parentModelJs = parentModel.getModelDictionary();
+      collectionName = parentModel.collection.name;
+
+      modelJs.schema = extend(parentModelJs.schema, modelJs.schema);
+      if (!modelJs.initSchema) {
+        modelJs.initSchema = parentModelJs.initSchema;
       }
-      modelName = path.basename(workingPath, '.js');
+
+      if (!modelJs.initSchema) {
+        modelJs.initSchema = parentModelJs.initSchema;
+      }
+      modelJs.options = extend(parentModel.options || {}, modelJs.options);
+
+      if (app.isDebug) {
+        console.debug('Model %s has a parent %s', modelName, modelJs.parentModel);
+      }
+      //modelJs = extend(true, parentModelJs, modelJs);
     }
-
-    if (app.modelCache[modelName]) {
-      return app.modelCache[modelName];
-    }
-
-
 
     var conn;
 
@@ -38,28 +53,9 @@ module.exports = function(app) {
       }
 
     }
-    if (!modelJs.schema) {
-      throw new Error(modelName + '.schema not found.');
-    }
+    
 
-    var collectionName = undefined;
-    if (modelJs.parentModel) {
-      
-      var parentModel = includeModel(modelJs.parentModel);
-      var parentModelJs = parentModel.getModelDictionary();
-      collectionName = parentModel.collection.name;
 
-      modelJs.schema = extend(parentModelJs.schema, modelJs.schema);
-      if (!modelJs.initSchema) {
-        modelJs.initSchema = parentModelJs.initSchema;
-      }
-      modelJs.options = extend(parentModel.options || {}, modelJs.options);
-
-      if (app.isDebug) {
-        console.debug('Model %s has a parent %s', modelName, modelJs.parentModel);
-      }
-      //modelJs = extend(true, parentModelJs, modelJs);
-    }
 
     var schema = new Schema(modelJs.schema, modelJs.options);
     if (modelJs.initSchema) {
@@ -87,8 +83,22 @@ module.exports = function(app) {
     } catch (e) {
       throw new Error('Error loading model ' + workingPath + '. Probably invalid model format ::: ' + e.message);
     }
+
+    if (!modelJs.name) {
+      if (!workingPath) {
+        throw new Error('Model name must be defined.');
+      }
+      modelJs.name = path.basename(workingPath, '.js');
+    }
+
+    if (app.modelCache[modelJs.name]) {
+      if (app.isDebug) {
+        console.debug("Loading model %s from cache", modelJs.name)
+      }
+      return app.modelCache[modelJs.name];
+    }
    
-    return app.includeModelObj(modelJs, workingPath);
+    return app.includeModelObj(modelJs);
   }
 
   global.includeModel = app.includeModel;

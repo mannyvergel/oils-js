@@ -58,3 +58,7 @@ module.exports = {
   connection: 'mainDb'
 }
 ```
+
+###parentModel [optional]
+
+Accepts a path to a model to specify the parent. Schema and options will be inherited, initSchema and connection may be overridden.

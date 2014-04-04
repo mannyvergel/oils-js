@@ -13,7 +13,9 @@ module.exports = {
 	,
 	options: {
     //mongoose schema options
-  }
+  },
+
+  parentModel: '/path/to/parent/model'
 
 	connection: 'mainDb' //defaults to 'mainDb' or the first defined connection in conf.js
 

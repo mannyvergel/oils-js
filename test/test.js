@@ -106,7 +106,12 @@ describe('app', function () {
     var childModel = app.includeModelObj(childModelJs);
 
     assert.equal(childModel.collection.name, 'books', 'Collection name must be books');
-    assert.notStrictEqual(childModel.getModelDictionary().schema.title, undefined, 'parent book title not found');
+    assert.notStrictEqual(childModel.getModelDictionary().schema.title, undefined, 'parent Book title not found');
+
+
+    //test load from cache
+    var Book = models('Book');
+    assert.notStrictEqual(Book.getModelDictionary().schema.title, undefined, 'Cached Book title not found');
     done();
 
   });
