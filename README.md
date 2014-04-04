@@ -40,6 +40,9 @@ template is optional...
 
 #### Latest Release(s)
 
+Version 0.4.3 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.3.zip))
+* Support for parent model through model attribute: parentModel.
+
 Version 0.4.2 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.2.zip))
 * Bug fixes
 
@@ -47,11 +50,6 @@ Version 0.4.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.1.
 * plugins can now extend from main views template.
 * changed swig behavior to retrieve to default views dir.
 
-Version 0.3.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.3.1.zip))
-* used domains for error handling
-* added onError in controllers and routes
-* templates, oils new [folder] --template [template e.g. zurb5]
-* various bug fixes
 
 #### Directory Structure
 
