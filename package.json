@@ -31,7 +31,8 @@
     "log4js" : "0.6.x",
     "nomnom" : "1.6.x",
     "connect-flash": "0.1.x",
-    "fs-extra": "0.8.x"
+    "fs-extra": "0.8.x",
+    "node.extend" : "1.0.x"
   },
   "devDependencies": {},
   "bundleDependencies": [],

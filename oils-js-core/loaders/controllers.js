@@ -9,14 +9,14 @@ module.exports = function(app) {
 
 function setControllerRoutes(app, dir) {
   if (app.isDebug) {
-    console.log("Scanning controllers in %s", dir);
+    console.debug("Scanning controllers in %s", dir);
   }
   fileUtils.recurseDir(dir, function(err, opts) {
     if (!opts.isDirectory() && stringUtils.endsWith(opts.file, '.js')) {
       var file = opts.file;
       var subfolder = opts.subfolder;
       if (app.isDebug) {
-        console.log(opts.absolutePath + '[file]');
+        console.debug(opts.absolutePath + '[file]');
       }
       var subPath = subfolder + '/' + file;
       var absPath = opts.absolutePath;

@@ -96,6 +96,17 @@ describe('app', function () {
         }
       }, 'Retrieving Book');
 
+
+    var childModelJs = {
+      name: 'Book2',
+      schema: {hello: {type: String}},
+      parentModel: '/web/src/models/Book'
+    }
+
+    var childModel = app.includeModelObj(childModelJs);
+
+    assert.equal(childModel.collection.name, 'books', 'Collection name must be books');
+    assert.notStrictEqual(childModel.getModelDictionary().schema.title, undefined, 'parent book title not found');
     done();
 
   });

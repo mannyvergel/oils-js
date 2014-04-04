@@ -11,7 +11,7 @@ exports.applyRoute = function(app, route, obj) {
   } else if (objectUtils.isFunction(obj) || objectUtils.isArray(obj)) {
     
     if (app.isDebug) {
-      console.log('[route] ALL ' + route);
+      console.debug('[route] ALL ' + route);
     }
     //server.all(route, obj);
     handleRequest(app, 'all', route, obj);
@@ -30,7 +30,7 @@ function applyVerbs(app, route, obj, verbs) {
       
       if (obj.isRegexp) {
         if (app.isDebug) {
-          console.log('[route regex] %s %s', verb, route);
+          console.debug('[route regex] %s %s', verb, route);
         }
         var flags = route.replace(/.*\/([gimy]*)$/, '$1');
         var pattern = route.replace(new RegExp('^/(.*?)/'+flags+'$'), '$1');
@@ -40,7 +40,7 @@ function applyVerbs(app, route, obj, verbs) {
         
       } else {
         if (app.isDebug) {
-          console.log('[route] %s %s', verb, route);
+          console.debug('[route] %s %s', verb, route);
         } 
       }
 

@@ -1,23 +1,18 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var pluginUtils = require('../utils/pluginUtils');
+var extend = require('node.extend');
 
 module.exports = function(app) {
 
   app.modelCache = new Object();
 
-  app.includeModel = function(workingPath) {
-
-
-    var modelJs = null;
-    try {
-      modelJs = include(workingPath);
-    } catch (e) {
-      throw new Error('Error loading model ' + workingPath + '. Probably invalid model format ::: ' + e.message);
-    }
-   
+  app.includeModelObj = function(modelJs, workingPath) {
     var modelName = modelJs.name;
     if (!modelName) {
+      if (!workingPath) {
+        throw new Error('Model name must be defined.');
+      }
       modelName = path.basename(workingPath, '.js');
     }
 
@@ -47,19 +42,53 @@ module.exports = function(app) {
       throw new Error(modelName + '.schema not found.');
     }
 
+    var collectionName = undefined;
+    if (modelJs.parentModel) {
+      
+      var parentModel = includeModel(modelJs.parentModel);
+      var parentModelJs = parentModel.getModelDictionary();
+      collectionName = parentModel.collection.name;
+
+      modelJs.schema = extend(parentModelJs.schema, modelJs.schema);
+      if (!modelJs.initSchema) {
+        modelJs.initSchema = parentModelJs.initSchema;
+      }
+      modelJs.options = extend(parentModel.options || {}, modelJs.options);
+
+      if (app.isDebug) {
+        console.debug('Model %s has a parent %s', modelName, modelJs.parentModel);
+      }
+      //modelJs = extend(true, parentModelJs, modelJs);
+    }
+
     var schema = new Schema(modelJs.schema, modelJs.options);
     if (modelJs.initSchema) {
       modelJs.initSchema(schema);
     }
 
-    var model = conn.model(modelName, schema);
-    
+    var model = conn.model(modelName, schema, collectionName);
     if (app.isDebug) {
-      console.log("Loaded model for the first time: " + modelName)
+      console.debug("Loaded model for the first time: " + modelName)
     }
 
-    app.modelCache[modelName] = model;        
+    app.modelCache[modelName] = model;
+    model.getModelDictionary = function() {
+      return modelJs;
+    }        
     return model;
+  }
+
+  app.includeModel = function(workingPath) {
+
+
+    var modelJs = null;
+    try {
+      modelJs = include(workingPath);
+    } catch (e) {
+      throw new Error('Error loading model ' + workingPath + '. Probably invalid model format ::: ' + e.message);
+    }
+   
+    return app.includeModelObj(modelJs, workingPath);
   }
 
   global.includeModel = app.includeModel;
