@@ -22,13 +22,17 @@ module.exports = function(app) {
       collectionName = parentModel.collection.name;
 
       modelJs.schema = extend(parentModelJs.schema, modelJs.schema);
-      if (!modelJs.initSchema) {
-        modelJs.initSchema = parentModelJs.initSchema;
+      
+      var origSchema = modelJs.initSchema;
+      modelJs.initSchema = [];
+      if (origSchema) {
+        modelJs.initSchema.push(origSchema);
       }
 
-      if (!modelJs.initSchema) {
-        modelJs.initSchema = parentModelJs.initSchema;
+      if (parentModelJs.initSchema) {
+        modelJs.initSchema.push(parentModelJs.initSchema);
       }
+
       modelJs.options = extend(parentModel.options || {}, modelJs.options);
 
       if (app.isDebug) {
@@ -59,7 +63,19 @@ module.exports = function(app) {
 
     var schema = new Schema(modelJs.schema, modelJs.options);
     if (modelJs.initSchema) {
-      modelJs.initSchema(schema);
+      if (modelJs.initSchema instanceof Array) {
+        for (var i in modelJs.initSchema) {
+          var mySchema = modelJs.initSchema[i];
+          // if (app.isDebug) {
+          //   console.debug('[%s] Executing array initSchema %s', modelJs.name ,mySchema);
+          // }
+          mySchema(schema);
+        }
+      } else {
+        //console.debug('[%s] Executing normal initSchema %s', modelJs.name ,modelJs.initSchema);
+        modelJs.initSchema(schema);
+      }
+      
     }
 
     var model = conn.model(modelName, schema, collectionName);
