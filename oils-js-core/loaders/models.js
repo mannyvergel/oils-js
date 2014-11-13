@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var pluginUtils = require('../utils/pluginUtils');
 var extend = require('node.extend');
+var path = require('path');
 
 module.exports = function(app) {
 
