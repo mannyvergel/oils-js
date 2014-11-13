@@ -1,20 +1,22 @@
 var objectUtils = require('./objectUtils');
 var domain = require('domain');
-exports.applyRoute = function(app, route, obj) {
+//var web = global.web;
+exports.applyRoute = function(web, route, obj) {
+  
   if (obj.route) {
     //override autoroute with controller's defined route
     route = obj.route;
   }
-  var server = app.server;
+ 
   if (objectUtils.isObject(obj)) {
-    applyVerbs(app, route, obj, ["get", "put", "post", "delete", "options", "all"]);
+    applyVerbs(web,route, obj, ["get", "put", "post", "delete", "options", "all"]);
   } else if (objectUtils.isFunction(obj) || objectUtils.isArray(obj)) {
     
-    if (app.isDebug) {
+    if (console.isDebug) {
       console.debug('[route] ALL ' + route);
     }
-    //server.all(route, obj);
-    handleRequest(app, 'all', route, obj);
+
+    handleRequest('all', route, obj);
     
   } else {
     throw new Error('Unsupported route object.');
@@ -22,14 +24,14 @@ exports.applyRoute = function(app, route, obj) {
   
 }
 
-function applyVerbs(app, route, obj, verbs) {
-  var server = app.server;
+function applyVerbs(web,route, obj, verbs) {
+
   for (var i in verbs) {
     var verb = verbs[i];
     if (obj[verb]) {
       
       if (obj.isRegexp) {
-        if (app.isDebug) {
+        if (console.isDebug) {
           console.debug('[route regex] %s %s', verb, route);
         }
         var flags = route.replace(/.*\/([gimy]*)$/, '$1');
@@ -39,24 +41,23 @@ function applyVerbs(app, route, obj, verbs) {
         //route = new RegExp(route);
         
       } else {
-        if (app.isDebug) {
+        if (console.isDebug) {
           console.debug('[route] %s %s', verb, route);
         } 
       }
 
-      handleRequest(app, verb, route, obj[verb], obj);
+      handleRequest(web, verb, route, obj[verb], obj);
     }
   }
 }
 
-function handleRequest(app, verb, route, obj, controller) {
-  var server = app.server;
-  server[verb](route, function(req, res, next) {
+function handleRequest(web, verb, route, obj, controller) {
+  var app = web.app;
+  app.route(route)[verb](function(req, res, next) {
     var reqd = domain.create();
     reqd.add(req);
     reqd.add(res);
     reqd.on('error', function(er) {
-      console.error('Error', er, req.url);
       if (controller && controller.onError) {
         try {
           controller.onError(req, res, er, app);
@@ -95,7 +96,8 @@ function handleRequest(app, verb, route, obj, controller) {
 function showError(req, res, er, app) {
   try {
     res.writeHead(500);
-    if (app.isDev) {
+    console.error('Route error at ' + req.url, er);
+    if (console.isDebug) {
       res.write(er.stack);
     } else {
       //show to end users

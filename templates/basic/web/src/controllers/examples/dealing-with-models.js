@@ -1,6 +1,6 @@
-var Book = models('Book');
+var Book = web.models('Book');
 module.exports =  {
-	get : function(req, res, next) {
+	get : function get(req, res, next) {
 		//You Mongo DB must be running for this page to work
 		var isbn = '2002-71970';
 		Book.findOne({isbn: isbn}, function(err, book) {

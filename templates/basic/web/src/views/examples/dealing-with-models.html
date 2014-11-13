@@ -1,4 +1,4 @@
-{% extends '../templates/main.html' %}
+{% extends 'templates/main.html' %}
 
 {% block title %}Dealing with Models{% endblock %}
 
@@ -9,8 +9,9 @@
 
 
 <h3>Book: {{book.title}} by {{book.author}}</h3>
-<div>ISBN #: {{book.isbn}}</div>
-<div>Publish Date: {{book.publishDt|date('F jS, Y')}}</div>
+<p>ISBN #: {{book.isbn}}
+<br/>
+Publish Date: {{book.publishDt|date('MMMM Do YYYY')}}</p>
 
 
 {% endblock %}

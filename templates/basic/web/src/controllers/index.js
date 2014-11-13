@@ -1,7 +1,7 @@
-module.exports =  {
+module.exports = {
 	get : function(req, res, next) {
 		
-		res.render('index');
+		res.render('index.html');
 		//res.end('HELLO WORLD!');
 	}
 }

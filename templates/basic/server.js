@@ -1,10 +1,5 @@
-#!/bin/env node
-var Application = require('oils');
+var Web = require('oils');
 
-var app = new Application();
+var web = new Web({isDebug: true});
 
-//additional server configuration if needed before starting
-
-//var server = app.server; //express server
-
-app.start();
+web.start();

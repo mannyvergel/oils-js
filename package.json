@@ -1,7 +1,7 @@
 {
   "name": "oils",
-  "version": "0.4.5",
-  "description": "Oils js framework built on top of Express.",
+  "version": "1.0.0",
+  "description": "Oils js framework built on top of Express 4.",
   "keywords": [
   	"OilsJs",
     "Oils",
@@ -25,20 +25,29 @@
   },
 
   "dependencies": {
-    "express": "~3.4.8",
-    "mongoose": "3.8.x",
-    "swig": "1.3.x",
-    "log4js" : "0.6.x",
-    "nomnom" : "1.6.x",
+    "express": "~4.10.2",
+    "body-parser" : "1.9.x",
+    "cookie-parser" : "1.3.x",
+    "cookie-session" : "1.0.x",
+    "method-override" : "2.3.x",
+    "function-name" : "0.0.x",
     "connect-flash": "0.1.x",
-    "fs-extra": "0.8.x",
-    "node.extend" : "1.0.x"
+    "nunjucks": "1.1.x",
+    "moment": "2.8.x",
+    "marked": "0.3.x",
+    "es6-promise" : "2.0.x",
+    "mongoose": "3.8.x",
+    "log4js" : "0.6.x",
+    "nomnom" : "1.8.x",
+    "node.extend" : "1.1.x"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "fs-extra": "*"
+    },
   "bundleDependencies": [],
 
   "private": false,
-  "main": "oils-js-core/app.js",
+  "main": "core/Web.js",
   "bin": {
     "oils": "./bin/oils.js"
   }

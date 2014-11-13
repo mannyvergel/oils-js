@@ -1,0 +1,94 @@
+{% extends 'templates/main.html' %}
+
+{% block title %}Markdown Sample{% endblock %}
+
+{% block head %}
+<style>
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+<h3>Examples</h3>
+
+
+{%marked%}
+
+####Headers
+
+```
+#Header1
+##Header2
+###Header3
+####Header4
+#####Header5
+```
+
+#Header1
+##Header2
+###Header3
+####Header4
+#####Header5
+
+
+###Links
+```
+This is an [example link](http://example.com/).
+```
+This is an [example link](http://example.com/).
+
+####Text formatting
+```
+Emphasis, aka italics, with *asterisks* or _underscores_.
+
+Strong emphasis, aka bold, with **asterisks** or __underscores__.
+
+Combined emphasis with **asterisks and _underscores_**.
+
+Strikethrough uses two tildes. ~~Scratch this.~~
+```
+
+Emphasis, aka italics, with *asterisks* or _underscores_.
+
+Strong emphasis, aka bold, with **asterisks** or __underscores__.
+
+Combined emphasis with **asterisks and _underscores_**.
+
+Strikethrough uses two tildes. ~~Scratch this.~~
+
+####Block Quotes
+```
+> ## Blockquoted header
+>
+> This is blockquoted text.
+>
+> This is a second paragraph within the blockquoted text.
+```
+
+> ## Blockquoted header
+>
+> This is blockquoted text.
+>
+> This is a second paragraph within the blockquoted text.
+
+####Lists
+```
++ One
++ Two
++ Three
+    - Nested One
+    - Nested Two
+```
+
++ One
++ Two
++ Three
+    - Nested One
+    - Nested Two
+
+{%endmarked%}
+
+
+{% endblock %}

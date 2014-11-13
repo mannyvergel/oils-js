@@ -1,4 +1,5 @@
-exports.responsePatch = function(app) {
+var web = global.web;
+var customResponse = function() {
   return function(req, res, next) {
 
       //redirect trailing e.g. '/hello/' to '/hello' 
@@ -15,7 +16,7 @@ exports.responsePatch = function(app) {
       //override res.render
       res.render = function(view, options, callback) {
         options = beforeRender(req, res, view, options, callback);
-        app.callEvent('beforeRender', [view, options, callback, req, res])
+        web.callEvent('beforeRender', [view, options, callback, req, res])
         _render.call(res, view, options, callback);
       };
 
@@ -26,11 +27,13 @@ exports.responsePatch = function(app) {
     }
 }
 
+module.exports = customResponse;
+
 function beforeRender(req, res, view, options, callback) {
   if (!options) {
     options = {}
   }
-  //assumes middleware in app.js
+  //assumes middleware in Web.js
   var req = res.request;
   options['_errors'] = req.flash('error');
 

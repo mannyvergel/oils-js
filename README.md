@@ -40,24 +40,17 @@ template is optional...
 
 #### Latest Release(s)
 
+Version 1.0.0 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.5.zip))
+* Revamp of code, more structured
+* Not backwards compatible
+
 Version 0.4.5 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.5.zip))
 * Bug fix for model inclusion
-
-Version 0.4.4 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.4.zip))
-* Support child initSchema
-
-Version 0.4.3 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.3.zip))
-* Support for parent model through model attribute: parentModel.
-
-Version 0.4.1 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.1.zip))
-* plugins can now extend from main views template.
-* changed swig behavior to retrieve to default views dir.
 
 
 #### Directory Structure
 
     |-- conf                  //config files and routes
-    |   |-- plugins           //plugins   
     |-- web          
     |   |-- public            //assets like css, js, images
     |   |-- src               
@@ -70,7 +63,11 @@ You can see the README.md's of each directory above for more information.
 
 #### Noteworthy Helper Functions
 
-##### ```include(path)```
+#### ```web```
+
+The global variable ```web``` can be used almost anywhere to access the instance of oils. ```web.app``` is the instance of express server.
+
+##### ```web.include(path)```
 
 You can use ```include``` function which is basically like ```require``` except that it's based on the the project directory if the path starts with '/'.
 
@@ -98,31 +95,31 @@ var lib1 = require('../../../../../lib/folder/subfolder/lib1.js');
 Use 
 
 ```
-var lib1 = include('/lib/folder/subfolder/lib1.js');
+var lib1 = web.include('/lib/folder/subfolder/lib1.js');
 ````
 
-##### ```includeModel(path)```
+##### ```web.includeModel(path)```
 
 loads a model based on the path and returns a Mongoose Model. The path also behaves like ```include``` i.e. if it starts with '/' it will base the path on the project's directory.
 
 e.g.
 ```
-var Book = includeModel('/web/models/Book.js');
+var Book = web.includeModel('/web/models/Book.js');
 ```
 
-##### ```models('modelName')```
+##### ```web.models('modelName')```
 
 A convenience function for ```includeModel```
 
 e.g.
 ```
-var Book = models('Book');
+var Book = web.models('Book');
 ```
 
 ### Components
-Oils js uses Mongoose for ORM, Mongo DB for the database and Swig for templating. Only Mongo DB is supported for now but this may change in the future depending on the needs.
+Oils js uses Mongoose for ORM, Mongo DB for the database and Nunjucks for templating. Only Mongo DB is supported for now but this may change in the future depending on the needs.
 
-For the default templating, Swig has been chosen because it doesn't mess much with the html syntax. You can override this by setting the attributes of app.server before calling app.start(), however, do this at your own risk as future features may not support custom template engines (e.g. scaffolding).
+For the default templating, Nunjucks has been chosen because it doesn't mess much with the html syntax. You can override this by passing an express templateEngine e.g. var web = new Web({templateEngine: myTemplateEngin}).
 
 ### Features
 
@@ -169,7 +166,7 @@ Starting v0.2.5
 #### ```beforeRender```
 
 ```
-app.on('beforeRender', function(view, options, callback, req, res) {
+web.on('beforeRender', function(view, options, callback, req, res) {
 	//called before res.render(...);
 })
 ```
@@ -177,7 +174,7 @@ app.on('beforeRender', function(view, options, callback, req, res) {
 #### ```initializeServer```
 
 ```
-app.on('initializeServer', function() {
+web.on('initializeServer', function() {
 	var app = this;
 	var server = app.server; //express server
 	...

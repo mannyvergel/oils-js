@@ -1,6 +1,6 @@
 module.exports = {
   get : function(req, res, next) {
-    res.render('examples/controller-verbs');
+    res.render('examples/controller-verbs.html');
   },
   post: function(req, res, next) {
     res.end('post function');
