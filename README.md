@@ -40,7 +40,7 @@ template is optional...
 
 #### Latest Release(s)
 
-Version 1.0.0 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.5.zip))
+Version 1.0.0 ([Download](https://github.com/mannyvergel/oils-js/archive/v1.0.0.zip))
 * Revamp of code, more structured
 * Not backwards compatible
 
@@ -155,9 +155,16 @@ After you have set-up a new oils project.
 * Restart server.
 * Access your controller with your browser: http://localhost:8080/test
 
-### Plugins
+### Plugin Support
 
-Check plugin folder's [README.md](https://github.com/mannyvergel/oils-js/tree/master/templates/basic/conf/plugins) for more information.
+Basically there are two steps to make a plugin work:
+
+1. Install the required module in node_modules directory via npm install or package.js,
+
+2. and declare it /conf/conf.js (see /conf/conf.js for more information).
+
+Creating your own plugin is easy; you just hook onto events of oils. See the (oils-plugin-basic)[https://github.com/mannyvergel/oils-plugin-basic] for more information.
+
 
 ### Event Hooks
 
