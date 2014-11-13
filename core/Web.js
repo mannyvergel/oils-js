@@ -5,6 +5,7 @@ var domain = require('domain');
 var Schema = require('mongoose').Schema;
 var log4js = require('log4js');
 var flash = require('connect-flash');
+var routeUtils = require('./utils/routeUtils');
 log4js.replaceConsole();
 
 var constants = {
@@ -14,6 +15,7 @@ var constants = {
   PUBLIC_DIR: '/web/public',
   //PLUGINS_DIR: '/conf/plugins',
   CONFIG_PATH: '/conf/conf.js',
+  ROUTES_FILE: '/conf/routes.js'
 }
 
 var defaultConf = {
@@ -24,6 +26,7 @@ var defaultConf = {
   publicDir: constants.PUBLIC_DIR,
   pluginsDir: constants.PLUGINS_DIR,
   customConfigFile: constants.CONFIG_PATH,
+  routesFile: constants.ROUTES_FILE,
   port: 8080,
   ipAddress: '0.0.0.0',
   isDebug: false,
@@ -224,6 +227,16 @@ var Web = Obj.extend('Web', {
     require('./utils/stackLoader.js')(this.plugins, [this]);
   },
 
+  applyRoutes: function(routes) {
+    for (var routeKey in routes) {
+      var customRoute = routes[routeKey];
+      if (console.isDebug) {
+        console.debug('[conf.route] ' + routeKey);
+      }
+      routeUtils.applyRoute(web, routeKey, customRoute);
+    }
+  },
+
   initServer: function() {
     var app = this.app;
     var bodyParser = require('body-parser');
@@ -254,8 +267,11 @@ var Web = Obj.extend('Web', {
     app.use(cookieSession({keys: [cookieKey], cookie: {maxAge: oneDay}}));
     app.use(require('./custom/response')());
     app.use(flash());
-    
     require('./loaders/connections.js')(this);
+
+    var routesFromConf = this.include(web.conf.routesFile);
+    this.applyRoutes(routesFromConf);
+
     require('./loaders/controllers')(this);
 
     require('./loaders/plugins.js')(this);

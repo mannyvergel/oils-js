@@ -16,7 +16,7 @@ exports.applyRoute = function(web, route, obj) {
       console.debug('[route] ALL ' + route);
     }
 
-    handleRequest('all', route, obj);
+    handleRequest(web, 'all', route, obj);
     
   } else {
     throw new Error('Unsupported route object.');
