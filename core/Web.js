@@ -224,24 +224,22 @@ var Web = Obj.extend('Web', {
     require('./utils/stackLoader.js')(this.plugins, [this]);
   },
 
-  initializeServer: function() {
+  initServer: function() {
     var app = this.app;
     var bodyParser = require('body-parser');
     var methodOverride = require('method-override');
     var cookieParser = require('cookie-parser');
     var cookieSession = require('cookie-session');
-    // var nunjucks = require('nunjucks');
-    
-    // this.nunjucksEnv =  nunjucks.configure(this.conf.baseDir + this.conf.viewsDir, {
-    //   autoescape: true,
-    //   express   : app
-    // });
+
   
     var templatesPath = this.conf.baseDir + this.conf.viewsDir;
-    this.templateEngine = this.conf.templateEngine || require('./template_engine/nunjucks.engine.js')(templatesPath);
-    app.set('view', this.templateEngine);
 
-    // require('./custom/nunjucks.ext.js')(this.nunjucksEnv);
+    if (this.conf.templateLoader) {
+      this.templateEngine = this.conf.templateLoader(web, templatesPath);
+    } else {
+      this.templateEngine = require('./loaders/defaultTemplateEngine.js')(web, templatesPath);
+    }
+    
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({
@@ -291,7 +289,7 @@ var Web = Obj.extend('Web', {
     serverDomain.run(function() {
 
       // Initialize the express server and routes.
-      web.initializeServer();
+      web.initServer();
       
       //  Start the app on the specific interface (and port).
       web.app.listen(web.conf.port, web.conf.ipAddress, function(err, result) {

@@ -178,12 +178,11 @@ web.on('beforeRender', function(view, options, callback, req, res) {
 })
 ```
 
-#### ```initializeServer```
+#### ```initServer```
 
 ```
-web.on('initializeServer', function() {
-	var app = this;
-	var server = app.server; //express server
+web.on('initServer', function() {
+	var web = this; //this is an instance of web
 	...
 })
 ```
