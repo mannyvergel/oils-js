@@ -40,6 +40,9 @@ template is optional...
 
 #### Latest Release(s)
 
+Version 0.4.5 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.5.zip))
+* Bug fix for model inclusion
+
 Version 0.4.4 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.4.zip))
 * Support child initSchema
 
