@@ -21,7 +21,7 @@ var customResponse = function() {
       };
 
       res.renderFile = function(view, options, callback) {
-        res.render.call(res, global.BASE_DIR + view, options, callback);
+        res.render.call(res, web.conf.baseDir + view, options, callback);
       };
       next();
     }

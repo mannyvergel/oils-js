@@ -240,7 +240,7 @@ var Web = Obj.extend('Web', {
       pluginFunctions.push(this._getPluginFunction(plugin));
 
     }
-    require('./utils/stackLoader.js')(pluginFunctions, [this]);
+    require('./utils/stackLoader.js')(pluginFunctions, []);
   },
 
   applyRoutes: function(routes) {
@@ -299,7 +299,7 @@ var Web = Obj.extend('Web', {
     app.use(function(err, req, res, next){
       // logic
       console.error("General error", err);
-      res.send(500, "This is embarrassing.");
+      res.status(500).send("This is embarrassing.");
       //TODO: tweet / email
     });
     

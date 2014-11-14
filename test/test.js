@@ -31,7 +31,7 @@ var overrideConf = {
 
 var web;
 describe('app', function () {
-  this.timeout(20000);
+  this.timeout(40000);
   before (function (done) {
   	fs.copySync('./templates/basic', global.BASE_DIR);
     fs.copySync('./templates/zurb5', global.BASE_DIR);

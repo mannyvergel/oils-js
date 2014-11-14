@@ -2,7 +2,9 @@ var nunjucks = require('nunjucks');
 var path = require('path');
 
 module.exports = function DefaultTemplateEngine(web, templatesPath) {
-	var env = nunjucks.configure(templatesPath, {autoescape: true, express: web.app});
+	//var env = nunjucks.configure(templatesPath, {autoescape: true, express: web.app});
+	var env = new nunjucks.Environment(new CustomFileSystemLoader(templatesPath), {autoescape: true});
+	env.express(web.app)
 	customiseNunjucks(env);
 
 	return env;
@@ -80,3 +82,25 @@ function MarkedExtension() {
         return ret;
     };
 }
+
+
+
+var fs = require('fs');
+
+var CustomFileSystemLoader = nunjucks.FileSystemLoader.extend({
+   
+    getSource: function(name) {
+
+    	if (!(name && name[0] == '/')) {
+    		return this.parent(name);
+    	}
+
+        var fullpath = name;
+       
+
+        this.pathsToNames[fullpath] = name;
+
+        return { src: fs.readFileSync(fullpath, 'utf-8'),
+                 path: fullpath };
+    }
+});
