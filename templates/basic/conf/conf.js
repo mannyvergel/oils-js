@@ -18,6 +18,7 @@ var conf = {
   plugins: {
     //add your plugins in package.js and declare it here e.g.
     //'oils-plugin-basic': {
+    //  enabled: true  
     //  //override plugin configurations  
     //} 
   }

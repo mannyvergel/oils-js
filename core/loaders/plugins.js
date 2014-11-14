@@ -1,19 +1,32 @@
+
+var Plugin = require('../Plugin.js');
 module.exports = function Plugins(web) {
 
   for (var i in web.conf.plugins) {
     var pluginConf = web.conf.plugins[i];
-    if (pluginConf.enabled != "N") {
+    if (pluginConf.enabled) {
 
       var pluginPath = web.conf.baseDir + '/node_modules/' + i;
       if (console.isDebug) {
         console.debug('Adding plugin: ' + pluginPath);
       }
-
+      var plugin = require(pluginPath);
       try {
-        var pluginObj = require(pluginPath);
-        web.addPlugin(pluginObj);
+        var pluginObj = null;
+        if (!plugin.load) {
+          pluginObj = Plugin.extend({
+            load: plugin
+          });
+        } else {
+          pluginObj = plugin;
+        }
+        
+        web.addPlugin(new pluginObj(pluginConf, i));
       } catch (e) {
-        console.error('Problem adding plugin: ' + i + '. Make sure it is found in node_modules directory.');
+        console.error('Problem adding plugin: ' + i + '. ' + e);
+        if (console.isDebug) {
+          throw e;
+        }
       }
     }
   }

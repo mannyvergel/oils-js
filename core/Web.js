@@ -85,7 +85,7 @@ var Web = Obj.extend('Web', {
   },
   // EVENTS end -------
 
-  include: function(file) {
+  include: function(file, secondFileFallback) {
     if (file && file[0] == '/') {
       return require(this.conf.baseDir + file);
     } else {
@@ -222,9 +222,21 @@ var Web = Obj.extend('Web', {
     this.plugins.push(plugin);
   },
 
-  loadPlugins: function(plugin) {
+  _getPluginFunction: function(plugin) {
+    return function(next) {
+      plugin.load(plugin.conf, web, next);
 
-    require('./utils/stackLoader.js')(this.plugins, [this]);
+    }
+  },
+
+  loadPlugins: function() {
+    var pluginFunctions = [];
+    for (var i in this.plugins) {
+      var plugin = this.plugins[i];
+      pluginFunctions.push(this._getPluginFunction(plugin));
+
+    }
+    require('./utils/stackLoader.js')(pluginFunctions, [this]);
   },
 
   applyRoutes: function(routes) {

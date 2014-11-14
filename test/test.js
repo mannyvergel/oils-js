@@ -6,7 +6,7 @@
 
 
 //global.BASE_DIR = 'c:/tmp/oils';
-global.BASE_DIR = '/Users/manny/progs/tmp/oilsjstest';
+global.BASE_DIR = process.cwd() + '/test/tmp/oilsjstest';
 
 try {
 fs.mkdirsSync(global.BASE_DIR);
