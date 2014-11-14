@@ -1,14 +1,20 @@
 module.exports = function Plugins(web) {
 
   for (var i in web.conf.plugins) {
-    var plugin = web.conf.plugins[i];
-    if (plugin.enabled != "N") {
+    var pluginConf = web.conf.plugins[i];
+    if (pluginConf.enabled != "N") {
 
       var pluginPath = web.conf.baseDir + '/node_modules/' + i;
       if (console.isDebug) {
         console.debug('Adding plugin: ' + pluginPath);
       }
-      web.addPlugin(require(pluginPath));
+
+      try {
+        var pluginObj = require(pluginPath);
+        web.addPlugin(pluginObj);
+      } catch (e) {
+        console.error('Problem adding plugin: ' + i + '. Make sure it is found in node_modules directory.');
+      }
     }
   }
 }

@@ -265,6 +265,7 @@ var Web = Obj.extend('Web', {
     app.use(cookieParser(cookieKey));
     var oneDay = 86400000;
     app.use(cookieSession({keys: [cookieKey], cookie: {maxAge: oneDay}}));
+    this.callEvent('initServer');
     app.use(require('./custom/response')());
     app.use(flash());
     require('./loaders/connections.js')(this);
