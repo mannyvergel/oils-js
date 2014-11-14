@@ -65,6 +65,10 @@ var Web = Obj.extend('Web', {
     this.plugins = [];
   },
 
+  utils: {
+    extend: extend
+  },
+
   //BasePlugin: require('./BasePlugin.js'),
 
   // EVENTS -----------
@@ -86,11 +90,11 @@ var Web = Obj.extend('Web', {
   // EVENTS end -------
 
   include: function(file, secondFileFallback) {
-    if (file && file[0] == '/') {
+    //if (file && file[0] == '/') {
       return require(this.conf.baseDir + file);
-    } else {
-      return require(file);
-    }
+    //} else {
+    //  return require(file);
+    //}
   },
 
   //MODELS ------------
@@ -219,7 +223,7 @@ var Web = Obj.extend('Web', {
 
 
   addPlugin: function(plugin) {
-    this.plugins.push(plugin);
+    this.plugins[plugin.id] = plugin;
   },
 
   _getPluginFunction: function(plugin) {
