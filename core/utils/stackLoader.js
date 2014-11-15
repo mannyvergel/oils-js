@@ -1,13 +1,13 @@
-module.exports = function stackLoader(stack, params) {
+module.exports = function stackLoader(stack, params, cb) {
   var myStack = stack.slice(0);
   params = params || [];
   //params.push(doNext(stack, params))
   var newParams = params.slice(0);
-  newParams.push(doNext(myStack, newParams))
-  doNext(myStack, newParams)();
+  newParams.push(doNext(myStack, newParams, cb))
+  doNext(myStack, newParams, cb)();
 }
 
-function doNext(myStack, newParams) {
+function doNext(myStack, newParams, cb) {
 
  return function next() {
 
@@ -15,6 +15,10 @@ function doNext(myStack, newParams) {
       var nextPlugin = myStack.pop();
 
       nextPlugin.apply(undefined, newParams);
+    } else {
+      if (cb) {
+        cb();
+      }
     }
   }
 }

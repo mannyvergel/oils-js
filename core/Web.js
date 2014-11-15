@@ -69,7 +69,8 @@ var Web = Obj.extend('Web', {
     extend: extend
   },
 
-  //BasePlugin: require('./BasePlugin.js'),
+  //web.Plugin.extend..
+  Plugin: require('./Plugin.js'),
 
   // EVENTS -----------
   on: function(eventStr, callback) {
@@ -233,14 +234,14 @@ var Web = Obj.extend('Web', {
     }
   },
 
-  loadPlugins: function() {
+  loadPlugins: function(cb) {
     var pluginFunctions = [];
     for (var i in this.plugins) {
       var plugin = this.plugins[i];
       pluginFunctions.push(this._getPluginFunction(plugin));
 
     }
-    require('./utils/stackLoader.js')(pluginFunctions, []);
+    require('./utils/stackLoader.js')(pluginFunctions, [], cb);
   },
 
   applyRoutes: function(routes) {
@@ -281,7 +282,7 @@ var Web = Obj.extend('Web', {
     app.use(cookieParser(cookieKey));
     var oneDay = 86400000;
     app.use(cookieSession({keys: [cookieKey], cookie: {maxAge: oneDay}}));
-    this.callEvent('initServer');
+   
     app.use(require('./custom/response')());
     app.use(flash());
     require('./loaders/connections.js')(this);
@@ -292,7 +293,10 @@ var Web = Obj.extend('Web', {
     require('./loaders/controllers')(this);
 
     require('./loaders/plugins.js')(this);
-    this.loadPlugins();
+    var self = this;
+    this.loadPlugins(function() {
+       self.callEvent('initServer');
+    });
 
     app.use(express.static(this.conf.baseDir + this.conf.publicDir));
 
