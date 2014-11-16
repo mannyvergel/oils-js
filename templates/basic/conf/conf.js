@@ -10,9 +10,9 @@ var conf = {
     //only mongoose connections are support for now
     //you can specify multiple connections and specify the connection in your model.
     //if you don't need a db, you can remove/comment out mainDb
-    /*mainDb : {
+    mainDb : {
       url: (process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME) || 'mongodb://localhost/oils'
-    }*/
+    }
   },
   isDebug: false,
   plugins: {
