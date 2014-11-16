@@ -14,7 +14,7 @@ The author is **NOT** a fan of the ff:
 * forcing non standard javascript syntax
 * complicated build procedures before you can run the app
 
-The default configuration is for running on local machine and on Openshift servers but it's configurable in conf.js.
+The framework by default integrates nunjucks templating for the front end and mongodb for the backend.
 
 ### Quick Start
 
