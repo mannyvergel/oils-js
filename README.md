@@ -163,7 +163,13 @@ Basically there are two steps to make a plugin work:
 
 2. and declare it /conf/conf.js (see /conf/conf.js for more information).
 
+
+###Creating your own plugin
+
 Creating your own plugin is easy; you just hook onto events of oils. See the (oils-plugin-basic)[https://github.com/mannyvergel/oils-plugin-basic] for more information.
+
+Plugins:
+(Authentication (oils-plugin-auth))[https://github.com/mannyvergel/oils-plugin-auth]
 
 
 ### Event Hooks
