@@ -270,7 +270,7 @@ var Web = Obj.extend('Web', {
     if (this.conf.templateLoader) {
       this.templateEngine = this.conf.templateLoader(web, templatesPath);
     } else {
-      this.templateEngine = require('./loaders/defaultTemplateEngine.js')(web, templatesPath);
+      this.templateEngine = require('./engines/nunjucks')(web, templatesPath);
     }
     
 
