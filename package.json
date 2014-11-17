@@ -39,10 +39,11 @@
     "mongoose": "3.8.x",
     "log4js" : "0.6.x",
     "nomnom" : "1.8.x",
-    "node.extend" : "1.1.x"
+    "node.extend" : "1.1.x",
+    "fs-extra": "0.12.x"
   },
   "devDependencies": {
-    "fs-extra": "*"
+    
     },
   "bundleDependencies": [],
 
