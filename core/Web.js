@@ -82,6 +82,9 @@ var Web = Obj.extend('Web', {
   },
 
   callEvent: function(eventStr, argsArray){
+    if (console.isDebug) {
+      console.debug('Calling event ' + eventStr);
+    }
     var myEvents = this.events[eventStr];
     for (var i in myEvents) {
       var myEvent = myEvents[i];
