@@ -1,5 +1,5 @@
-module.exports = function stackLoader(stack, params, cb) {
-  var myStack = stack.slice(0);
+module.exports = function queueLoader(stack, params, cb) {
+  var myStack = stack.slice(0).reverse();
   params = params || [];
   //params.push(doNext(stack, params))
   var newParams = params.slice(0);

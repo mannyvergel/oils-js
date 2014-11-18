@@ -244,7 +244,7 @@ var Web = Obj.extend('Web', {
       pluginFunctions.push(this._getPluginFunction(plugin));
 
     }
-    require('./utils/stackLoader.js')(pluginFunctions, [], cb);
+    require('./utils/queueLoader.js')(pluginFunctions, [], cb);
   },
 
   applyRoutes: function(routes) {
