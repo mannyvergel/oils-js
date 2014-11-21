@@ -16,6 +16,6 @@ module.exports = nunjucks.FileSystemLoader.extend({
       this.pathsToNames[fullpath] = name;
 
       return { src: fs.readFileSync(fullpath, 'utf-8'),
-               path: fullpath };
+               path: fullpath, noCache: web.conf.isDebug };
     }
 });
