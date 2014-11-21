@@ -65,9 +65,7 @@ var Web = Obj.extend('Web', {
     this.plugins = [];
   },
 
-  utils: {
-    extend: extend
-  },
+  utils: require('./utils/oilsUtils.js'),
 
   //web.Plugin.extend..
   Plugin: require('./Plugin.js'),
@@ -82,9 +80,6 @@ var Web = Obj.extend('Web', {
   },
 
   callEvent: function(eventStr, argsArray){
-    if (console.isDebug) {
-      console.debug('Calling event ' + eventStr);
-    }
     var myEvents = this.events[eventStr];
     for (var i in myEvents) {
       var myEvent = myEvents[i];

@@ -1,6 +1,6 @@
 {
   "name": "oils",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A slightly opinionated web framework built on top of Express 4.",
   "keywords": [
   	"OilsJs",
@@ -40,7 +40,8 @@
     "log4js" : "0.6.x",
     "nomnom" : "1.8.x",
     "node.extend" : "1.1.x",
-    "fs-extra": "0.12.x"
+    "fs-extra": "0.12.x",
+    "simple-mime": "0.1.x"
   },
   "devDependencies": {
     
