@@ -10,12 +10,12 @@ module.exports = nunjucks.FileSystemLoader.extend({
         return this.parent(name);
       }
 
-        var fullpath = name;
+      var fullpath = web.conf.baseDir + name;
        
 
-        this.pathsToNames[fullpath] = name;
+      this.pathsToNames[fullpath] = name;
 
-        return { src: fs.readFileSync(fullpath, 'utf-8'),
-                 path: fullpath };
+      return { src: fs.readFileSync(fullpath, 'utf-8'),
+               path: fullpath };
     }
 });

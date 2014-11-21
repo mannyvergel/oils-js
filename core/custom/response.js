@@ -20,8 +20,9 @@ var customResponse = function() {
         _render.call(res, view, options, callback);
       };
 
+      //obsolete, handled in engines/nunjucks
       res.renderFile = function(view, options, callback) {
-        res.render.call(res, web.conf.baseDir + view, options, callback);
+        res.render.call(res, view, options, callback);
       };
       next();
     }
