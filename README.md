@@ -40,7 +40,7 @@ template is optional...
 
 #### Latest Release(s)
 
-Version 1.0.0 ([Download](https://github.com/mannyvergel/oils-js/archive/v1.0.0.zip))
+Version 1.0.6 ([Download](https://github.com/mannyvergel/oils-js/archive/v1.0.6.zip))
 * Revamp of code, more structured
 * Not backwards compatible
 
