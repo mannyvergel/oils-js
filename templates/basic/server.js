@@ -1,5 +1,5 @@
 var Web = require('oils');
 
-var web = new Web({isDebug: true});
+var web = new Web();
 
 web.start();
