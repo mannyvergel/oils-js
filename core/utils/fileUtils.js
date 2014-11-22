@@ -1,4 +1,7 @@
 var fs = require('fs');
+var joinPath = require('path.join');
+
+exports.joinPath = joinPath;
 
 exports.recurseDir = function(dir, callback, subfolder) {
   if (!dir) {

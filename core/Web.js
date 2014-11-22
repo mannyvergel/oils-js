@@ -66,6 +66,7 @@ var Web = Obj.extend('Web', {
   },
 
   utils: require('./utils/oilsUtils.js'),
+  fileUtils: require('./utils/fileUtils.js'),
 
   //web.Plugin.extend..
   Plugin: require('./Plugin.js'),

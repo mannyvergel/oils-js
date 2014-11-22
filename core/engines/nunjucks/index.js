@@ -7,8 +7,12 @@ module.exports = function DefaultTemplateEngine(web, templatesPath) {
   var env = new nunjucks.Environment(new CustomFileSystemLoader(templatesPath), {autoescape: true});
   env.express(web.app)
 
-  //extend nunjucks
-  require('./nunjucks.ext.js')(env);
+  env.extendNunjucks = function(env) {
+  	//extend nunjucks
+  	require('./nunjucks.ext.js')(env);
+  }
+
+  env.extendNunjucks(env);
 
   return env;
 }
