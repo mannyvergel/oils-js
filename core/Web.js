@@ -287,15 +287,14 @@ var Web = Obj.extend('Web', {
     app.use(flash());
     require('./loaders/connections.js')(this);
 
-    var routesFromConf = this.include(web.conf.routesFile);
-    this.applyRoutes(routesFromConf);
-
     require('./loaders/controllers')(this);
 
     require('./loaders/plugins.js')(this);
     var self = this;
     this.loadPlugins(function() {
-       self.callEvent('initServer');
+      var routesFromConf = self.include(web.conf.routesFile);
+      self.applyRoutes(routesFromConf);
+      self.callEvent('initServer');
     });
 
     app.use(express.static(this.conf.baseDir + this.conf.publicDir));
