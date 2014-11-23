@@ -7,7 +7,7 @@ Models directory do not officially support sub folders as of now.
 
 e.g.
 
-/web/models/Book.js ==> ```models('Book')```
+/web/models/Book.js ==> ```web.models('Book')```
 
 ###schema [required]
 
