@@ -2,7 +2,8 @@ var Obj = require('./Obj.js');
 var extend = require('node.extend');
 var express = require('express');
 var domain = require('domain');
-var Schema = require('mongoose').Schema;
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 var log4js = require('log4js');
 var flash = require('connect-flash');
 var routeUtils = require('./utils/routeUtils');
@@ -64,7 +65,7 @@ var Web = Obj.extend('Web', {
     this.modelCache = new Object();
     this.plugins = [];
   },
-
+  mongoose: mongoose,
   utils: require('./utils/oilsUtils.js'),
   fileUtils: require('./utils/fileUtils.js'),
 
