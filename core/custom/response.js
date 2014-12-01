@@ -1,5 +1,8 @@
 var web = global.web;
 var customResponse = function() {
+  //TODO: may need to transfer this later (make sure it's only called once)
+  web.on('beforeRender', initBeforeRender)
+
   return function(req, res, next) {
 
       //redirect trailing e.g. '/hello/' to '/hello' 
@@ -15,7 +18,6 @@ var customResponse = function() {
       
       //override res.render
       res.render = function(view, options, callback) {
-        web.on('beforeRender', initBeforeRender)
         web.callEvent('beforeRender', [view, options, callback, req, res])
         _render.call(res, view, options, callback);
       };
