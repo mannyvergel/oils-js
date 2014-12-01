@@ -15,7 +15,7 @@ var customResponse = function() {
       
       //override res.render
       res.render = function(view, options, callback) {
-        options = beforeRender(req, res, view, options, callback);
+        web.on('beforeRender', initBeforeRender)
         web.callEvent('beforeRender', [view, options, callback, req, res])
         _render.call(res, view, options, callback);
       };
@@ -30,7 +30,7 @@ var customResponse = function() {
 
 module.exports = customResponse;
 
-function beforeRender(req, res, view, options, callback) {
+function initBeforeRender(view, options, callback, req, res) {
   if (!options) {
     options = {}
   }
@@ -39,5 +39,5 @@ function beforeRender(req, res, view, options, callback) {
   options['_errors'] = req.flash('error');
 
   options['_infos'] = req.flash('info');
-  return options;
+
 };
