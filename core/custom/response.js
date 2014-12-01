@@ -18,6 +18,7 @@ var customResponse = function() {
       
       //override res.render
       res.render = function(view, options, callback) {
+        options = options || {};
         web.callEvent('beforeRender', [view, options, callback, req, res])
         _render.call(res, view, options, callback);
       };
