@@ -95,15 +95,20 @@ function handleRequest(web, verb, route, obj, controller) {
 
 function showError(req, res, er, app) {
   try {
-    res.writeHead(500);
+    res.status(500);
     console.error('Route error at ' + req.url, er);
-    if (console.isDebug) {
-      res.write(er.stack);
+    if (web.conf.handle500) {
+      web.conf.handle500(er, req, res);
     } else {
-      //show to end users
-      res.write('An unexpected error has occurred.');
+      if (console.isDebug) {
+        res.write(er.stack);
+      } else {
+        //show to end users
+        res.write('An unexpected error has occurred.');
+      }
+      res.end();
     }
-    res.end();
+
   } catch (er) {
     console.error('Error sending 500', er, req.url);
   }

@@ -30,6 +30,7 @@ var defaultConf = {
   pluginsDir: constants.PLUGINS_DIR,
   customConfigFile: constants.CONFIG_PATH,
   routesFile: constants.ROUTES_FILE,
+  secretPassphrase: 'hello oils 2015',
   port: 8080,
   ipAddress: '0.0.0.0',
   isDebug: false,
@@ -259,6 +260,7 @@ var Web = Obj.extend('Web', {
 
   initServer: function() {
     var app = this.app;
+    var web = this;
     var bodyParser = require('body-parser');
     var methodOverride = require('method-override');
     var cookieParser = require('cookie-parser');
@@ -281,7 +283,7 @@ var Web = Obj.extend('Web', {
 
     
     app.use(methodOverride());
-    var cookieKey = "hello oils 2014";
+    var cookieKey = web.conf.secretPassphrase;
     app.use(cookieParser(cookieKey));
     var oneDay = 86400000;
     app.use(cookieSession({keys: [cookieKey], cookie: {maxAge: oneDay}}));

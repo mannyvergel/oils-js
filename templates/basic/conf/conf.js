@@ -14,6 +14,7 @@ var conf = {
       url: (process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME) || 'mongodb://localhost/oils'
     }
   },
+  secretPassphrase: '546f91bbb70913c308f6ca0f',
   isDebug: (typeof process.env.OPENSHIFT_NODEJS_IP === 'undefined'),
   plugins: {
     //add your plugins in package.js and declare it here e.g.
