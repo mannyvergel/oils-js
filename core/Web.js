@@ -6,6 +6,8 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var log4js = require('log4js');
 var flash = require('connect-flash');
+var path = require('path');
+var fs = require('fs');
 var routeUtils = require('./utils/routeUtils');
 log4js.replaceConsole();
 
@@ -68,6 +70,7 @@ var Web = Obj.extend('Web', {
   mongoose: mongoose,
   utils: require('./utils/oilsUtils.js'),
   fileUtils: require('./utils/fileUtils.js'),
+  stringUtils: require('./utils/stringUtils.js'),
 
   //web.Plugin.extend..
   Plugin: require('./Plugin.js'),
@@ -292,18 +295,25 @@ var Web = Obj.extend('Web', {
     require('./loaders/plugins.js')(this);
     var self = this;
     this.loadPlugins(function() {
-      var routesFromConf = self.include(web.conf.routesFile);
-      self.applyRoutes(routesFromConf);
+
+      var confRoutes = self.conf.routes || {};
+      confRoutes = extend(self.include(self.conf.routesFile), confRoutes);
+
+      self.conf.routes = confRoutes;
+      self.applyRoutes(self.conf.routes);
       self.callEvent('initServer');
     });
 
     app.use(express.static(this.conf.baseDir + this.conf.publicDir));
 
     app.use(function(err, req, res, next){
-      // logic
+      res.status(500);
+      if (web.conf.handle500) {
+        web.conf.handle500(err, req, res, next);
+      } else {
+        res.send("This is embarrassing.");
+      }
       console.error("General error", err);
-      res.status(500).send("This is embarrassing.");
-      //TODO: tweet / email
     });
     
   },
@@ -326,16 +336,76 @@ var Web = Obj.extend('Web', {
 
       // Initialize the express server and routes.
       web.initServer();
-      
-      //  Start the app on the specific interface (and port).
-      web.app.listen(web.conf.port, web.conf.ipAddress, function(err, result) {
-          console.log('%s: Node server started on %s:%d ...',
-                      Date(Date.now()), web.conf.ipAddress, web.conf.port);
+      var http = require('http');
+
+      var alwaysSecure = null;
+      if (web.conf.https) {
+        var https = require('https');
+        var privateKey = fs.readFileSync(web.conf.https.privateKey, 'utf8');
+        var certificate = fs.readFileSync(web.conf.https.certificate, 'utf8');
+        var credentials = {key: privateKey, cert: certificate};
+        var httpsServer = https.createServer(credentials, web.app);
+
+        httpsServer.listen(web.conf.https.port, web.conf.ipAddress, function(err, result) {
+          if (err) {
+            console.error(err);
+          }
+          console.log('%s: Node https server started on %s:%d ...',
+                      Date(Date.now()), web.conf.ipAddress, web.conf.https.port);
 
           if (cb) {
             cb(err, result);
           }
-      });
+        });
+
+        alwaysSecure = web.conf.https.alwaysSecure;
+      }
+      
+      if (alwaysSecure && alwaysSecure.enabled) {
+        var httpRedirecter = http.createServer(function(req, res) {
+
+          if (alwaysSecure.redirectHandler) {
+            alwaysSecure.redirectHandler(req, res);
+          } else {  
+            var url = require('url');
+            var nonStandardPort = '';
+            if (web.conf.https.port != 443) {
+              nonStandardPort = ':' + web.conf.https.port;
+            }
+            res.writeHead(302, {'Location': 'https://' + req.headers.host.split(':')[0] + nonStandardPort});
+            res.end();
+          }
+        });
+
+        httpRedirecter.listen(web.conf.port, web.conf.ipAddress, function(err, result) {
+           if (err) {
+              console.error(err);
+            }
+            
+            console.log('%s: http redirecter server started on %s:%d ...',
+                        Date(Date.now()), web.conf.ipAddress, web.conf.port);
+
+            if (cb) {
+              cb(err, result);
+            }
+        });
+      } else {
+        var httpServer = http.createServer(web.app);
+        //  Start the app on the specific interface (and port).
+        httpServer.listen(web.conf.port, web.conf.ipAddress, function(err, result) {
+           if (err) {
+              console.error(err);
+            }
+            
+            console.log('%s: Node server started on %s:%d ...',
+                        Date(Date.now()), web.conf.ipAddress, web.conf.port);
+
+            if (cb) {
+              cb(err, result);
+            }
+        });
+      }
+
     });
   }
 
