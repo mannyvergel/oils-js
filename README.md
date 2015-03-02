@@ -38,15 +38,9 @@ template is optional...
 ```
 
 
-#### Latest Release(s)
+#### Latest Releases
 
-Version 1.0.6 ([Download](https://github.com/mannyvergel/oils-js/archive/v1.0.6.zip))
-* Revamp of code, more structured
-* Not backwards compatible
-
-Version 0.4.5 ([Download](https://github.com/mannyvergel/oils-js/archive/v0.4.5.zip))
-* Bug fix for model inclusion
-
+See [Releases](https://github.com/mannyvergel/oils-js/releases) page.
 
 #### Directory Structure
 
