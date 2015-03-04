@@ -292,8 +292,6 @@ var Web = Obj.extend('Web', {
     app.use(flash());
     require('./loaders/connections.js')(this);
 
-    require('./loaders/controllers')(this);
-
     require('./loaders/plugins.js')(this);
     var self = this;
     this.loadPlugins(function() {
@@ -303,6 +301,7 @@ var Web = Obj.extend('Web', {
 
       self.conf.routes = confRoutes;
       self.applyRoutes(self.conf.routes);
+      require('./loaders/controllers')(self);
       self.callEvent('initServer');
     });
 
