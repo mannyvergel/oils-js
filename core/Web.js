@@ -9,6 +9,7 @@ var flash = require('connect-flash');
 var path = require('path');
 var fs = require('fs');
 var routeUtils = require('./utils/routeUtils');
+var stringUtils = require('./utils/stringUtils.js');
 log4js.replaceConsole();
 
 var constants = {
@@ -43,12 +44,52 @@ var defaultConf = {
     }
   }
 }
+
+var callerId = require('caller-id')
 /**
 Oils web app
 */
 var Web = Obj.extend('Web', {
+
   init: function(conf){
-    global.web = this;
+    //global.web = this;
+    var web = this;
+
+    if (!global._web) {
+      global._web = {};
+    }
+    conf = conf || {};
+
+    var callerFilePath = callerId.getData().filePath;
+
+    if (!conf.baseDir) {
+      conf.baseDir = callerFilePath.substr(0, callerFilePath.indexOf('node_modules') - 1);
+    }
+    if (global._web[conf.baseDir]) {
+      throw new Error("Web has been redefined " + conf.baseDir + " vs " + JSON.stringify(callerId.getData()));
+    }
+
+    global._web[conf.baseDir] = web;
+
+    if (!global.hasOwnProperty('web')) {
+      Object.defineProperty(global, 'web', {
+        get: function() {
+          if (Object.keys(global._web).length == 1) {
+            return web;
+          }
+
+          for (var i in global._web) {
+            if (stringUtils.startsWith(callerId.getData().filePath, i)) {
+              //console.warn('Found new web! ' + i);
+              return global._web[i];
+            }
+          }
+
+          throw new Error("Web cache not found " + JSON.stringify(callerId.getData()));
+          //return web;
+        }
+      })
+    }
     this.constants = constants;
     //load custom config file
     this.conf = defaultConf;
@@ -71,7 +112,7 @@ var Web = Obj.extend('Web', {
   mongoose: mongoose,
   utils: require('./utils/oilsUtils.js'),
   fileUtils: require('./utils/fileUtils.js'),
-  stringUtils: require('./utils/stringUtils.js'),
+  stringUtils: stringUtils,
 
   //web.Plugin.extend..
   Plugin: require('./Plugin.js'),

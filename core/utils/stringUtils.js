@@ -2,6 +2,13 @@ exports.endsWith = function(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+exports.startsWith = function (str, startsWith){
+  if (!str || !startsWith) {
+    return false;
+  }
+  return str.indexOf(startsWith) == 0;
+}
+
 exports.escapeRegexp = function(str) {
 	return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
