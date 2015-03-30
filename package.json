@@ -1,6 +1,6 @@
 {
   "name": "oils",
-  "version": "1.0.17",
+  "version": "2.0.0",
   "description": "A slightly opinionated web framework built on top of Express 4.",
   "keywords": [
   	"OilsJs",
@@ -27,17 +27,16 @@
   },
 
   "dependencies": {
-    "express": "~4.10.2",
-    "body-parser" : "1.9.x",
+    "express": "~4.12.2",
+    "body-parser" : "1.12.x",
     "cookie-parser" : "1.3.x",
-    "cookie-session" : "1.0.x",
+    "cookie-session" : "1.1.x",
     "method-override" : "2.3.x",
     "function-name" : "0.0.x",
     "connect-flash": "0.1.x",
-    "nunjucks": "1.1.x",
+    "nunjucks": "1.2.x",
     "moment": "2.8.x",
     "marked": "0.3.x",
-    "es6-promise" : "2.0.x",
     "mongoose": "3.8.x",
     "log4js" : "0.6.x",
     "nomnom" : "1.8.x",
