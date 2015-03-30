@@ -37,13 +37,14 @@ module.exports = function(web) {
 			}
 
 			var connect = function() {
-				web.connections[i].open(url, errFunc);
+				web.connections[i].open(url, {server: {poolSize: web.conf.connectionPoolSize}, replset: {poolSize: web.conf.connectionPoolSize}}, errFunc);
 			}
 
 			web.connections[i] = mongoose.createConnection();
-      if (console.isDebug) {
-        console.debug('connections.' + i + ' created.');
-      }
+			
+			if (console.isDebug) {
+			console.debug('connections.' + i + ' created.');
+			}
 			
 			web.connections[i].on('error', errFunc);
 			web.connections[i].on('open', function() {

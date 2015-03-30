@@ -35,6 +35,7 @@ var defaultConf = {
   port: 8080,
   ipAddress: '0.0.0.0',
   isDebug: false,
+  connectionPoolSize: 5,
   connections: {
     //only mongoose connections are support for now
     //you can specify multiple connections and specify the connection in your model.
