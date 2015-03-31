@@ -13,7 +13,7 @@ module.exports = function(web) {
 		var dbConf = conf.connections[i];
 
 		if (!web.connections[i]) {
-			var mongoose = web.mongoose;
+			var mongoose = web.lib.mongoose;
 
 			var url = dbConf.url;
 			

@@ -55,6 +55,8 @@ var Web = Obj.extend('Web', {
   init: function(conf){
     //global.web = this;
     var web = this;
+    web.lib = web.lib || {};
+    web.lib.mongoose = mongoose;
 
     if (!global._web) {
       global._web = {};
@@ -110,7 +112,6 @@ var Web = Obj.extend('Web', {
     this.modelCache = new Object();
     this.plugins = [];
   },
-  mongoose: mongoose,
   utils: require('./utils/oilsUtils.js'),
   fileUtils: require('./utils/fileUtils.js'),
   stringUtils: stringUtils,
