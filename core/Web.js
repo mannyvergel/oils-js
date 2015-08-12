@@ -43,7 +43,8 @@ var defaultConf = {
     mainDb : {
       url: (process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME) || 'mongodb://localhost/test'
     }
-  }
+  },
+  parserLimit: '3mb'
 }
 
 var callerId = require('caller-id')
@@ -319,9 +320,10 @@ var Web = Obj.extend('Web', {
     }
     
 
-    app.use(bodyParser.json());
+    app.use(bodyParser.json({limit: web.conf.parserLimit}));
     app.use(bodyParser.urlencoded({
-      extended: true
+      extended: true,
+      limit: web.conf.parserLimit
     }));
 
     
