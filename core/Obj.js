@@ -1,4 +1,4 @@
-var set = require('function-name');
+//var set = require('function-name');
 // A simple class system, more documentation to come
 
 function extend(cls, name, props) {
@@ -53,7 +53,8 @@ function extend(cls, name, props) {
             name = "anonymous";
         }
         //for more reliable stack trace
-        set(this, name);
+        //commented since not working in latest build, fix soon
+        //set(this, name);
         return extend(new_cls, name, props);
     };
 
