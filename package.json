@@ -1,9 +1,9 @@
 {
   "name": "oils",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "A slightly opinionated web framework built on top of Express 4.",
   "keywords": [
-  	"OilsJs",
+    "OilsJs",
     "Oils",
     "MVC",
     "application",
@@ -22,35 +22,31 @@
     "type": "git",
     "url": "https://github.com/mannyvergel/oils-js.git"
   },
-
   "engines": {
     "node": ">= 0.10.0"
   },
-
   "dependencies": {
-    "express": "~4.13.2",
-    "body-parser" : "1.14.x",
-    "cookie-parser" : "1.4.x",
-    "cookie-session" : "1.2.x",
-    "method-override" : "2.3.x",
+    "body-parser": "1.14.x",
+    "caller-id": "0.1.x",
     "connect-flash": "0.1.x",
-    "nunjucks": "2.2.x",
-    "moment": "2.10.x",
-    "marked": "0.3.x",
-    "mongoose": "4.2.x",
-    "log4js" : "0.6.x",
-    "nomnom" : "1.8.x",
-    "node.extend" : "1.1.x",
+    "cookie-parser": "1.4.x",
+    "cookie-session": "1.2.x",
+    "express": "~4.13.2",
     "fs-extra": "0.26.x",
-    "simple-mime": "0.1.x",
+    "letsencrypt": "^1.4.3",
+    "log4js": "0.6.x",
+    "marked": "0.3.x",
+    "method-override": "2.3.x",
+    "moment": "2.10.x",
+    "mongoose": "4.2.x",
+    "node.extend": "1.1.x",
+    "nomnom": "1.8.x",
+    "nunjucks": "2.2.x",
     "path.join": "1.0.x",
-    "caller-id": "0.1.x"
+    "simple-mime": "0.1.x"
   },
-  "devDependencies": {
-    
-    },
+  "devDependencies": {},
   "bundleDependencies": [],
-
   "private": false,
   "main": "core/Web.js",
   "bin": {

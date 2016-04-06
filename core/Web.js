@@ -385,24 +385,65 @@ var Web = Obj.extend('Web', {
       var http = require('http');
 
       var alwaysSecure = null;
-      if (web.conf.https) {
-        var https = require('https');
-        var privateKey = fs.readFileSync(web.conf.https.privateKey, 'utf8');
-        var certificate = fs.readFileSync(web.conf.https.certificate, 'utf8');
-        var credentials = {key: privateKey, cert: certificate};
-        var httpsServer = https.createServer(credentials, web.app);
+      if (web.conf.https && web.conf.https.enabled) {
+        if (web.conf.https.letsEncrypt) {
+          //must do this manuall - npm install --global letsencrypt-cli
+          var https = require('https');
+          var email = web.conf.https.letsEncrypt.email;
 
-        httpsServer.listen(web.conf.https.port, web.conf.ipAddress, function(err, result) {
-          if (err) {
-            console.error(err);
+          var LEX;
+          if (web.conf.https.letsEncrypt.testing) {
+            LEX = require('letsencrypt-express').testing();
+          } else {
+            LEX = require('letsencrypt-express');
           }
-          console.log('%s: Node https server started on %s:%d ...',
-                      Date(Date.now()), web.conf.ipAddress, web.conf.https.port);
 
-          if (cb) {
-            cb(err, result);
-          }
-        });
+          var lex = LEX.create({
+            configDir: require('os').homedir() + '/letsencrypt/etc'
+          , approveRegistration: function (hostname, cb) { // leave `null` to disable automatic registration
+              // Note: this is the place to check your database to get the user associated with this domain
+              cb(null, {
+                domains: [hostname]
+              , email: email 
+              , agreeTos: true
+              });
+            }
+          });
+
+          https.createServer(lex.httpsOptions, LEX.createAcmeResponder(lex, app))
+          .listen(web.conf.https.port, web.conf.ipAddress, function(err, result) {
+            if (err) {
+              console.error(err);
+            }
+            console.log('%s: Node https server started on %s:%d ...',
+                        Date(Date.now()), web.conf.ipAddress, web.conf.https.port);
+
+            if (cb) {
+              cb(err, result);
+            }
+          });
+
+
+
+        } else {
+          var https = require('https');
+          var privateKey = fs.readFileSync(web.conf.https.privateKey, 'utf8');
+          var certificate = fs.readFileSync(web.conf.https.certificate, 'utf8');
+          var credentials = {key: privateKey, cert: certificate};
+          var httpsServer = https.createServer(credentials, web.app);
+
+          httpsServer.listen(web.conf.https.port, web.conf.ipAddress, function(err, result) {
+            if (err) {
+              console.error(err);
+            }
+            console.log('%s: Node https server started on %s:%d ...',
+                        Date(Date.now()), web.conf.ipAddress, web.conf.https.port);
+
+            if (cb) {
+              cb(err, result);
+            }
+          });
+        }
 
         alwaysSecure = web.conf.https.alwaysSecure;
       }
