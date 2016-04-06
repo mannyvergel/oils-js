@@ -455,12 +455,11 @@ var Web = Obj.extend('Web', {
           if (alwaysSecure.redirectHandler) {
             alwaysSecure.redirectHandler(req, res);
           } else {  
-            var url = require('url');
             var nonStandardPort = '';
             if (web.conf.https.port != 443) {
               nonStandardPort = ':' + web.conf.https.port;
             }
-            res.writeHead(302, {'Location': 'https://' + req.headers.host.split(':')[0] + nonStandardPort});
+            res.writeHead(302, {'Location': 'https://' + req.headers.host.split(':')[0] + nonStandardPort + req.url});
             res.end();
           }
         });
