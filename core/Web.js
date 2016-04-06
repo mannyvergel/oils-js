@@ -410,13 +410,14 @@ var Web = Obj.extend('Web', {
             }
           });
 
-          https.createServer(lex.httpsOptions, LEX.createAcmeResponder(lex, app))
-          .listen(web.conf.https.port, web.conf.ipAddress, function(err, result) {
+          var httpsPort = web.conf.https.port || 443;
+          https.createServer(lex.httpsOptions, LEX.createAcmeResponder(lex, web.app))
+          .listen(httpsPort, web.conf.ipAddress, function(err, result) {
             if (err) {
               console.error(err);
             }
             console.log('%s: Node https server started on %s:%d ...',
-                        Date(Date.now()), web.conf.ipAddress, web.conf.https.port);
+                        Date(Date.now()), web.conf.ipAddress, httpsPort);
 
             if (cb) {
               cb(err, result);

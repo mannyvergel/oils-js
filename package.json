@@ -33,6 +33,7 @@
     "cookie-session": "1.2.x",
     "express": "~4.13.2",
     "fs-extra": "0.26.x",
+    "http2": "^3.3.2",
     "letsencrypt-express": "^1.1.2",
     "log4js": "0.6.x",
     "marked": "0.3.x",
