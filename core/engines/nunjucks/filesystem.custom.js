@@ -10,7 +10,10 @@ module.exports = nunjucks.FileSystemLoader.extend({
         return this.parent(name);
       }
 
-      var fullpath = web.conf.baseDir + name;
+      var fullpath = name;
+      if (!web.stringUtils.startsWith(name, web.conf.baseDir)) {
+      	fullpath = web.conf.baseDir + name;
+      }
        
 
       this.pathsToNames[fullpath] = name;
