@@ -1,9 +1,13 @@
 var moment = require('moment');
 module.exports = function customiseNunjucks(nunjucksEnv) {
   nunjucksEnv.addFilter('date', function(date, format) {
-        var s = moment(date).format(format);
-        return s;
-      });
+    if (!date) {
+      return null;
+    }
+    
+    var s = moment(date).format(format);
+    return s;
+  });
 
   nunjucksEnv.addExtension('MarkedExtension', new MarkedExtension());
 }
