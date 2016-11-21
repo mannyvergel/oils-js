@@ -1,6 +1,6 @@
 {
   "name": "oils",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "description": "A slightly opinionated web framework built on top of Express 4.",
   "keywords": [
     "OilsJs",

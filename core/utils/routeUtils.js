@@ -53,7 +53,24 @@ function applyVerbs(web,route, obj, verbs) {
 
 function handleRequest(web, verb, route, obj, controller) {
   var app = web.app;
-  app.route(route)[verb](function(req, res, next) {
+  var objArray = obj;
+  if (!objectUtils.isArray(objArray)) {
+    objArray = [objArray];
+  }
+
+  var objArrayToApply = [];
+  for (var i in objArray) {
+    var singleObj = objArray[i];
+    objArrayToApply.push(wrapObjToControllerDomain(web, verb, route, singleObj, controller));
+  }
+
+  app.route(route)[verb](objArrayToApply);
+  
+}
+
+function wrapObjToControllerDomain(web, verb, route, obj, controller) {
+  var app = web.app;
+  return function(req, res, next) {
     var reqd = domain.create();
     reqd.add(req);
     reqd.add(res);
@@ -89,8 +106,7 @@ function handleRequest(web, verb, route, obj, controller) {
       
     }) 
 
-  });
-  
+  }
 }
 
 function showError(req, res, er, app) {
