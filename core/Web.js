@@ -8,6 +8,7 @@ var log4js = require('log4js');
 var flash = require('connect-flash');
 var path = require('path');
 var fs = require('fs');
+var csrf = require('csurf');
 var routeUtils = require('./utils/routeUtils');
 var stringUtils = require('./utils/stringUtils.js');
 log4js.replaceConsole();
@@ -31,10 +32,11 @@ var defaultConf = {
   pluginsDir: constants.PLUGINS_DIR,
   customConfigFile: constants.CONFIG_PATH,
   routesFile: constants.ROUTES_FILE,
-  secretPassphrase: 'hello oils 2015',
+  enableCsrfToken: true,
+  secretPassphrase: 'hello oils 2017',
   port: 8080,
   ipAddress: '0.0.0.0',
-  isDebug: false,
+  isDebug: true,
   connectionPoolSize: 5,
   connections: {
     //only mongoose connections are support for now
@@ -305,18 +307,19 @@ var Web = Obj.extend('Web', {
   initServer: function() {
     var app = this.app;
     var web = this;
+    var self = this;
     var bodyParser = require('body-parser');
     var methodOverride = require('method-override');
     var cookieParser = require('cookie-parser');
     var cookieSession = require('cookie-session');
 
   
-    var templatesPath = this.conf.baseDir + this.conf.viewsDir;
+    var templatesPath = self.conf.baseDir + self.conf.viewsDir;
 
-    if (this.conf.templateLoader) {
-      this.templateEngine = this.conf.templateLoader(web, templatesPath);
+    if (self.conf.templateLoader) {
+      self.templateEngine = self.conf.templateLoader(web, templatesPath);
     } else {
-      this.templateEngine = require('./engines/nunjucks')(web, templatesPath);
+      self.templateEngine = require('./engines/nunjucks')(web, templatesPath);
     }
     
 
@@ -332,14 +335,22 @@ var Web = Obj.extend('Web', {
     app.use(cookieParser(cookieKey));
     var oneDay = 86400000;
     app.use(cookieSession({keys: [cookieKey], cookie: {maxAge: oneDay}}));
-   
-    app.use(require('./custom/response')());
-    app.use(flash());
-    require('./loaders/connections.js')(this);
 
-    require('./loaders/plugins.js')(this);
-    var self = this;
-    this.loadPlugins(function() {
+    if (self.conf.enableCsrfToken) {
+      app.use(csrf());
+      app.use(function(req, res, next) {
+        res.locals._csrf = req.csrfToken();
+        next();
+      });
+    }
+   
+    app.use(require('./middleware/custom-response.js')());
+    app.use(flash());
+    require('./loaders/connections.js')(self);
+
+    require('./loaders/plugins.js')(self);
+    
+    self.loadPlugins(function() {
 
       var confRoutes = self.conf.routes || {};
       confRoutes = extend(self.include(self.conf.routesFile), confRoutes);
@@ -350,7 +361,7 @@ var Web = Obj.extend('Web', {
       self.callEvent('initServer');
     });
 
-    app.use(express.static(this.conf.baseDir + this.conf.publicDir));
+    app.use(express.static(self.conf.baseDir + self.conf.publicDir));
 
     app.use(function(err, req, res, next){
       res.status(500);
