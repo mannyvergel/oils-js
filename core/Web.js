@@ -237,11 +237,9 @@ var Web = Obj.extend('Web', {
 
     var web = this;
     var modelJs = null;
-    try {
-      modelJs = web.include(workingPath);
-    } catch (e) {
-      throw new Error('Error loading model ' + workingPath + '. Probably invalid model format ::: ' + e.message);
-    }
+
+    //removed try catch bec v6+ of node already include stack info
+    modelJs = web.include(workingPath);
 
     if (!modelJs.name) {
       if (!workingPath) {
