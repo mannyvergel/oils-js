@@ -3,6 +3,7 @@ var extend = require('node.extend');
 var express = require('express');
 var domain = require('domain');
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var Schema = mongoose.Schema;
 var log4js = require('log4js');
 var flash = require('connect-flash');
@@ -187,8 +188,22 @@ var Web = Obj.extend('Web', {
 
     var conn;
 
-    if (modelJs.connection) {
-      conn = this.connections[modelJs.connection];
+    var getModelConnection = function(modelJs) {
+      if (modelJs.connection) {
+        return modelJs.connection
+      }
+      
+      if (modelJs.parentModel) {
+        return getModelConnection(web.include(modelJs.parentModel));
+      }
+    }
+
+    var modelConn = getModelConnection(modelJs);
+    if (modelConn) {
+      conn = this.connections[modelConn];
+      if (web.conf.isDebug) {
+        console.debug("Found model conn: ", modelJs.name, modelConn);
+      }
     } else if (web.connections.mainDb) {
       conn = web.connections.mainDb; 
     } else {
