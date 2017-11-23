@@ -78,6 +78,11 @@ describe('app', function () {
     done();
   });
 
+  it('should have functioning utilities', function (done) {
+    assert.equal(web.utils.getMimeType('asd.png'), 'image/png', 'getMimeType not functioning correctly.');
+    done();
+  });
+
   it('should have correct globals', function (done) {
 
     assert.notStrictEqual(global.web, undefined, 'global.web not found');

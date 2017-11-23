@@ -39,4 +39,5 @@ module.exports = {
     	res.writeHead(200, {'Content-Type': contentType})
     	res.end(buffer);
 	},
+	getMimeType: getMimeType
 }
