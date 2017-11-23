@@ -28,13 +28,14 @@ var overrideConf = {
   port: 3000,
   baseDir: global.BASE_DIR,
   https: {
+    enabled: false,
     letsEncrypt: {
       email:'manny@mvergel.com',
       testing: true
     },
     port: 8443,
     alwaysSecure: {
-      enabled: true
+      enabled: false
     }
   }
 }

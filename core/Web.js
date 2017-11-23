@@ -469,7 +469,7 @@ var Web = Obj.extend('Web', {
           var lex = web.getLetsEncryptLex();
 
           var httpsPort = web.conf.https.port || 443;
-          https.createServer(lex.httpsOptions, lets.middleware(web.app))
+          https.createServer(lex.httpsOptions, lex.middleware(web.app))
           .listen(httpsPort, web.conf.ipAddress, function(err, result) {
             if (err) {
               console.error(err);
