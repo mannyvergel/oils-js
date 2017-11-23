@@ -388,6 +388,57 @@ var Web = Obj.extend('Web', {
     
   },
 
+  getLetsEncryptLex: function() {
+    var self = this;
+    if (!self.lex) {
+      var defaultHttpsConf = {
+        letsEncrypt: {
+          prodServer: 'https://acme-v01.api.letsencrypt.org/directory',
+          stagingServer: 'staging',
+          email:'manny@mvergel.com',
+          testing: false
+        },
+        port: 443,
+        alwaysSecure: {
+          enabled: false
+        }
+      }
+
+      if (self.conf.https && self.conf.https.letsEncrypt) {
+        self.conf.https.letsEncrypt = extend(defaultHttpsConf.letsEncrypt, self.conf.https.letsEncrypt);
+      }
+      self.conf.https = extend(defaultHttpsConf, self.conf.https || {});
+
+      var letsEncrServer = (!self.conf.isProduction || self.conf.https.letsEncrypt.testing) ? self.conf.https.letsEncrypt.stagingServer : self.conf.https.letsEncrypt.prodServer;
+
+      if (!letsEncrServer) {
+        throw new Error("Cannot set encrypt server.");
+      }
+
+      if (console.isDebug) {
+        console.debug('Server:', letsEncrServer, 'with https conf:', self.conf.https);
+      }
+
+      self.lex = require('greenlock-express').create({
+        server: letsEncrServer,
+       
+        approveDomains: function (opts, certs, cb) {
+          if (certs) {
+            // change domain list here
+            opts.domains = certs.altnames;
+          } else { 
+            // change default email to accept agreement
+            opts.email = self.conf.https.letsEncrypt.email; 
+            opts.agreeTos = true;
+          }
+          cb(null, { options: opts, certs: certs });
+        }
+      });
+    }
+
+    return self.lex
+  },
+
   /**
    * Start the server (starts up the sample application).
    * @param {Web~startCallback} cb - called after server starts.
@@ -413,29 +464,12 @@ var Web = Obj.extend('Web', {
         if (web.conf.https.letsEncrypt) {
           //must do this manuall - npm install --global letsencrypt-cli
           var https = require('https');
-          var email = web.conf.https.letsEncrypt.email;
+          
 
-          var LEX;
-          if (web.conf.https.letsEncrypt.testing) {
-            LEX = require('letsencrypt-express').testing();
-          } else {
-            LEX = require('letsencrypt-express');
-          }
-
-          var lex = LEX.create({
-            configDir: require('os').homedir() + '/letsencrypt/etc'
-          , approveRegistration: function (hostname, cb) { // leave `null` to disable automatic registration
-              // Note: this is the place to check your database to get the user associated with this domain
-              cb(null, {
-                domains: [hostname]
-              , email: email 
-              , agreeTos: true
-              });
-            }
-          });
+          var lex = web.getLetsEncryptLex();
 
           var httpsPort = web.conf.https.port || 443;
-          https.createServer(lex.httpsOptions, LEX.createAcmeResponder(lex, web.app))
+          https.createServer(lex.httpsOptions, lets.middleware(web.app))
           .listen(httpsPort, web.conf.ipAddress, function(err, result) {
             if (err) {
               console.error(err);

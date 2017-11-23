@@ -26,7 +26,17 @@ var includeOils = function(dir) {
 var overrideConf = {
   isDebug: true,
   port: 3000,
-  baseDir: global.BASE_DIR
+  baseDir: global.BASE_DIR,
+  https: {
+    letsEncrypt: {
+      email:'manny@mvergel.com',
+      testing: true
+    },
+    port: 8443,
+    alwaysSecure: {
+      enabled: true
+    }
+  }
 }
 
 var web;
@@ -80,6 +90,7 @@ describe('app', function () {
 
   it('should have functioning utilities', function (done) {
     assert.equal(web.utils.getMimeType('asd.png'), 'image/png', 'getMimeType not functioning correctly.');
+    assert.notStrictEqual(web.getLetsEncryptLex(), undefined, 'web.getLetsEncryptLex not working');
     done();
   });
 

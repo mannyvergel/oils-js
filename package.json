@@ -1,6 +1,6 @@
 {
   "name": "oils",
-  "version": "2.4.4",
+  "version": "2.5.0",
   "description": "A slightly opinionated web framework built on top of Express 4.",
   "keywords": [
     "OilsJs",
@@ -35,8 +35,8 @@
     "csurf": "^1.9.0",
     "express": "~4.16.2",
     "fs-extra": "0.26.x",
+    "greenlock-express": "^2.0.11",
     "http2": "^3.3.2",
-    "letsencrypt-express": "^1.1.2",
     "log4js": "0.6.x",
     "marked": "0.3.x",
     "method-override": "2.3.x",
