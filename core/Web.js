@@ -388,7 +388,7 @@ var Web = Obj.extend('Web', {
     
   },
 
-  getLetsEncryptLex: function() {
+  getLetsEncryptLex: function(approveDomainsFunc) {
     var self = this;
     if (!self.lex) {
       var defaultHttpsConf = {
@@ -396,7 +396,18 @@ var Web = Obj.extend('Web', {
           prodServer: 'https://acme-v01.api.letsencrypt.org/directory',
           stagingServer: 'staging',
           email:'manny@mvergel.com',
-          testing: false
+          testing: true,
+          approveDomainsFunc: function(opts, certs, cb) {
+            if (certs) {
+              // change domain list here
+              opts.domains = certs.altnames;
+            } else { 
+              // change default email to accept agreement
+              opts.email = self.conf.https.letsEncrypt.email; 
+              opts.agreeTos = true;
+            }
+            cb(null, { options: opts, certs: certs });
+          }
         },
         port: 443,
         alwaysSecure: {
@@ -419,20 +430,12 @@ var Web = Obj.extend('Web', {
         console.debug('Server:', letsEncrServer, 'with https conf:', self.conf.https);
       }
 
+      approveDomainsFunc = approveDomainsFunc || self.conf.https.letsEncrypt.approveDomainsFunc;
+
       self.lex = require('greenlock-express').create({
         server: letsEncrServer,
        
-        approveDomains: function (opts, certs, cb) {
-          if (certs) {
-            // change domain list here
-            opts.domains = certs.altnames;
-          } else { 
-            // change default email to accept agreement
-            opts.email = self.conf.https.letsEncrypt.email; 
-            opts.agreeTos = true;
-          }
-          cb(null, { options: opts, certs: certs });
-        }
+        approveDomains: approveDomainsFunc
       });
     }
 
