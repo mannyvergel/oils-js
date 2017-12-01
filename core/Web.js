@@ -307,13 +307,31 @@ var Web = Obj.extend('Web', {
     require('./utils/queueLoader.js')(pluginFunctions, [], cb);
   },
 
+  //for deprection, use addRoutes whenever possible instead
   applyRoutes: function(routes) {
+    var stack = new Error().stack;
+    console.warn("Consider using web.addRoutes instead of applyRoutes.", stack);
+    this._applyRoutes(routes);
+  },
+
+  _applyRoutes: function(routes) {
     for (var routeKey in routes) {
       var customRoute = routes[routeKey];
       if (console.isDebug) {
         console.debug('[conf.route] ' + routeKey);
       }
       routeUtils.applyRoute(web, routeKey, customRoute);
+    }
+  },
+
+  addRoutes: function(routes) {
+    this.conf.routes = this.conf.routes || {};
+    for (var key in routes) {
+      if (this.conf.routes[key]) {
+        console.warn("Check conflicting routes:", key, confRoutes);
+      }
+
+      this.conf.routes[key] = routes[key];
     }
   },
 
@@ -364,13 +382,16 @@ var Web = Obj.extend('Web', {
     require('./loaders/plugins.js')(self);
     
     self.loadPlugins(function() {
+      //use this for adding events prior to adding routes
+      self.callEvent('loadPlugins');
 
       var confRoutes = self.conf.routes || {};
       confRoutes = extend(self.include(self.conf.routesFile), confRoutes);
 
       self.conf.routes = confRoutes;
-      self.applyRoutes(self.conf.routes);
+      self._applyRoutes(self.conf.routes);
       require('./loaders/controllers')(self);
+      
       self.callEvent('initServer');
     });
 
