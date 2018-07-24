@@ -1,3 +1,5 @@
+var escapeHtml = require('escape-html');
+
 exports.endsWith = function(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
@@ -26,4 +28,8 @@ exports.capitalize = function(aStr) {
 
 exports.isEmpty = function(str) {
 	return str == null || str.length == 0;
+}
+
+exports.escapeHTML = function(str) {
+  return escapeHtml(str);
 }

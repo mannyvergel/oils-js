@@ -1,4 +1,4 @@
-var extend = require('node.extend');
+var extend = Object.assign;
 var fs = require('fs');
 var getMimeType = require('simple-mime')('application/octet-stream');
 

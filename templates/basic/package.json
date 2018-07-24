@@ -3,10 +3,8 @@
   "version": "1.0.0",
   "description": "Oils Js Sample Application",
   "keywords": [
-    "OpenShift",
     "Node.js",
-    "application",
-    "openshift"
+    "application"
   ],
   "author": {
     "name": "Manny Vergel",

@@ -1,17 +1,28 @@
 var Obj = require('./Obj.js');
-var extend = require('node.extend');
+var extend = Object.assign;
 var express = require('express');
 var domain = require('domain');
 var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 var Schema = mongoose.Schema;
-var log4js = require('log4js');
 var flash = require('connect-flash');
 var path = require('path');
 var fs = require('fs');
 var csrf = require('csurf');
 var routeUtils = require('./utils/routeUtils');
 var stringUtils = require('./utils/stringUtils.js');
+
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
+if (!log4js.replaceConsole) {
+  log4js.replaceConsole = function() {
+    console.log = logger.info.bind(logger);
+    console.debug = logger.debug.bind(logger);
+    console.warn = logger.warn.bind(logger);
+  }
+}
+
 log4js.replaceConsole();
 
 var constants = {
@@ -24,8 +35,12 @@ var constants = {
   ROUTES_FILE: '/conf/routes.js'
 }
 
+var isProd = process.env.NODE_ENV == 'production';
+
 var defaultConf = {
   baseDir: process.cwd(),
+  isProd: isProd,
+  isProduction: isProd,
   viewsDir: constants.VIEWS_DIR,
   controllersDir: constants.CONTROLLERS_DIR,
   modelsDir: constants.MODELS_DIR,
@@ -33,8 +48,8 @@ var defaultConf = {
   pluginsDir: constants.PLUGINS_DIR,
   customConfigFile: constants.CONFIG_PATH,
   routesFile: constants.ROUTES_FILE,
-  enableCsrfToken: true,
-  secretPassphrase: 'hello oils 2017',
+  enableCsrfToken: false,
+  secretPassphrase: 'hello oils 2018',
   port: 8080,
   ipAddress: '0.0.0.0',
   isDebug: true,
@@ -44,7 +59,7 @@ var defaultConf = {
     //you can specify multiple connections and specify the connection in your model.
     //if you don't need a db, you can remove/comment out mainDb
     mainDb : {
-      url: (process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME) || 'mongodb://localhost/test'
+      url: 'mongodb://localhost:27017/test'
     }
   },
   parserLimit: '3mb'
@@ -110,15 +125,34 @@ var Web = Obj.extend('Web', {
     console.isDebug = this.conf.isDebug;
     if (console.isDebug) {
       console.debug('Oils config: ' + JSON.stringify(this.conf, null, 2));
+      logger.level = 'debug';
+    } else {
+      logger.level = 'info';
     }
+
     this.app = express();
     this.events = {};
     this.modelCache = new Object();
     this.plugins = [];
   },
+
+  //collection of general utilties
   utils: require('./utils/oilsUtils.js'),
+
+  //collection of common file utilities
   fileUtils: require('./utils/fileUtils.js'),
+
+  //collection of common date utilities
+  dateUtils: require('./utils/dateUtils.js'),
+
+  //collection of common string utilities
   stringUtils: stringUtils,
+
+  //a way to use oils library so no need to re-install
+  //e.g. const moment = web.require('moment');
+  require: function(str) {
+    return require(str);
+  },
 
   //web.Plugin.extend..
   Plugin: require('./Plugin.js'),
@@ -183,7 +217,7 @@ var Web = Obj.extend('Web', {
       if (console.isDebug) {
         console.debug('Model %s has a parent %s', modelName, modelJs.parentModel);
       }
-      //modelJs = extend(true, parentModelJs, modelJs);
+
     }
 
     var conn;
@@ -409,26 +443,20 @@ var Web = Obj.extend('Web', {
     
   },
 
-  getLetsEncryptLex: function(approveDomainsFunc) {
+  getLetsEncryptLex: function() {
     var self = this;
     if (!self.lex) {
+
       var defaultHttpsConf = {
         letsEncrypt: {
-          prodServer: 'https://acme-v01.api.letsencrypt.org/directory',
+          version: 'draft-11',
+          server: 'https://acme-v02.api.letsencrypt.org/directory',
           stagingServer: 'staging',
+          configDir: (self.conf.dataDir || (self.conf.baseDir + "/data")) + '/.config/acme/',
           email:'manny@mvergel.com',
           testing: true,
-          approveDomainsFunc: function(opts, certs, cb) {
-            if (certs) {
-              // change domain list here
-              opts.domains = certs.altnames;
-            } else { 
-              // change default email to accept agreement
-              opts.email = self.conf.https.letsEncrypt.email; 
-              opts.agreeTos = true;
-            }
-            cb(null, { options: opts, certs: certs });
-          }
+          agreeTos: true,
+          approveDomains: self.conf.https.domains,
         },
         port: 443,
         alwaysSecure: {
@@ -441,7 +469,7 @@ var Web = Obj.extend('Web', {
       }
       self.conf.https = extend(defaultHttpsConf, self.conf.https || {});
 
-      var letsEncrServer = (!self.conf.isProduction || self.conf.https.letsEncrypt.testing) ? self.conf.https.letsEncrypt.stagingServer : self.conf.https.letsEncrypt.prodServer;
+      var letsEncrServer = (!self.conf.isProd || self.conf.https.letsEncrypt.testing) ? self.conf.https.letsEncrypt.stagingServer : self.conf.https.letsEncrypt.prodServer;
 
       if (!letsEncrServer) {
         throw new Error("Cannot set encrypt server.");
@@ -451,13 +479,8 @@ var Web = Obj.extend('Web', {
         console.debug('Server:', letsEncrServer, 'with https conf:', self.conf.https);
       }
 
-      approveDomainsFunc = approveDomainsFunc || self.conf.https.letsEncrypt.approveDomainsFunc;
 
-      self.lex = require('greenlock-express').create({
-        server: letsEncrServer,
-       
-        approveDomains: approveDomainsFunc
-      });
+      self.lex = require('greenlock-express').create(self.conf.https.letsEncrypt);
     }
 
     return self.lex

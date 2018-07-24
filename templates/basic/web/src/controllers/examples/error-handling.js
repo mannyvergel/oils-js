@@ -1,6 +1,15 @@
 module.exports = {
-  get: function(req, res, next) {
-    throw new Error('Hello Error!');
+  get: async function(req, res, next) {
+    console.log('Accessing', req.url);
+
+    var myPromise = new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        throw new Error("Some error");
+      }, 500);
+    });
+
+    await myPromise;
+    
   },
 
   onError: function(req, res, err) {

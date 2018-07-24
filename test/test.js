@@ -45,7 +45,6 @@ describe('app', function () {
   this.timeout(40000);
   before (function (done) {
   	fs.copySync('./templates/basic', global.BASE_DIR);
-    fs.copySync('./templates/zurb5', global.BASE_DIR);
 
     fs.remove(BASE_DIR + '/node_modules', function(err) {
       try {
@@ -86,12 +85,21 @@ describe('app', function () {
     assert.notStrictEqual(web.plugins, undefined, 'web.plugins not found');
     assert.notStrictEqual(web.include, undefined, 'web.include not found');
     assert.notStrictEqual(web.includeModel, undefined, 'web.includeModel not found');
+    assert.notStrictEqual(web.require('moment'), null, 'web.require not working');
     done();
   });
 
   it('should have functioning utilities', function (done) {
     assert.equal(web.utils.getMimeType('asd.png'), 'image/png', 'getMimeType not functioning correctly.');
     assert.notStrictEqual(web.getLetsEncryptLex(), undefined, 'web.getLetsEncryptLex not working');
+
+    assert.notStrictEqual(web.stringUtils, undefined, 'web.stringUtils not found');
+    assert.strictEqual(web.stringUtils.escapeHTML("<Test>"), "&lt;Test&gt;", 'web.stringUtils.escaepHTML is invalid');
+
+
+    assert.notStrictEqual(web.dateUtils, undefined, 'web.dateUtils not found');
+    assert.strictEqual(web.dateUtils.formatDate(new Date("April 30 1985"), "YYYYMMDD"), "19850430", 'web.dateUtils.format is invalid');
+
     done();
   });
 

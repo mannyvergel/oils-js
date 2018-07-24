@@ -49,7 +49,7 @@ function webConnect(web, connIndex) {
 	var dbConf = web.conf.connections[connIndex];
 	var url = dbConf.url;
 	var errFunc = getErrFunc(web, connIndex);
-	web.connections[connIndex].openUri(url, {useMongoClient: true, poolSize: web.conf.connectionPoolSize, poolSize: web.conf.connectionPoolSize}, errFunc);
+	web.connections[connIndex].openUri(url, {useNewUrlParser: true, poolSize: web.conf.connectionPoolSize, poolSize: web.conf.connectionPoolSize}, errFunc);
 }
 
 function getErrFunc(web, connIndex) {

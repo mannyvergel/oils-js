@@ -11,7 +11,7 @@ parser.command('new')
  },
  template: {
    abbr: 't',
-   help: "Template to use e.g. zurb5"
+   help: "Template to use e.g. basic"
  }
 })
 .callback(function(opts) {
@@ -31,10 +31,6 @@ function newProject(opts) {
   } else {
 
     fs.copySync(__dirname + '/../templates/basic', folderName);
-
-    if (opts.template == "zurb5") {
-      fs.copySync(__dirname + '/../templates/zurb5', folderName);  
-    }
 
     fs.renameSync(folderName + '/template.gitignore', folderName + '/.gitignore');
 
