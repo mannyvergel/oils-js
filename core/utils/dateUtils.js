@@ -1,4 +1,4 @@
-var moment = require('moment');
+const moment = require('moment');
 
 exports.formatReadableDateTime = function(date) {
   return moment(date).calendar();

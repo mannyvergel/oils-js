@@ -1,12 +1,12 @@
 
-var Plugin = require('../Plugin.js');
+const Plugin = require('../Plugin.js');
 module.exports = function Plugins(web) {
 
-  for (var i in web.conf.plugins) {
-    var pluginConf = web.conf.plugins[i];
+  for (let i in web.conf.plugins) {
+    let pluginConf = web.conf.plugins[i];
     if (pluginConf.enabled) {
 
-      var pluginPath;
+      let pluginPath;
       if (pluginConf.pluginPath) {
         pluginPath = pluginConf.pluginPath;
       } else {
@@ -17,9 +17,9 @@ module.exports = function Plugins(web) {
       if (console.isDebug) {
         console.debug('Adding plugin: ' + pluginPath);
       }
-      var plugin = require(web.conf.baseDir + pluginPath);
+      let plugin = require(web.conf.baseDir + pluginPath);
       try {
-        var pluginObj = null;
+        let pluginObj = null;
         if (!plugin.load) {
           pluginObj = Plugin.extend({
             load: plugin

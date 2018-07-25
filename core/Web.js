@@ -1,19 +1,20 @@
-var Obj = require('./Obj.js');
-var extend = Object.assign;
-var express = require('express');
-var domain = require('domain');
-var mongoose = require('mongoose');
+const Obj = require('./Obj.js');
+const extend = Object.assign;
+const express = require('express');
+const domain = require('domain');
+const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
-var Schema = mongoose.Schema;
-var flash = require('connect-flash');
-var path = require('path');
-var fs = require('fs');
-var csrf = require('csurf');
-var routeUtils = require('./utils/routeUtils');
-var stringUtils = require('./utils/stringUtils.js');
+const Schema = mongoose.Schema;
+const flash = require('connect-flash');
+const path = require('path');
+const fs = require('fs');
+const csrf = require('csurf');
+const routeUtils = require('./utils/routeUtils');
+const stringUtils = require('./utils/stringUtils.js');
 
-var log4js = require('log4js');
-var logger = log4js.getLogger();
+const log4js = require('log4js');
+const logger = log4js.getLogger();
+logger.level = 'debug';
 
 if (!log4js.replaceConsole) {
   log4js.replaceConsole = function() {
@@ -25,33 +26,32 @@ if (!log4js.replaceConsole) {
 
 log4js.replaceConsole();
 
-var constants = {
-  VIEWS_DIR: '/web/src/views',
-  CONTROLLERS_DIR: '/web/src/controllers',
-  MODELS_DIR: '/web/src/models',
-  PUBLIC_DIR: '/web/public',
-  //PLUGINS_DIR: '/conf/plugins',
-  CONFIG_PATH: '/conf/conf.js',
-  ROUTES_FILE: '/conf/routes.js'
-}
+const isProd = process.env.NODE_ENV == 'production';
 
-var isProd = process.env.NODE_ENV == 'production';
-
-var defaultConf = {
+const defaultConf = {
   baseDir: process.cwd(),
   isProd: isProd,
   isProduction: isProd,
-  viewsDir: constants.VIEWS_DIR,
-  controllersDir: constants.CONTROLLERS_DIR,
-  modelsDir: constants.MODELS_DIR,
-  publicDir: constants.PUBLIC_DIR,
-  pluginsDir: constants.PLUGINS_DIR,
-  customConfigFile: constants.CONFIG_PATH,
-  routesFile: constants.ROUTES_FILE,
+
+  viewConf: {
+    mainTemplate: 'templates/main.html',
+    template: 'bootstrap', //zurb or bootstrap, but doesn't make a diff now
+  },
+
+  viewsDir: '/web/src/views',
+  controllersDir: '/web/src/controllers',
+  modelsDir: '/web/src/models',
+  publicDir: '/web/public',
+  customConfigFile: '/conf/conf.js',
+
+  routesFile: '/conf/routes.js',
+
   enableCsrfToken: false,
+  cookieMaxAge: 86400000, //one day
   secretPassphrase: 'hello oils 2018',
   port: 8080,
   ipAddress: '0.0.0.0',
+  zconf: path.join(require('os').homedir(), ".oils", "zconf.js"), //e.g. ~/.oils/zconf.js in mac/linux
   isDebug: true,
   connectionPoolSize: 5,
   connections: {
@@ -65,27 +65,37 @@ var defaultConf = {
   parserLimit: '3mb'
 }
 
-var callerId = require('caller-id')
+const callerId = require('caller-id')
 /**
 Oils web app
 */
-var Web = Obj.extend('Web', {
+const Web = Obj.extend('Web', {
 
   init: function(conf){
     //global.web = this;
-    var web = this;
+    let web = this;
     web.lib = web.lib || {};
-    web.lib.mongoose = mongoose;
+
+    Object.defineProperty(web.lib, 'mongoose', {
+      get: function() {
+        let stack = new Error().stack;
+        console.warn("Use web.require('mongoose') instead of calling web.lib..", stack);
+        return require('mongoose');
+      }
+    });
 
     if (!global._web) {
       global._web = {};
     }
     conf = conf || {};
 
-    var callerFilePath = callerId.getData().filePath;
+    let callerFilePath = callerId.getData().filePath;
 
     if (!conf.baseDir) {
-      conf.baseDir = callerFilePath.substr(0, callerFilePath.indexOf('node_modules') - 1);
+      let tmpBaseDir = callerFilePath.substr(0, callerFilePath.indexOf('node_modules') - 1);
+      if (!stringUtils.isEmpty(tmpBaseDir)) {
+        conf.baseDir = tmpBaseDir;
+      }
     }
     if (global._web[conf.baseDir]) {
       throw new Error("Web has been redefined " + conf.baseDir + " vs " + JSON.stringify(callerId.getData()));
@@ -100,7 +110,7 @@ var Web = Obj.extend('Web', {
             return web;
           }
 
-          for (var i in global._web) {
+          for (let i in global._web) {
             if (stringUtils.startsWith(callerId.getData().filePath, i)) {
               //console.warn('Found new web! ' + i);
               return global._web[i];
@@ -112,15 +122,28 @@ var Web = Obj.extend('Web', {
         }
       })
     }
-    this.constants = constants;
+ 
     //load custom config file
     this.conf = defaultConf;
     this.conf = extend(this.conf, conf);
-    var customConfigFile = this.include(this.conf.customConfigFile);
-    for (var i in conf) {
-      delete customConfigFile[i];
+    
+    if (this.conf.customConfigFile) {
+      let customConf = _nvmRequire(path.join(this.conf.baseDir, this.conf.customConfigFile));
+      if (customConf) {
+        this.conf = extend(this.conf, customConf);
+      }
     }
-    this.conf = extend(this.conf, customConfigFile);
+
+    //zconf: third config path for environmental / more private properties
+    if (this.conf.zconf) {
+      let zconf = _nvmRequire(this.conf.zconf);
+      if (zconf) {
+        this.conf = extend(this.conf, zconf);
+        console.info('Found zconf.. extending.');
+      } else {
+        console.warn(web.conf.zconf, 'not found. Ignoring.');
+      }
+    }
 
     console.isDebug = this.conf.isDebug;
     if (console.isDebug) {
@@ -167,42 +190,40 @@ var Web = Obj.extend('Web', {
   },
 
   callEvent: function(eventStr, argsArray){
-    var myEvents = this.events[eventStr];
-    for (var i in myEvents) {
-      var myEvent = myEvents[i];
-      myEvent.apply(this, argsArray);
+    let myEvents = this.events[eventStr];
+    if (myEvents) {
+      for (let myEvent of myEvents) {
+        myEvent.apply(this, argsArray);
+      }
     }
   },
   // EVENTS end -------
 
   include: function(file, secondFileFallback) {
-    //if (file && file[0] == '/') {
-      return require(this.conf.baseDir + file);
-    //} else {
-    //  return require(file);
-    //}
+    let baseDir = this.conf.baseDir || process.cwd();
+    return require(path.join(this.conf.baseDir, file));
   },
 
   //MODELS ------------
 
   includeModelObj: function(modelJs) {
-    var web = this;
-    var modelName = modelJs.name;
+    let web = this;
+    let modelName = modelJs.name;
     
     if (!modelJs.schema) {
       throw new Error(modelName + '.schema not found.');
     }
 
-    var collectionName = undefined;
+    let collectionName = undefined;
     if (modelJs.parentModel) {
       
-      var parentModel = web.includeModel(modelJs.parentModel);
-      var parentModelJs = parentModel.getModelDictionary();
+      let parentModel = web.includeModel(modelJs.parentModel);
+      let parentModelJs = parentModel.getModelDictionary();
       collectionName = parentModel.collection.name;
 
       modelJs.schema = extend(parentModelJs.schema, modelJs.schema);
       
-      var origSchema = modelJs.initSchema;
+      let origSchema = modelJs.initSchema;
       modelJs.initSchema = [];
       if (origSchema) {
         modelJs.initSchema.push(origSchema);
@@ -220,9 +241,9 @@ var Web = Obj.extend('Web', {
 
     }
 
-    var conn;
+    let conn;
 
-    var getModelConnection = function(modelJs) {
+    let getModelConnection = function(modelJs) {
       if (modelJs.connection) {
         return modelJs.connection
       }
@@ -232,7 +253,7 @@ var Web = Obj.extend('Web', {
       }
     }
 
-    var modelConn = getModelConnection(modelJs);
+    let modelConn = getModelConnection(modelJs);
     if (modelConn) {
       conn = this.connections[modelConn];
       if (web.conf.isDebug) {
@@ -241,7 +262,7 @@ var Web = Obj.extend('Web', {
     } else if (web.connections.mainDb) {
       conn = web.connections.mainDb; 
     } else {
-    for (var i in this.connections) {
+    for (let i in this.connections) {
         //get the first connection
         conn = this.connections[i];
         break;
@@ -253,11 +274,11 @@ var Web = Obj.extend('Web', {
       return;
     }
     
-    var schema = new Schema(modelJs.schema, modelJs.options);
+    let schema = new Schema(modelJs.schema, modelJs.options);
     if (modelJs.initSchema) {
       if (modelJs.initSchema instanceof Array) {
-        for (var i in modelJs.initSchema) {
-          var mySchema = modelJs.initSchema[i];
+        for (let i in modelJs.initSchema) {
+          let mySchema = modelJs.initSchema[i];
           // if (app.isDebug) {
           //   console.debug('[%s] Executing array initSchema %s', modelJs.name ,mySchema);
           // }
@@ -270,7 +291,7 @@ var Web = Obj.extend('Web', {
       
     }
 
-    var model = conn.model(modelName, schema, collectionName);
+    let model = conn.model(modelName, schema, collectionName);
     if (console.isDebug) {
       console.debug("Loaded model for the first time: " + modelName)
     }
@@ -284,8 +305,8 @@ var Web = Obj.extend('Web', {
 
   includeModel: function(workingPath) {
 
-    var web = this;
-    var modelJs = null;
+    let web = this;
+    let modelJs = null;
 
     //removed try catch bec v6+ of node already include stack info
     modelJs = web.include(workingPath);
@@ -310,7 +331,7 @@ var Web = Obj.extend('Web', {
   models: function(modelName) {
 
     if (!this.modelCache[modelName]) {
-      var workingPath = this.conf.modelsDir + '/' + modelName;
+      let workingPath = this.conf.modelsDir + '/' + modelName;
       this.modelCache[modelName] = this.includeModel(workingPath);
     }
     return this.modelCache[modelName];
@@ -332,9 +353,9 @@ var Web = Obj.extend('Web', {
   },
 
   loadPlugins: function(cb) {
-    var pluginFunctions = [];
-    for (var i in this.plugins) {
-      var plugin = this.plugins[i];
+    let pluginFunctions = [];
+    for (let i in this.plugins) {
+      let plugin = this.plugins[i];
       pluginFunctions.push(this._getPluginFunction(plugin));
 
     }
@@ -343,14 +364,14 @@ var Web = Obj.extend('Web', {
 
   //for deprection, use addRoutes whenever possible instead
   applyRoutes: function(routes) {
-    var stack = new Error().stack;
+    let stack = new Error().stack;
     console.warn("Consider using web.addRoutes instead of applyRoutes.", stack);
     this._applyRoutes(routes);
   },
 
   _applyRoutes: function(routes) {
-    for (var routeKey in routes) {
-      var customRoute = routes[routeKey];
+    for (let routeKey in routes) {
+      let customRoute = routes[routeKey];
       if (console.isDebug) {
         console.debug('[conf.route] ' + routeKey);
       }
@@ -360,7 +381,7 @@ var Web = Obj.extend('Web', {
 
   addRoutes: function(routes) {
     this.conf.routes = this.conf.routes || {};
-    for (var key in routes) {
+    for (let key in routes) {
       if (this.conf.routes[key]) {
         console.warn("Check conflicting routes:", key, confRoutes);
       }
@@ -370,16 +391,16 @@ var Web = Obj.extend('Web', {
   },
 
   initServer: function() {
-    var app = this.app;
-    var web = this;
-    var self = this;
-    var bodyParser = require('body-parser');
-    var methodOverride = require('method-override');
-    var cookieParser = require('cookie-parser');
-    var cookieSession = require('cookie-session');
+    let app = this.app;
+    let web = this;
+    let self = this;
+    let bodyParser = require('body-parser');
+    let methodOverride = require('method-override');
+    let cookieParser = require('cookie-parser');
+    let cookieSession = require('cookie-session');
 
   
-    var templatesPath = self.conf.baseDir + self.conf.viewsDir;
+    let templatesPath = self.conf.baseDir + self.conf.viewsDir;
 
     if (self.conf.templateLoader) {
       self.templateEngine = self.conf.templateLoader(web, templatesPath);
@@ -396,10 +417,13 @@ var Web = Obj.extend('Web', {
 
     
     app.use(methodOverride());
-    var cookieKey = web.conf.secretPassphrase;
+    let cookieKey = web.conf.secretPassphrase;
     app.use(cookieParser(cookieKey));
-    var oneDay = 86400000;
-    app.use(cookieSession({keys: [cookieKey], cookie: {maxAge: oneDay}}));
+  
+    app.use(cookieSession({keys: [cookieKey], 
+      cookie: {maxAge: self.conf.cookieMaxAge},
+      maxAge: self.conf.cookieMaxAge, //documentation is confusing that's why need to dup
+    }));
 
     if (self.conf.enableCsrfToken) {
       app.use(csrf());
@@ -419,7 +443,7 @@ var Web = Obj.extend('Web', {
       //use this for adding events prior to adding routes
       self.callEvent('loadPlugins');
 
-      var confRoutes = self.conf.routes || {};
+      let confRoutes = self.conf.routes || {};
       confRoutes = extend(self.include(self.conf.routesFile), confRoutes);
 
       self.conf.routes = confRoutes;
@@ -444,10 +468,10 @@ var Web = Obj.extend('Web', {
   },
 
   getLetsEncryptLex: function() {
-    var self = this;
+    let self = this;
     if (!self.lex) {
 
-      var defaultHttpsConf = {
+      let defaultHttpsConf = {
         letsEncrypt: {
           version: 'draft-11',
           server: 'https://acme-v02.api.letsencrypt.org/directory',
@@ -469,7 +493,7 @@ var Web = Obj.extend('Web', {
       }
       self.conf.https = extend(defaultHttpsConf, self.conf.https || {});
 
-      var letsEncrServer = (!self.conf.isProd || self.conf.https.letsEncrypt.testing) ? self.conf.https.letsEncrypt.stagingServer : self.conf.https.letsEncrypt.prodServer;
+      let letsEncrServer = (!self.conf.isProd || self.conf.https.letsEncrypt.testing) ? self.conf.https.letsEncrypt.stagingServer : self.conf.https.letsEncrypt.prodServer;
 
       if (!letsEncrServer) {
         throw new Error("Cannot set encrypt server.");
@@ -491,7 +515,7 @@ var Web = Obj.extend('Web', {
    * @param {Web~startCallback} cb - called after server starts.
    */
   start: function(cb) {
-    var serverDomain = domain.create();
+    let serverDomain = domain.create();
     serverDomain.on('error', function(err) {
       console.error('Server domain caught an exception: ' + err);
       if (err) {
@@ -499,23 +523,23 @@ var Web = Obj.extend('Web', {
       }
     });
 
-    var web = this;
+    let web = this;
     serverDomain.run(function() {
 
       // Initialize the express server and routes.
       web.initServer();
-      var http = require('http');
+      let http = require('http');
 
-      var alwaysSecure = null;
+      let alwaysSecure = null;
       if (web.conf.https && web.conf.https.enabled) {
         if (web.conf.https.letsEncrypt) {
           //must do this manuall - npm install --global letsencrypt-cli
-          var https = require('https');
+          let https = require('https');
           
 
-          var lex = web.getLetsEncryptLex();
+          let lex = web.getLetsEncryptLex();
 
-          var httpsPort = web.conf.https.port || 443;
+          let httpsPort = web.conf.https.port || 443;
           https.createServer(lex.httpsOptions, lex.middleware(web.app))
           .listen(httpsPort, web.conf.ipAddress, function(err, result) {
             if (err) {
@@ -532,11 +556,11 @@ var Web = Obj.extend('Web', {
 
 
         } else {
-          var https = require('https');
-          var privateKey = fs.readFileSync(web.conf.https.privateKey, 'utf8');
-          var certificate = fs.readFileSync(web.conf.https.certificate, 'utf8');
-          var credentials = {key: privateKey, cert: certificate};
-          var httpsServer = https.createServer(credentials, web.app);
+          let https = require('https');
+          let privateKey = fs.readFileSync(web.conf.https.privateKey, 'utf8');
+          let certificate = fs.readFileSync(web.conf.https.certificate, 'utf8');
+          let credentials = {key: privateKey, cert: certificate};
+          let httpsServer = https.createServer(credentials, web.app);
 
           httpsServer.listen(web.conf.https.port, web.conf.ipAddress, function(err, result) {
             if (err) {
@@ -555,12 +579,12 @@ var Web = Obj.extend('Web', {
       }
       
       if (alwaysSecure && alwaysSecure.enabled) {
-        var httpRedirecter = http.createServer(function(req, res) {
+        let httpRedirecter = http.createServer(function(req, res) {
 
           if (alwaysSecure.redirectHandler) {
             alwaysSecure.redirectHandler(req, res);
           } else {  
-            var nonStandardPort = '';
+            let nonStandardPort = '';
             if (web.conf.https.port != 443) {
               nonStandardPort = ':' + web.conf.https.port;
             }
@@ -582,7 +606,7 @@ var Web = Obj.extend('Web', {
             }
         });
       } else {
-        var httpServer = http.createServer(web.app);
+        let httpServer = http.createServer(web.app);
         //  Start the app on the specific interface (and port).
         httpServer.listen(web.conf.port, web.conf.ipAddress, function(err, result) {
            if (err) {
@@ -604,3 +628,28 @@ var Web = Obj.extend('Web', {
 });
 
 module.exports = Web;
+
+
+function _applyRoutes(routes) {
+  for (let routeKey in routes) {
+    let customRoute = routes[routeKey];
+    if (console.isDebug) {
+      console.debug('[conf.route] ' + routeKey);
+    }
+    routeUtils.applyRoute(web, routeKey, customRoute);
+  }
+}
+
+function _nvmRequire(libStr) {
+  try {
+    return require(libStr);
+  } catch (er) {
+    if (er.code == 'MODULE_NOT_FOUND') {
+      return null;
+    } else {
+      throw er;
+    }
+  }
+
+  console.error("[_nvmRequire] Unexpected end");
+}

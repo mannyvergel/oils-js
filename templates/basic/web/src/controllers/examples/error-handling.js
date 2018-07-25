@@ -2,7 +2,7 @@ module.exports = {
   get: async function(req, res, next) {
     console.log('Accessing', req.url);
 
-    var myPromise = new Promise(function(resolve, reject) {
+    let myPromise = new Promise(function(resolve, reject) {
       setTimeout(function() {
         throw new Error("Some error");
       }, 500);

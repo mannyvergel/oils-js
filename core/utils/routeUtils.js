@@ -1,6 +1,6 @@
-var objectUtils = require('./objectUtils');
-var domain = require('domain');
-//var web = global.web;
+const objectUtils = require('./objectUtils');
+const domain = require('domain');
+//let web = global.web;
 exports.applyRoute = function(web, route, obj) {
   
   if (obj.route) {
@@ -26,18 +26,18 @@ exports.applyRoute = function(web, route, obj) {
 
 function applyVerbs(web,route, obj, verbs) {
 
-  for (var i in verbs) {
-    var verb = verbs[i];
+  for (let i in verbs) {
+    let verb = verbs[i];
     if (obj[verb]) {
       
       if (obj.isRegexp) {
         if (console.isDebug) {
           console.debug('[route regex] %s %s', verb, route);
         }
-        var flags = route.replace(/.*\/([gimy]*)$/, '$1');
-        var pattern = route.replace(new RegExp('^/(.*?)/'+flags+'$'), '$1');
+        let flags = route.replace(/.*\/([gimy]*)$/, '$1');
+        let pattern = route.replace(new RegExp('^/(.*?)/'+flags+'$'), '$1');
         route = new RegExp(pattern, flags);
-        //var match = route.match(new RegExp('/^\/(.*?)\/([gim]*)$/'));
+        //let match = route.match(new RegExp('/^\/(.*?)\/([gim]*)$/'));
         //route = new RegExp(route);
         
       } else {
@@ -52,15 +52,15 @@ function applyVerbs(web,route, obj, verbs) {
 }
 
 function handleRequest(web, verb, route, obj, controller) {
-  var app = web.app;
-  var objArray = obj;
+  let app = web.app;
+  let objArray = obj;
   if (!objectUtils.isArray(objArray)) {
     objArray = [objArray];
   }
 
-  var objArrayToApply = [];
-  for (var i in objArray) {
-    var singleObj = objArray[i];
+  let objArrayToApply = [];
+  for (let i in objArray) {
+    let singleObj = objArray[i];
     objArrayToApply.push(wrapObjToControllerDomain(web, verb, route, singleObj, controller));
   }
 
@@ -69,9 +69,9 @@ function handleRequest(web, verb, route, obj, controller) {
 }
 
 function wrapObjToControllerDomain(web, verb, route, obj, controller) {
-  var app = web.app;
+  let app = web.app;
   return function(req, res, next) {
-    var reqd = domain.create();
+    let reqd = domain.create();
     reqd.add(req);
     reqd.add(res);
     reqd.on('error', function(er) {

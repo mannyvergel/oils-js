@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-var parser = require("nomnom");
-var fs = require('fs-extra');
+let parser = require("nomnom");
+let fs = require('fs-extra');
 
 parser.command('new')
 .options({
@@ -23,7 +23,7 @@ parser.parse();
 
 
 function newProject(opts) {
-  var folderName = opts.name;
+  let folderName = opts.name;
   //console.log('NEW PROJECT TO ' + folderName);
 
   if (fs.existsSync(folderName)) {

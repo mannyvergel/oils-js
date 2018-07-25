@@ -1,5 +1,5 @@
-var web = global.web;
-var customResponse = function() {
+const web = global.web;
+const customResponse = function() {
   //TODO: may need to transfer this later (make sure it's only called once)
   web.on('beforeRender', initBeforeRender)
 
@@ -11,10 +11,7 @@ var customResponse = function() {
          return;
       }
 
-      res.request = req;
-
-      var _render = res.render;
-
+      let _render = res.render;
       
       //override res.render
       res.render = function(view, options, callback) {
@@ -23,7 +20,7 @@ var customResponse = function() {
         _render.call(res, view, options, callback);
       };
 
-      //obsolete, handled in engines/nunjucks
+      
       res.renderFile = function(view, options, callback) {
         res.render.call(res, view, options, callback);
       };
@@ -37,10 +34,9 @@ function initBeforeRender(view, options, callback, req, res) {
   if (!options) {
     options = {}
   }
-  //assumes middleware in Web.js
-  var req = res.request;
-  options['_errors'] = req.flash('error');
 
+  options['_errors'] = req.flash('error');
   options['_infos'] = req.flash('info');
+  options['_conf'] = web.conf.viewConf;
 
 };

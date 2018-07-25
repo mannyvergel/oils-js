@@ -5,7 +5,7 @@ You can create your own routing here.
 This is prioritized over automatic controller routing.
 **/
 
-var routes = {
+const routes = {
 
   /** Example:
   

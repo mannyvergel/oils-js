@@ -1,7 +1,7 @@
 //MOCHA test
 //run the ff before starting this test
 //> npm install
-//var TEMP_DIR = 'C:/temp'
+//let TEMP_DIR = 'C:/temp'
 
 
 
@@ -14,16 +14,16 @@ fs.mkdirsSync(global.BASE_DIR);
   
 }
 
-var fs = require('fs-extra');
+const fs = require('fs-extra');
 
-var assert = require("assert");
+const assert = require("assert");
 
-var oilsBaseDir = global.BASE_DIR + '/node_modules/oils';
-var includeOils = function(dir) {
+const oilsBaseDir = global.BASE_DIR + '/node_modules/oils';
+let includeOils = function(dir) {
 	return require(oilsBaseDir + dir);
 }
 
-var overrideConf = {
+let overrideConf = {
   isDebug: true,
   port: 3000,
   baseDir: global.BASE_DIR,
@@ -40,7 +40,7 @@ var overrideConf = {
   }
 }
 
-var web;
+let web;
 describe('app', function () {
   this.timeout(40000);
   before (function (done) {
@@ -56,7 +56,7 @@ describe('app', function () {
       }
 
       fs.copy('./',  BASE_DIR + '/node_modules/oils', function(err) {
-        var Web = includeOils('/core/Web.js');
+        let Web = includeOils('/core/Web.js');
         web = new Web(overrideConf);
         web.start(function (err, result) {
           if (err) {
@@ -112,33 +112,33 @@ describe('app', function () {
   it('should have loaded models', function (done) {
 
     assert.doesNotThrow(function() {
-        var Book = web.models('Book');
+        let Book = web.models('Book');
         if (!Book) {
           throw new Error('Book is null')
         }
       }, 'Retrieving Book');
 
 
-    var childModelJs = {
+    let childModelJs = {
       name: 'Book2',
       schema: {hello: {type: String}},
       parentModel: '/web/src/models/Book'
     }
 
-    var childModel = web.includeModelObj(childModelJs);
+    let childModel = web.includeModelObj(childModelJs);
 
     assert.equal(childModel.collection.name, 'books', 'Collection name must be books');
     assert.notStrictEqual(childModel.getModelDictionary().schema.title, undefined, 'parent Book title not found');
 
 
     //test load from cache
-    var Book = web.models('Book');
+    let Book = web.models('Book');
     assert.notStrictEqual(Book.getModelDictionary().schema.title, undefined, 'Cached Book title not found');
     done();
 
   });
 
-  var http = require('http');
+  let http = require('http');
 
   it('should connect', function (done) {
     http.get("http://127.0.0.1:" + overrideConf.port, function(res) {

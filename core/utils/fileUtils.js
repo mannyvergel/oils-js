@@ -1,5 +1,5 @@
-var fs = require('fs');
-var joinPath = require('path.join');
+const fs = require('fs');
+const joinPath = require('path.join');
 
 exports.joinPath = joinPath;
 
@@ -8,7 +8,7 @@ exports.recurseDir = function(dir, callback, subfolder) {
     throw new Error('dir cannot be null');
   }
   subfolder = subfolder || '';
-  var pathToSearch = dir + subfolder;
+  let pathToSearch = dir + subfolder;
   if (console.isDebug) {
     console.debug('Path to search: ' + pathToSearch);
   }
@@ -17,8 +17,8 @@ exports.recurseDir = function(dir, callback, subfolder) {
     if (err) {
       throw new Error('Error reading dir ' + pathToSearch);
     } else {
-      for (var i in files) {
-        var file = files[i];
+      for (let i in files) {
+        let file = files[i];
         handleFile(true, dir, subfolder, file, callback);
         
       }
@@ -39,7 +39,7 @@ exports.readRootDirOnly = function(dir, callback, subfolder) {
     throw new Error('dir cannot be null');
   }
   subfolder = subfolder || '';
-  var pathToSearch = dir + subfolder;
+  let pathToSearch = dir + subfolder;
   if (console.isDebug) {
     console.debug('Path to search: ' + pathToSearch);
   }
@@ -48,8 +48,8 @@ exports.readRootDirOnly = function(dir, callback, subfolder) {
     if (err) {
       throw new Error('Error reading dir ' + pathToSearch);
     } else {
-      for (var i in files) {
-        var file = files[i];
+      for (let i in files) {
+        let file = files[i];
         
         handleFile(false, dir, subfolder, file, callback);
         
@@ -66,15 +66,15 @@ exports.readRootDirOnlySync = function(dir, callback) {
     throw new Error('dir cannot be null');
   }
 
-  var pathToSearch = dir;
+  let pathToSearch = dir;
   if (console.isDebug) {
     console.debug('Path to search: ' + pathToSearch);
   }
 
-  var filteredFiles = [];
-  var arrFiles = fs.readdirSync(pathToSearch);
-  for (var i in arrFiles) {
-    var file = arrFiles[i];
+  let filteredFiles = [];
+  let arrFiles = fs.readdirSync(pathToSearch);
+  for (let i in arrFiles) {
+    let file = arrFiles[i];
     if (!exports.isHidden(file)) {
       filteredFiles.push(file);
     }
@@ -89,11 +89,11 @@ function handleFile(recurse, dir, subfolder, file, callback) {
   if (exports.isHidden(dir)) {
     return;
   }
-  var pathToSearch = dir + subfolder;
-  var absPath = pathToSearch + '/' + file;
+  let pathToSearch = dir + subfolder;
+  let absPath = pathToSearch + '/' + file;
   
   fs.stat(absPath, function(err, stat) {
-    var opts = {
+    let opts = {
       origDir: dir,
       subfolder: subfolder,
       folder: pathToSearch,

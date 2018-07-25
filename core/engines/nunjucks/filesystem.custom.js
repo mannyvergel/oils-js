@@ -1,6 +1,6 @@
 
-var nunjucks = require('nunjucks');
-var fs = require('fs');
+const nunjucks = require('nunjucks');
+const fs = require('fs');
 
 module.exports = nunjucks.FileSystemLoader.extend({
    
@@ -10,7 +10,7 @@ module.exports = nunjucks.FileSystemLoader.extend({
         return this.parent(name);
       }
 
-      var fullpath = name;
+      let fullpath = name;
       if (!web.stringUtils.startsWith(name, web.conf.baseDir)) {
       	fullpath = web.conf.baseDir + name;
       }

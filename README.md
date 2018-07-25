@@ -83,13 +83,13 @@ If you are in controller1.js and you want to import lib1.js
 Instead of using:
 
 ````
-var lib1 = require('../../../../../lib/folder/subfolder/lib1.js');
+const lib1 = require('../../../../../lib/folder/subfolder/lib1.js');
 ```
 
 Use 
 
 ```
-var lib1 = web.include('/lib/folder/subfolder/lib1.js');
+const lib1 = web.include('/lib/folder/subfolder/lib1.js');
 ````
 
 ##### ```web.includeModel(path)```
@@ -98,7 +98,7 @@ loads a model based on the path and returns a Mongoose Model. The path also beha
 
 e.g.
 ```
-var Book = web.includeModel('/web/models/Book.js');
+const Book = web.includeModel('/web/models/Book.js');
 ```
 
 ##### ```web.models('modelName')```
@@ -107,13 +107,13 @@ A convenience function for ```includeModel```
 
 e.g.
 ```
-var Book = web.models('Book');
+const Book = web.models('Book');
 ```
 
 ### Components
 Oils js uses Mongoose for ORM, Mongo DB for the database and Nunjucks for templating. Only Mongo DB is supported for now but this may change in the future depending on the needs.
 
-For the default templating, Nunjucks has been chosen because it doesn't mess much with the html syntax. You can override this by passing an express templateEngine e.g. var web = new Web({templateEngine: myTemplateEngin}).
+For the default templating, Nunjucks has been chosen because it doesn't mess much with the html syntax. You can override this by passing an express templateEngine e.g. let web = new Web({templateEngine: myTemplateEngin}).
 
 ### Features
 
@@ -182,7 +182,7 @@ web.on('beforeRender', function(view, options, callback, req, res) {
 
 ```
 web.on('initServer', function() {
-	var web = this; //this is an instance of web
+	let web = this; //this is an instance of web
 	...
 })
 ```

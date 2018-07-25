@@ -1,8 +1,8 @@
-var Book = web.models('Book');
+let Book = web.models('Book');
 module.exports =  {
 	get : function get(req, res, next) {
 		//You Mongo DB must be running for this page to work
-		var isbn = '2002-71970';
+		let isbn = '2002-71970';
 		Book.findOne({isbn: isbn}, function(err, book) {
 			if (!book) {
 				console.log('Book %s not found. Creating a new one.', isbn);

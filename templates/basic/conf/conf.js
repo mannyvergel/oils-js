@@ -3,7 +3,7 @@
  e.g. web.conf.ipAddress
 */
 
-var conf = {
+const conf = {
   ipAddress: '0.0.0.0',
   port: 8080,
   connections: {

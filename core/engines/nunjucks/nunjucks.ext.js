@@ -1,18 +1,18 @@
-var moment = require('moment');
+const moment = require('moment');
 module.exports = function customiseNunjucks(nunjucksEnv) {
   nunjucksEnv.addFilter('date', function(date, format) {
     if (!date) {
       return null;
     }
     
-    var s = moment(date).format(format);
+    let s = moment(date).format(format);
     return s;
   });
 
   nunjucksEnv.addExtension('MarkedExtension', new MarkedExtension());
 }
 
-var marked = require('marked');
+let marked = require('marked');
 
 function MarkedExtension() {
   
@@ -31,15 +31,15 @@ function MarkedExtension() {
   this.autoescape = false;
   this.parse = function(parser, nodes, lexer) {
       // get the tag token
-      var tok = parser.nextToken();
+      let tok = parser.nextToken();
 
       // parse the args and move after the block end. passing true
       // as the second arg is required if there are no parentheses
-      //var args = parser.parseSignature(null, true);
+      //let args = parser.parseSignature(null, true);
       parser.advanceAfterBlockEnd(tok.value);
-      var args = null;
+      let args = null;
       // parse the body and possibly the error block, which is optional
-      var body = parser.parseUntilBlocks('endmarked');
+      let body = parser.parseUntilBlocks('endmarked');
      
       parser.advanceAfterBlockEnd();
 
@@ -52,7 +52,7 @@ function MarkedExtension() {
       if (!body) {
         return "";
       }
-      var ret = marked(body());
+      let ret = marked(body());
 
       return ret;
   };

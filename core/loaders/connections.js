@@ -1,27 +1,19 @@
 
 module.exports = function(web) {
-  //var web = global.web;
-	var conf = web.conf;
+
+	let conf = web.conf;
 
 
 	if (!web.connections) {
 		web.connections = [];
 	}
 
-	
-
-	for (var i in conf.connections) {
-		var dbConf = conf.connections[i];
+	for (let i in conf.connections) {
+		let dbConf = conf.connections[i];
 		dbConf.showWarning = true;
 
 		if (!web.connections[i]) {
-			var mongoose = web.lib.mongoose;
-
-			//var url = dbConf.url;
-			
-			// var connect = function() {
-			// 	web.connections[i].open(url, {server: {poolSize: web.conf.connectionPoolSize}, replset: {poolSize: web.conf.connectionPoolSize}}, errFunc);
-			// }
+			let mongoose = web.lib.mongoose;
 
 			web.connections[i] = mongoose.createConnection();
 			
@@ -30,13 +22,11 @@ module.exports = function(web) {
 			}
 			
 			web.connections[i].on('error', getErrFunc(web, i));
-
-			(function(dbConf) {
-				web.connections[i].on('open', function() {
-					dbConf.counter = 0;
-					dbConf.showWarning = true;
-				});
-			})(dbConf)
+			
+			web.connections[i].on('open', function() {
+				dbConf.counter = 0;
+				dbConf.showWarning = true;
+			});
 			
 
 			webConnect(web, i);
@@ -46,14 +36,14 @@ module.exports = function(web) {
 }
 
 function webConnect(web, connIndex) {
-	var dbConf = web.conf.connections[connIndex];
-	var url = dbConf.url;
-	var errFunc = getErrFunc(web, connIndex);
+	let dbConf = web.conf.connections[connIndex];
+	let url = dbConf.url;
+	let errFunc = getErrFunc(web, connIndex);
 	web.connections[connIndex].openUri(url, {useNewUrlParser: true, poolSize: web.conf.connectionPoolSize, poolSize: web.conf.connectionPoolSize}, errFunc);
 }
 
 function getErrFunc(web, connIndex) {
-	var dbConf = web.conf.connections[connIndex];
+	let dbConf = web.conf.connections[connIndex];
 	if (!dbConf.counter) {
 		dbConf.counter = 1;
 	}

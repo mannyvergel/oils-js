@@ -1,5 +1,5 @@
-var Web = require('oils');
+const Web = require('oils');
 
-var web = new Web();
+let web = new Web();
 
 web.start();

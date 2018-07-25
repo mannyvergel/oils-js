@@ -1,18 +1,18 @@
-//var set = require('function-name');
+//let set = require('function-name');
 // A simple class system, more documentation to come
 
 function extend(cls, name, props) {
     // This does that same thing as Object.create, but with support for IE8
-    var F = function() {};
+    let F = function() {};
     F.prototype = cls.prototype;
-    var prototype = new F();
+    let prototype = new F();
 
-    var fnTest = /xyz/.test(function(){ xyz; }) ? /\bparent\b/ : /.*/;
+    let fnTest = /xyz/.test(function(){ xyz; }) ? /\bparent\b/ : /.*/;
     props = props || {};
 
-    for(var k in props) {
-        var src = props[k];
-        var parent = prototype[k];
+    for(let k in props) {
+        let src = props[k];
+        let parent = prototype[k];
 
         if(typeof parent == "function" &&
            typeof src == "function" &&
@@ -20,11 +20,11 @@ function extend(cls, name, props) {
             prototype[k] = (function (src, parent) {
                 return function() {
                     // Save the current parent method
-                    var tmp = this.parent;
+                    let tmp = this.parent;
 
                     // Set parent to the previous method, call, and restore
                     this.parent = parent;
-                    var res = src.apply(this, arguments);
+                    let res = src.apply(this, arguments);
                     this.parent = tmp;
 
                     return res;
@@ -38,7 +38,7 @@ function extend(cls, name, props) {
 
     prototype.typename = name;
 
-    var new_cls = function() { 
+    let new_cls = function() { 
         if(prototype.init) {
             prototype.init.apply(this, arguments);
         }

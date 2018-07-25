@@ -1,6 +1,6 @@
-var Obj = require('./Obj.js');
+const Obj = require('./Obj.js');
 
-var Plugin = Obj.extend('Plugin', {
+const Plugin = Obj.extend('Plugin', {
   
 	init: function(conf, id) {
     this.id = id;

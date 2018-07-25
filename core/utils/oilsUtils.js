@@ -1,6 +1,6 @@
-var extend = Object.assign;
-var fs = require('fs');
-var getMimeType = require('simple-mime')('application/octet-stream');
+const extend = Object.assign;
+const fs = require('fs');
+const getMimeType = require('simple-mime')('application/octet-stream');
 
 module.exports = {
 	extend: extend,
