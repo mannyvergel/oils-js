@@ -88,9 +88,9 @@ function wrapObjToControllerDomain(web, verb, route, obj, controller) {
       
     });
 
-    reqd.run(function() {
+    reqd.run(async function() {
       try {
-        obj(req, res, next);
+        await obj(req, res, next);
       } catch(er) {
         if (controller && controller.onError) {
           try {

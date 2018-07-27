@@ -21,6 +21,7 @@ if (!log4js.replaceConsole) {
     console.log = logger.info.bind(logger);
     console.debug = logger.debug.bind(logger);
     console.warn = logger.warn.bind(logger);
+    console.error = logger.error.bind(logger);
   }
 }
 
