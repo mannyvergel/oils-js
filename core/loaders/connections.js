@@ -8,13 +8,14 @@ module.exports = function(web) {
 		web.connections = [];
 	}
 
+	let mongoose = web.require('mongoose');
+
 	for (let i in conf.connections) {
 		let dbConf = conf.connections[i];
 		dbConf.showWarning = true;
 
 		if (!web.connections[i]) {
-			let mongoose = web.lib.mongoose;
-
+			
 			web.connections[i] = mongoose.createConnection();
 			
 			if (console.isDebug) {

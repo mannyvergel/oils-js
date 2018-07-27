@@ -22,7 +22,7 @@
     "url": "https://github.com/mannyvergel/oils-js.git"
   },
   "engines": {
-    "node": ">= 0.10.0"
+    "node": ">= 8.0.0"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
