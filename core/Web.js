@@ -276,18 +276,28 @@ const Web = Obj.extend('Web', {
     }
     
     let schema = new Schema(modelJs.schema, modelJs.options);
+
+    //TODO: executing schemas of children are not a good idea
     if (modelJs.initSchema) {
       if (modelJs.initSchema instanceof Array) {
         for (let i in modelJs.initSchema) {
           let mySchema = modelJs.initSchema[i];
-          // if (app.isDebug) {
-          //   console.debug('[%s] Executing array initSchema %s', modelJs.name ,mySchema);
-          // }
-          mySchema(schema);
+          
+          //fixed bug where schemas are execd twice
+          if (!mySchema.execd) {
+            mySchema(schema);
+            mySchema.execd = true;
+          }
         }
       } else {
         //console.debug('[%s] Executing normal initSchema %s', modelJs.name ,modelJs.initSchema);
-        modelJs.initSchema(schema);
+        //fixed bug where schemas are execd twice
+        if (!modelJs.initSchema.execd) {
+          modelJs.initSchema(schema);
+
+          //execute only once
+          modelJs.initSchema.execd = true;
+        }
       }
       
     }
