@@ -47,6 +47,8 @@ const defaultConf = {
 
   routesFile: '/conf/routes.js',
 
+  publicContext: '/', //better to serve static files in a diff directory e.g. /public/
+
   enableCsrfToken: false,
   cookieMaxAge: 86400000, //one day
   secretPassphrase: 'hello oils 2018',
@@ -464,7 +466,7 @@ const Web = Obj.extend('Web', {
       self.callEvent('initServer');
     });
 
-    app.use(express.static(self.conf.baseDir + self.conf.publicDir));
+    app.use(self.conf.publicContext, express.static(self.conf.baseDir + self.conf.publicDir));
 
     app.use(function(err, req, res, next){
       res.status(500);
