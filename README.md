@@ -128,6 +128,7 @@ The follow are motivations behind creating Oils Js Framework:
 + Graceful error handling per request
 + Plugin support
 + Event hooks
++ Multi-tenancy (host multiple oils projects in one server instance)
 + [Scaffolding](https://www.github.com/mannyvergel/braziw-plugin-dbedit)
 
 
