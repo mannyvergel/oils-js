@@ -21,7 +21,7 @@ The framework by default integrates nunjucks templating for the front end and mo
 ```
 > npm install oils -g
 
-> oils new HelloWorld --template zurb5
+> oils new HelloWorld --template basic
 
 ```
 
