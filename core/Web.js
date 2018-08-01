@@ -491,7 +491,7 @@ const Web = Obj.extend('Web', {
           stagingServer: 'staging',
           configDir: (self.conf.dataDir || (self.conf.baseDir + "/data")) + '/.config/acme/',
           email:'manny@mvergel.com',
-          testing: true,
+          testing: !self.conf.isProd,
           agreeTos: true,
           approveDomains: self.conf.https.domains,
         },
@@ -506,10 +506,10 @@ const Web = Obj.extend('Web', {
       }
       self.conf.https = extend(defaultHttpsConf, self.conf.https || {});
 
-      let letsEncrServer = (!self.conf.isProd || self.conf.https.letsEncrypt.testing) ? self.conf.https.letsEncrypt.stagingServer : self.conf.https.letsEncrypt.prodServer;
+      let letsEncrServer = self.conf.https.letsEncrypt.testing ? self.conf.https.letsEncrypt.stagingServer : self.conf.https.letsEncrypt.server;
 
       if (!letsEncrServer) {
-        throw new Error("Cannot set encrypt server.");
+        throw new Error("Cannot find encrypt server.");
       }
 
       if (console.isDebug) {
