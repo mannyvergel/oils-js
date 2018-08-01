@@ -18,12 +18,10 @@ The framework by default integrates nunjucks templating for the front end and mo
 
 ### Quick Start
 
-This assumes you already have Node JS v0.10.x (or higher) installed.
-
 ```
 > npm install oils -g
 
-> oils new HelloWorld --template zurb5
+> oils new HelloWorld --template basic
 
 ```
 
@@ -40,7 +38,7 @@ template is optional...
 
 #### Latest Releases
 
-See [Releases](https://github.com/mannyvergel/oils-js/releases) page.
+See [NPM Releases](https://www.npmjs.com/package/oils) page.
 
 #### Directory Structure
 
@@ -130,10 +128,8 @@ The follow are motivations behind creating Oils Js Framework:
 + Graceful error handling per request
 + Plugin support
 + Event hooks
-
-Future Features:
-
-+ Scaffolding
++ Multi-tenancy (host multiple oils projects in one server instance)
++ [Scaffolding](https://www.github.com/mannyvergel/braziw-plugin-dbedit)
 
 
 ### Usage
@@ -145,7 +141,14 @@ Example:
 After you have set-up a new oils project. 
 
 * Go to controllers folder.
-* Create a controller. e.g. test.js
+* Create a controller. e.g. test.js, and add content:
+```
+module.exports = {
+  get: function(req, res) {
+    res.send("Hello world");
+  }
+}
+```
 * Restart server.
 * Access your controller with your browser: http://localhost:8080/test
 
@@ -158,7 +161,7 @@ Basically there are two steps to make a plugin work:
 2. and declare it /conf/conf.js (see /conf/conf.js for more information).
 
 
-###Creating your own plugin
+### Creating your own plugin
 
 Creating your own plugin is easy; you just hook onto events of oils. See the (oils-plugin-basic)[https://github.com/mannyvergel/oils-plugin-basic] for more information.
 
@@ -187,12 +190,39 @@ web.on('initServer', function() {
 })
 ```
 
+Starting v2.5.0
+
+#### ```loadPlugins```
+
+Called after loading of plugins. This is called before initServer, before routes and controllers are configured. If you need to add middleware at the end of plugin initialization, this is the place.
+
 More hooks to follow.
 
-### Authentication
+### Plugins
 
-Authentication is implemented as a plugin: [oils-auth-local](http://github.com/mannyvergel/oils-auth-local). Just place it in your project's plugin folder. i.e. under ```/conf/plugins/oils-auth-local```.
+#### Authentication
 
+Authentication is implemented as a plugin: [oils-plugin-auth](http://github.com/mannyvergel/oils-plugin-auth). Just install via npm, and configure in plugins.js, make sure to enable it there.
+
+#### Rendering Tables
+
+[oils-plugin-table](http://github.com/mannyvergel/oils-plugin-table)
+
+#### Forums
+
+[oils-plugin-forums](http://github.com/mannyvergel/oils-plugin-forums)
+
+#### Content and Document Management System
+
+[oils-plugin-braziw-cms](http://github.com/mannyvergel/oils-plugin-braziw-cms)
+
+#### Scaffolding
+
+[braziw-plugin-dbedit](http://github.com/mannyvergel/braziw-plugin-dbedit)
+
+#### Blog
+
+[braziw-plugin-blog](http://github.com/mannyvergel/braziw-plugin-blog)
 
 ### Contact
 
