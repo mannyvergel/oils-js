@@ -506,10 +506,14 @@ const Web = Obj.extend('Web', {
       }
       self.conf.https = extend(defaultHttpsConf, self.conf.https || {});
 
+      //validations
       let letsEncrServer = self.conf.https.letsEncrypt.testing ? self.conf.https.letsEncrypt.stagingServer : self.conf.https.letsEncrypt.server;
-
       if (!letsEncrServer) {
         throw new Error("Cannot find encrypt server.");
+      }
+
+      if (!self.conf.https.approveDomains || self.conf.https.approveDomains.length == 0) {
+        throw new Error("conf.https.approveDomains must not be nil");
       }
 
       if (console.isDebug) {
