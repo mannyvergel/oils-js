@@ -285,20 +285,13 @@ const Web = Obj.extend('Web', {
         for (let i in modelJs.initSchema) {
           let mySchema = modelJs.initSchema[i];
           
-          //fixed bug where schemas are execd twice
-          if (!mySchema.execd) {
-            mySchema(schema);
-            mySchema.execd = true;
-          }
+          mySchema(schema);
         }
       } else {
         //console.debug('[%s] Executing normal initSchema %s', modelJs.name ,modelJs.initSchema);
         //fixed bug where schemas are execd twice
         if (!modelJs.initSchema.execd) {
           modelJs.initSchema(schema);
-
-          //execute only once
-          modelJs.initSchema.execd = true;
         }
       }
       
