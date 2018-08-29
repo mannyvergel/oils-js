@@ -55,7 +55,7 @@ const defaultConf = {
   port: 8080,
   ipAddress: '0.0.0.0',
   zconf: path.join(require('os').homedir(), ".oils", "zconf.js"), //e.g. ~/.oils/zconf.js in mac/linux
-  isDebug: true,
+  isDebug: !isProd,
   connectionPoolSize: 5,
   connections: {
     //only mongoose connections are support for now
