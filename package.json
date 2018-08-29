@@ -1,6 +1,6 @@
 {
   "name": "oils",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "A slightly opinionated web framework built on top of Express 4.",
   "keywords": [
     "OilsJs",
@@ -41,7 +41,7 @@
     "marked": "0.4.x",
     "method-override": "3.0.x",
     "moment": "2.22.x",
-    "mongoose": "5.2.x",
+    "mongoose": "4.13.x",
     "nomnom": "1.8.x",
     "nunjucks": "3.1.x",
     "path.join": "1.0.x",
