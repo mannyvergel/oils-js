@@ -52,8 +52,9 @@ const defaultConf = {
   enableCsrfToken: false,
   cookieMaxAge: 86400000, //one day
   secretPassphrase: 'hello oils 2018',
-  port: 8080,
-  ipAddress: '0.0.0.0',
+  defaultRandomStringByteLength: 16, 
+  port: process.env.OILS_PORT ? parseInt(process.env.OILS_PORT) : 8080,
+  ipAddress: process.env.OILS_IP || '0.0.0.0',
   zconf: path.join(require('os').homedir(), ".oils", "zconf.js"), //e.g. ~/.oils/zconf.js in mac/linux
   isDebug: !isProd,
   connectionPoolSize: 5,

@@ -33,3 +33,29 @@ exports.isEmpty = function(str) {
 exports.escapeHTML = function(str) {
   return escapeHtml(str);
 }
+
+exports.genSecureRandomString = function(byteLen, cb) {
+
+  //byteLen usual vals = 48, 32, 24, 16
+
+  return new Promise(function(resolve, reject) {
+   
+    let useByteLen = byteLen || web.conf.defaultRandomStringByteLength || 16;
+    require('crypto').randomBytes(useByteLen, function(err, buffer) {
+      if (err) {
+        throw err;
+      }
+
+      let token = buffer.toString('hex');
+
+      if (cb) {
+        cb(err, token);
+      }
+      
+      resolve(token);
+    });
+    
+      
+    
+  });
+}

@@ -1,6 +1,6 @@
 {
   "name": "oils",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "A slightly opinionated web framework built on top of Express 4.",
   "keywords": [
     "OilsJs",
@@ -53,5 +53,8 @@
   "main": "core/Web.js",
   "bin": {
     "oils": "./bin/oils.js"
+  },
+  "scripts": {
+    "test": "OILS_IP=127.0.0.1 OILS_PORT=3000 mocha --timeout 5000 test/*.js"
   }
 }
