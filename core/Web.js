@@ -34,6 +34,8 @@ const defaultConf = {
   isProd: isProd,
   isProduction: isProd,
 
+  saveRawBody: false,
+
   viewConf: {
     mainTemplate: 'templates/main.html',
     template: 'bootstrap', //zurb or bootstrap, but doesn't make a diff now
@@ -416,11 +418,20 @@ const Web = Obj.extend('Web', {
     }
     
 
-    app.use(bodyParser.json({limit: web.conf.parserLimit}));
+    var rawBodySaver = function (req, res, buf, encoding) {
+      if (buf && buf.length && web.conf.saveRawBody) {
+        req.rawBody = buf.toString(encoding || 'utf8');
+      }
+    }
+    
+
+    app.use(bodyParser.json({limit: web.conf.parserLimit, verify: rawBodySaver}));
     app.use(bodyParser.urlencoded({
       extended: true,
-      limit: web.conf.parserLimit
+      limit: web.conf.parserLimit,
+      verify: rawBodySaver
     }));
+    app.use(bodyParser.raw({ verify: rawBodySaver, type: '*/*' }));
 
     
     app.use(methodOverride());
