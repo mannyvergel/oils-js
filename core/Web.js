@@ -43,6 +43,7 @@ class Web {
         conf.baseDir = tmpBaseDir;
       }
     }
+
     if (global._web[conf.baseDir]) {
       throw new Error("Web has been redefined " + conf.baseDir + " vs " + JSON.stringify(callerId.getData()));
     }

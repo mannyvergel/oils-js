@@ -21,9 +21,8 @@ module.exports = function Plugins(web) {
       try {
         let pluginObj = null;
         if (!plugin.load) {
-          pluginObj = Plugin.extend({
-            load: plugin
-          });
+          pluginObj = class extends Plugin {};
+          pluginObj.prototype.load = plugin;
         } else {
           pluginObj = plugin;
         }
