@@ -15,4 +15,6 @@ results
 
 npm-debug.log
 /node_modules
+/data/logs
+/data
 .DS_Store

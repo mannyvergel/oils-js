@@ -32,7 +32,7 @@ function applyVerbs(web,route, obj, verbs) {
       
       if (obj.isRegexp) {
         if (console.isDebug) {
-          console.debug('[route regex] %s %s', verb, route);
+          console.debug('[route regex]', verb, route);
         }
         let flags = route.replace(/.*\/([gimy]*)$/, '$1');
         let pattern = route.replace(new RegExp('^/(.*?)/'+flags+'$'), '$1');
@@ -42,7 +42,7 @@ function applyVerbs(web,route, obj, verbs) {
         
       } else {
         if (console.isDebug) {
-          console.debug('[route] %s %s', verb, route);
+          console.debug('[route]', verb, route);
         } 
       }
 

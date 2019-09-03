@@ -1,4 +1,3 @@
-const Obj = require('./Obj.js');
 const extend = Object.assign;
 const express = require('express');
 const domain = require('domain');
@@ -12,72 +11,13 @@ const csrf = require('csurf');
 const routeUtils = require('./utils/routeUtils');
 const stringUtils = require('./utils/stringUtils.js');
 
-const log4js = require('log4js');
-const logger = log4js.getLogger();
-logger.level = 'debug';
-
-if (!log4js.replaceConsole) {
-  log4js.replaceConsole = function() {
-    console.log = logger.info.bind(logger);
-    console.debug = logger.debug.bind(logger);
-    console.warn = logger.warn.bind(logger);
-    console.error = logger.error.bind(logger);
-  }
-}
-
-log4js.replaceConsole();
-
-const isProd = process.env.NODE_ENV == 'production';
-
-const defaultConf = {
-  baseDir: process.cwd(),
-  isProd: isProd,
-  isProduction: isProd,
-
-  saveRawBody: false,
-
-  viewConf: {
-    mainTemplate: 'templates/main.html',
-    template: 'bootstrap', //zurb or bootstrap, but doesn't make a diff now
-  },
-
-  viewsDir: '/web/src/views',
-  controllersDir: '/web/src/controllers',
-  modelsDir: '/web/src/models',
-  publicDir: '/web/public',
-  customConfigFile: '/conf/conf.js',
-
-  routesFile: '/conf/routes.js',
-
-  publicContext: '/', //better to serve static files in a diff directory e.g. /public/
-
-  enableCsrfToken: false,
-  cookieMaxAge: 86400000, //one day
-  secretPassphrase: 'hello oils 2018',
-  defaultRandomStringByteLength: 16, 
-  port: process.env.OILS_PORT ? parseInt(process.env.OILS_PORT) : 8080,
-  ipAddress: process.env.OILS_IP || '0.0.0.0',
-  zconf: path.join(require('os').homedir(), ".oils", "zconf.js"), //e.g. ~/.oils/zconf.js in mac/linux
-  isDebug: !isProd,
-  connectionPoolSize: 5,
-  connections: {
-    //only mongoose connections are support for now
-    //you can specify multiple connections and specify the connection in your model.
-    //if you don't need a db, you can remove/comment out mainDb
-    mainDb : {
-      url: 'mongodb://localhost:27017/test'
-    }
-  },
-  parserLimit: '3mb'
-}
-
 const callerId = require('caller-id')
 /**
 Oils web app
 */
-const Web = Obj.extend('Web', {
+class Web {
 
-  init: function(conf){
+  constructor(conf) {
     //global.web = this;
     let web = this;
     web.lib = web.lib || {};
@@ -130,8 +70,10 @@ const Web = Obj.extend('Web', {
     }
  
     //load custom config file
-    this.conf = defaultConf;
+    this.conf = require('./conf/conf-default.js')();
     this.conf = extend(this.conf, conf);
+
+    this.logger = require('./utils/logger.js')(this);
     
     if (this.conf.customConfigFile) {
       let customConf = _nvmRequire(path.join(this.conf.baseDir, this.conf.customConfigFile));
@@ -154,65 +96,47 @@ const Web = Obj.extend('Web', {
     console.isDebug = this.conf.isDebug;
     if (console.isDebug) {
       console.debug('Oils config: ' + JSON.stringify(this.conf, null, 2));
-      logger.level = 'debug';
-    } else {
-      logger.level = 'info';
     }
 
     this.app = express();
     this.events = {};
     this.modelCache = new Object();
     this.plugins = [];
-  },
-
-  //collection of general utilties
-  utils: require('./utils/oilsUtils.js'),
-
-  //collection of common file utilities
-  fileUtils: require('./utils/fileUtils.js'),
-
-  //collection of common date utilities
-  dateUtils: require('./utils/dateUtils.js'),
-
-  //collection of common string utilities
-  stringUtils: stringUtils,
+  }
 
   //a way to use oils library so no need to re-install
   //e.g. const moment = web.require('moment');
-  require: function(str) {
+  require(str) {
     return require(str);
-  },
-
-  //web.Plugin.extend..
-  Plugin: require('./Plugin.js'),
+  }
 
   // EVENTS -----------
-  on: function(eventStr, callback) {
+  on(eventStr, callback) {
     if (!this.events[eventStr]) {
       this.events[eventStr] = [];
     }
 
     this.events[eventStr].push(callback);
-  },
+  }
 
-  callEvent: function(eventStr, argsArray){
+  callEvent(eventStr, argsArray){
     let myEvents = this.events[eventStr];
     if (myEvents) {
       for (let myEvent of myEvents) {
         myEvent.apply(this, argsArray);
       }
     }
-  },
+  }
   // EVENTS end -------
 
-  include: function(file, secondFileFallback) {
+  include(file, secondFileFallback) {
     let baseDir = this.conf.baseDir || process.cwd();
     return require(path.join(this.conf.baseDir, file));
-  },
+  }
 
   //MODELS ------------
 
-  includeModelObj: function(modelJs) {
+  includeModelObj(modelJs) {
     let web = this;
     let modelName = modelJs.name;
     
@@ -310,9 +234,9 @@ const Web = Obj.extend('Web', {
       return modelJs;
     }        
     return model;
-  },
+  }
 
-  includeModel: function(workingPath) {
+  includeModel(workingPath) {
 
     let web = this;
     let modelJs = null;
@@ -335,9 +259,9 @@ const Web = Obj.extend('Web', {
     }
    
     return web.includeModelObj(modelJs);
-  },
+  }
 
-  models: function(modelName) {
+  models(modelName) {
 
     if (!this.modelCache[modelName]) {
       let workingPath = this.conf.modelsDir + '/' + modelName;
@@ -345,23 +269,23 @@ const Web = Obj.extend('Web', {
     }
     return this.modelCache[modelName];
 
-  },
+  }
 
   //END MODELS --------
 
 
-  addPlugin: function(plugin) {
+  addPlugin(plugin) {
     this.plugins[plugin.id] = plugin;
-  },
+  }
 
-  _getPluginFunction: function(plugin) {
+  _getPluginFunction(plugin) {
     return function(next) {
       plugin.load(plugin.conf, web, next);
 
     }
-  },
+  }
 
-  loadPlugins: function(cb) {
+  loadPlugins(cb) {
     let pluginFunctions = [];
     for (let i in this.plugins) {
       let plugin = this.plugins[i];
@@ -369,16 +293,16 @@ const Web = Obj.extend('Web', {
 
     }
     require('./utils/queueLoader.js')(pluginFunctions, [], cb);
-  },
+  }
 
   //for deprection, use addRoutes whenever possible instead
-  applyRoutes: function(routes) {
+  applyRoutes(routes) {
     let stack = new Error().stack;
     console.warn("Consider using web.addRoutes instead of applyRoutes.", stack);
     this._applyRoutes(routes);
-  },
+  }
 
-  _applyRoutes: function(routes) {
+  _applyRoutes(routes) {
     for (let routeKey in routes) {
       let customRoute = routes[routeKey];
       if (console.isDebug) {
@@ -386,9 +310,9 @@ const Web = Obj.extend('Web', {
       }
       routeUtils.applyRoute(web, routeKey, customRoute);
     }
-  },
+  }
 
-  addRoutes: function(routes) {
+  addRoutes(routes) {
     this.conf.routes = this.conf.routes || {};
     for (let key in routes) {
       if (this.conf.routes[key]) {
@@ -397,9 +321,9 @@ const Web = Obj.extend('Web', {
 
       this.conf.routes[key] = routes[key];
     }
-  },
+  }
 
-  initServer: function() {
+  initServer() {
     let app = this.app;
     let web = this;
     let self = this;
@@ -409,7 +333,7 @@ const Web = Obj.extend('Web', {
     let cookieSession = require('cookie-session');
 
   
-    let templatesPath = self.conf.baseDir + self.conf.viewsDir;
+    let templatesPath = path.join(self.conf.baseDir, self.conf.viewsDir);
 
     if (self.conf.templateLoader) {
       self.templateEngine = self.conf.templateLoader(web, templatesPath);
@@ -436,6 +360,9 @@ const Web = Obj.extend('Web', {
     
     app.use(methodOverride());
     let cookieKey = web.conf.secretPassphrase;
+    if (cookieKey == "change-this-it-is-2019!") {
+      throw new Error("Security error. Change conf.secretPassphrase.");
+    }
     app.use(cookieParser(cookieKey));
   
     app.use(cookieSession({keys: [cookieKey], 
@@ -471,7 +398,7 @@ const Web = Obj.extend('Web', {
       self.callEvent('initServer');
     });
 
-    app.use(self.conf.publicContext, express.static(self.conf.baseDir + self.conf.publicDir));
+    app.use(self.conf.publicContext, express.static(path.join(self.conf.baseDir, self.conf.publicDir)));
 
     app.use(function(err, req, res, next){
       res.status(500);
@@ -483,33 +410,23 @@ const Web = Obj.extend('Web', {
       console.error("General error", err);
     });
     
-  },
+  }
 
-  getLetsEncryptLex: function() {
+  getLetsEncryptLex() {
     let self = this;
+
     if (!self.lex) {
+      let defaultHttpsConf = require('./conf/conf-https-default.js')(self)
 
-      let defaultHttpsConf = {
-        letsEncrypt: {
-          version: 'draft-11',
-          server: 'https://acme-v02.api.letsencrypt.org/directory',
-          stagingServer: 'staging',
-          configDir: (self.conf.dataDir || (self.conf.baseDir + "/data")) + '/.config/acme/',
-          email:'manny@mvergel.com',
-          testing: !self.conf.isProd,
-          agreeTos: true,
-          approveDomains: self.conf.https.domains,
-        },
-        port: 443,
-        alwaysSecure: {
-          enabled: false
-        }
-      }
+      let confLetsEncrypt = self.conf.https && self.conf.https.letsEncrypt;
 
-      if (self.conf.https && self.conf.https.letsEncrypt) {
-        self.conf.https.letsEncrypt = extend(defaultHttpsConf.letsEncrypt, self.conf.https.letsEncrypt);
-      }
       self.conf.https = extend(defaultHttpsConf, self.conf.https || {});
+
+      self.conf.https.letsEncrypt = extend(defaultHttpsConf.letsEncrypt, confLetsEncrypt || {});
+
+      if (!self.conf.https.letsEncrypt.email) {
+        throw new Error("conf.https.letsEncrypt must not be nil.");
+      }
 
       //validations
       let letsEncrServer = self.conf.https.letsEncrypt.testing ? self.conf.https.letsEncrypt.stagingServer : self.conf.https.letsEncrypt.server;
@@ -517,8 +434,8 @@ const Web = Obj.extend('Web', {
         throw new Error("Cannot find encrypt server.");
       }
 
-      if (!self.conf.https.approveDomains || self.conf.https.approveDomains.length == 0) {
-        throw new Error("conf.https.approveDomains must not be nil");
+      if (!self.conf.https.letsEncrypt.approveDomains) {
+        throw new Error("conf.https.letsEncrypt.approveDomains must not be nil. See wildcard.js example from greenlock-express");
       }
 
       if (console.isDebug) {
@@ -530,13 +447,13 @@ const Web = Obj.extend('Web', {
     }
 
     return self.lex
-  },
+  }
 
   /**
    * Start the server (starts up the sample application).
    * @param {Web~startCallback} cb - called after server starts.
    */
-  start: function(cb) {
+  start(cb) {
     let serverDomain = domain.create();
     serverDomain.on('error', function(err) {
       console.error('Server domain caught an exception: ' + err);
@@ -553,27 +470,29 @@ const Web = Obj.extend('Web', {
       let http = require('http');
 
       let alwaysSecure = null;
-      if (web.conf.https && web.conf.https.enabled) {
+
+      let httpsConfigEnabled = web.conf.https && web.conf.https.enabled
+      if (httpsConfigEnabled) {
         if (web.conf.https.letsEncrypt) {
-          //must do this manuall - npm install --global letsencrypt-cli
-          let https = require('https');
           
+          let https = self.conf.https.getHttpsServer();
 
           let lex = web.getLetsEncryptLex();
 
           let httpsPort = web.conf.https.port || 443;
+          
           https.createServer(lex.httpsOptions, lex.middleware(web.app))
-          .listen(httpsPort, web.conf.ipAddress, function(err, result) {
-            if (err) {
-              console.error(err);
-            }
-            console.log('%s: Node https server started on %s:%d ...',
-                        Date(Date.now()), web.conf.ipAddress, httpsPort);
+            .listen(httpsPort, web.conf.ipAddress, function(err, result) {
+              if (err) {
+                console.error(err);
+              }
+              console.log('%s: Node https server started on %s:%d ...',
+                          Date(Date.now()), web.conf.ipAddress, httpsPort);
 
-            if (cb) {
-              cb(err, result);
-            }
-          });
+              if (cb) {
+                cb(err, result);
+              }
+            });
 
 
 
@@ -647,7 +566,25 @@ const Web = Obj.extend('Web', {
     });
   }
 
-});
+};
+
+
+
+
+//collection of general utilties
+Web.prototype.utils = require('./utils/oilsUtils.js');
+
+//collection of common file utilities
+Web.prototype.fileUtils = require('./utils/fileUtils.js');
+
+//collection of common date utilities
+Web.prototype.dateUtils = require('./utils/dateUtils.js');
+
+//collection of common string utilities
+Web.prototype.stringUtils = stringUtils;
+
+//web.Plugin.extend..
+Web.prototype.Plugin = require('./Plugin.js');
 
 module.exports = Web;
 

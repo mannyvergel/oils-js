@@ -1,7 +1,11 @@
 const fs = require('fs');
 const joinPath = require('path.join');
 
+const fsExtra = require('fs-extra');
+
 exports.joinPath = joinPath;
+
+Object.assign(exports, fsExtra);
 
 exports.recurseDir = function(dir, callback, subfolder) {
   if (!dir) {

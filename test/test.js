@@ -155,7 +155,7 @@ describe('app', function () {
     
   });
 
-  it('should generate random string', async function (done) {
+  it('should generate random string', async function() {
     try {
       let randomString = await web.stringUtils.genSecureRandomString();
       console.log("Random string generated", randomString);
@@ -163,8 +163,6 @@ describe('app', function () {
     } catch (ex) {
       assert.ok(false, 'Error generating random str ' + ex);
     }
-    
-    done();
     
   });
  
