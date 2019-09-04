@@ -279,18 +279,19 @@ class Web {
     this.plugins[plugin.id] = plugin;
   }
 
-  _getPluginFunction(plugin) {
+  _getPluginFunction(plugin, webSelf) {
     return function(next) {
-      plugin.load(plugin.conf, web, next);
+      plugin.load(plugin.conf, webSelf, next);
 
     }
   }
 
   loadPlugins(cb) {
+    let self = this;
     let pluginFunctions = [];
-    for (let i in this.plugins) {
-      let plugin = this.plugins[i];
-      pluginFunctions.push(this._getPluginFunction(plugin));
+    for (let i in self.plugins) {
+      let plugin = self.plugins[i];
+      pluginFunctions.push(self._getPluginFunction(plugin, self));
 
     }
     require('./utils/queueLoader.js')(pluginFunctions, [], cb);
