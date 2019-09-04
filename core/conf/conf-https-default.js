@@ -65,12 +65,13 @@ function approveDomains(opts, certs, cb) {
     // Certs being renewed are listed in certs.altnames (if that's useful)
  
     // Opt-in to submit stats and get important updates
-    opts.communityMember = true;
+    opts.communityMember = web.conf.https.letsEncrypt.communityMember;
  
     // If you wish to replace the default challenge plugin, you may do so here
-    opts.challenges = { "http-01": http01 };
+    // opts.challenges = { "http-01": http01 };
  
     opts.email = web.conf.https.letsEncrypt.email;
+
     opts.agreeTos = true;
  
     // NOTE: you can also change other options such as `challengeType` and `challenge`
