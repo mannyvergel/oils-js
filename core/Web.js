@@ -417,21 +417,26 @@ class Web {
     let self = this;
 
     if (!self.lex) {
-      let defaultHttpsConf = require('./conf/conf-https-default.js')(self)
+      let defaultHttpsConf = require('./conf/conf-https-default.js')(self);
+
+      let defaultLetsEncryptConf = defaultHttpsConf.letsEncrypt || {};
 
       let confLetsEncrypt = self.conf.https && self.conf.https.letsEncrypt;
 
       self.conf.https = extend(defaultHttpsConf, self.conf.https || {});
 
-      self.conf.https.letsEncrypt = extend(defaultHttpsConf.letsEncrypt, confLetsEncrypt || {});
+      self.conf.https.letsEncrypt = extend(defaultLetsEncryptConf, confLetsEncrypt || {});
 
       if (!self.conf.https.letsEncrypt.email) {
-        throw new Error("conf.https.letsEncrypt must not be nil.");
+        throw new Error("conf.https.letsEncrypt.email must not be nil.");
       }
 
       //validations
-      let letsEncrServer = self.conf.https.letsEncrypt.testing ? self.conf.https.letsEncrypt.stagingServer : self.conf.https.letsEncrypt.server;
-      if (!letsEncrServer) {
+      let letsEncrServer = self.conf.https.letsEncrypt.testing ? self.conf.https.letsEncrypt.stagingServer : self.conf.https.letsEncrypt.prodServer;
+
+      self.conf.https.letsEncrypt.server = self.conf.https.letsEncrypt.server || letsEncrServer;
+
+      if (self.stringUtils.isEmpty(self.conf.https.letsEncrypt.server)) {
         throw new Error("Cannot find encrypt server.");
       }
 
@@ -498,7 +503,7 @@ class Web {
 
 
         } else {
-          let https = require('https');
+          let https = self.conf.https.getHttpsServer();
           let privateKey = fs.readFileSync(web.conf.https.privateKey, 'utf8');
           let certificate = fs.readFileSync(web.conf.https.certificate, 'utf8');
           let credentials = {key: privateKey, cert: certificate};
