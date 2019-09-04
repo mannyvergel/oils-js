@@ -10,8 +10,8 @@ const fs = require('fs');
 const csrf = require('csurf');
 const routeUtils = require('./utils/routeUtils');
 const stringUtils = require('./utils/stringUtils.js');
+const callsites = require('callsites');
 
-const callerId = require('caller-id')
 /**
 Oils web app
 */
@@ -35,10 +35,8 @@ class Web {
     }
     conf = conf || {};
 
-    let callerFilePath = callerId.getData().filePath;
-
     if (!conf.baseDir) {
-      let tmpBaseDir = callerFilePath.substr(0, callerFilePath.indexOf('node_modules') - 1);
+      let tmpBaseDir = __filename.substr(0, __filename.indexOf('node_modules') - 1);
       if (!stringUtils.isEmpty(tmpBaseDir)) {
         conf.baseDir = tmpBaseDir;
       }
@@ -58,7 +56,7 @@ class Web {
           }
 
           for (let i in global._web) {
-            if (stringUtils.startsWith(callerId.getData().filePath, i)) {
+            if (stringUtils.startsWith(callsites()[1].getFileName(), i)) {
               //console.warn('Found new web! ' + i);
               return global._web[i];
             }
