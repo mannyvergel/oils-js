@@ -343,7 +343,7 @@ class Web {
     
 
     var rawBodySaver = function (req, res, buf, encoding) {
-      if (buf && buf.length && web.conf.saveRawBody) {
+      if (web.conf.saveRawBody && buf && buf.length) {
         req.rawBody = buf.toString(encoding || 'utf8');
       }
     }
@@ -355,7 +355,14 @@ class Web {
       limit: web.conf.parserLimit,
       verify: rawBodySaver
     }));
-    app.use(bodyParser.raw({ verify: rawBodySaver, type: '*/*' }));
+
+    if (web.conf.saveRawBody) {
+      console.warn("conf.saveRawBody uses a raw parser that conflicts with multer. Better maybe to save raw data in controller level instead.")
+      // raw interferes with multer (upload files) 
+      // https://github.com/expressjs/multer/issues/523
+      // use sparingly or better move to controller level
+      app.use(bodyParser.raw({ verify: rawBodySaver, type: '*/*', limit: web.conf.parserLimit}));
+    }
 
     
     app.use(methodOverride());
