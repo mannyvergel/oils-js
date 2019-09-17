@@ -1,3 +1,5 @@
+'use strict';
+
 const escapeHtml = require('escape-html');
 
 exports.endsWith = function(str, suffix) {

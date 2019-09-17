@@ -1,3 +1,5 @@
+'use strict';
+
 const extend = Object.assign;
 const express = require('express');
 const domain = require('domain');

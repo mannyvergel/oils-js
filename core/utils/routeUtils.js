@@ -1,3 +1,5 @@
+'use strict';
+
 const objectUtils = require('./objectUtils');
 const domain = require('domain');
 //let web = global.web;

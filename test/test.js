@@ -3,7 +3,7 @@
 //> npm install
 //let TEMP_DIR = 'C:/temp'
 
-
+'use strict';
 
 //global.BASE_DIR = 'c:/tmp/oils';
 global.BASE_DIR = process.cwd() + '/../tmp/oilsjstest';

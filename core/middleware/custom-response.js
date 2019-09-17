@@ -1,3 +1,5 @@
+'use strict';
+
 const web = global.web;
 const customResponse = function() {
   //TODO: may need to transfer this later (make sure it's only called once)

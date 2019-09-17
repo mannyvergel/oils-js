@@ -1,3 +1,5 @@
+'use strict';
+
 const nunjucks = require('nunjucks');
 const path = require('path');
 

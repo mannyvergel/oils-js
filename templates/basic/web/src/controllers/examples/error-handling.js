@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   get: async function(req, res, next) {
     console.log('Accessing', req.url);

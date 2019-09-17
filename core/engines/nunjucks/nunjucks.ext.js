@@ -1,3 +1,5 @@
+'use strict';
+
 const moment = require('moment');
 module.exports = function customiseNunjucks(nunjucksEnv) {
   nunjucksEnv.addFilter('date', function(date, format) {

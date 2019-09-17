@@ -1,3 +1,5 @@
+'use strict';
+
 const fileUtils = require('../utils/fileUtils.js');
 const stringUtils = require('../utils/stringUtils.js');
 const routeUtils = require('../utils/routeUtils.js');

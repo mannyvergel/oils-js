@@ -1,3 +1,5 @@
+'use strict';
+
 const extend = Object.assign;
 const fs = require('fs');
 const path = require('path');

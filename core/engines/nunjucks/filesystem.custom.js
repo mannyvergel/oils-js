@@ -1,3 +1,4 @@
+'use strict';
 
 const nunjucks = require('nunjucks');
 const fs = require('fs');

@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function queueLoader(stack, params, cb) {
   let myStack = stack.slice(0).reverse();
   params = params || [];

@@ -1,3 +1,5 @@
+'use strict';
+
 let Book = web.models('Book');
 module.exports =  {
 	get : function get(req, res, next) {

@@ -1,3 +1,4 @@
+'use strict';
 
 const Plugin = require('../Plugin.js');
 module.exports = function Plugins(web) {

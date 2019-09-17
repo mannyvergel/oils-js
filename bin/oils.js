@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+
+'use strict';
+
 let parser = require("nomnom");
 let fs = require('fs-extra');
 
