@@ -10,7 +10,7 @@ exports.startsWith = function (str, startsWith){
   if (!str || !startsWith) {
     return false;
   }
-  return str.indexOf(startsWith) == 0;
+  return str.indexOf(startsWith) === 0;
 }
 
 exports.escapeRegexp = function(str) {
@@ -29,7 +29,7 @@ exports.capitalize = function(aStr) {
 }
 
 exports.isEmpty = function(str) {
-	return str == null || str.length == 0;
+	return str === null || str.length === 0;
 }
 
 exports.escapeHTML = function(str) {

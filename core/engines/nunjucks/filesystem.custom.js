@@ -7,7 +7,7 @@ module.exports = nunjucks.FileSystemLoader.extend({
    
     getSource: function(name) {
 
-      if (!(name && name[0] == '/')) {
+      if (!(name && name[0] === '/')) {
         return this.parent(name);
       }
 

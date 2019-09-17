@@ -77,8 +77,10 @@ describe('app', function () {
     
   });
  
-  after(function (done) {
-    done();
+  after(async function() {
+    await sleep(2000);
+    console.log("Done with tests.. exiting.");
+    process.exit();
   });
  
   it('should have correct attributes', function (done) {
@@ -169,3 +171,9 @@ describe('app', function () {
 
  
 });
+
+function sleep(ms) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(resolve, ms);
+  })
+}

@@ -3,19 +3,25 @@
 const fileUtils = require('../utils/fileUtils.js');
 const stringUtils = require('../utils/stringUtils.js');
 const routeUtils = require('../utils/routeUtils.js');
-module.exports = function loadControllers(web, path) {
-  //let web = global.web;
+const path = require('path');
 
-  path = path || (web.conf.baseDir + web.conf.controllersDir);
+module.exports = function loadControllers(web, filePath) {
 
-  fileUtils.recurseDir(path, function loadControllerRecurseDir(err, opts) {
+  filePath = filePath || path.join(web.conf.baseDir, web.conf.controllersDir);
+
+  fileUtils.recurseDir(filePath, function loadControllerRecurseDir(err, opts) {
+    if (err) {
+      console.warn("Error loading controllers::", err);
+      return;
+    }
+
     if (!opts.isDirectory() && stringUtils.endsWith(opts.file, '.js') && !fileUtils.isHidden(opts.file)) {
       let file = opts.file;
       let subfolder = opts.subfolder;
       if (console.isDebug) {
         console.debug(opts.absolutePath + '[file]');
       }
-      let subPath = subfolder + '/' + file;
+      let subPath = path.join(subfolder, file);
       let absPath = opts.absolutePath;
       let controller = null;
       try {
@@ -25,7 +31,7 @@ module.exports = function loadControllers(web, path) {
         throw e;
       }
       if (controller.autoRoute !== false) {
-        if (file == 'index.js') {
+        if (file === 'index.js') {
           let subPathWithoutExt = subPath.slice(0, -8);
           routeUtils.applyRoute(web, subPathWithoutExt, controller);
 
@@ -39,11 +45,9 @@ module.exports = function loadControllers(web, path) {
         } else {
           let subPathWithoutExt = subPath.slice(0, -3);
           routeUtils.applyRoute(web, subPathWithoutExt, controller);
-        }
-        
+        } 
         
       }
-
       
     }
   });

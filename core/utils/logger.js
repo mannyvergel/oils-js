@@ -10,7 +10,7 @@ module.exports = function(webSelf) {
     logger.error = console.error.bind(logger);
 
     return logger;
-  } else if (webSelf.conf.logger.replaceWith == 'winston') {
+  } else if (webSelf.conf.logger.replaceWith === 'winston') {
     return replaceWithWinstonLogger(webSelf);
   } else {
     throw new Error("Unsupported logger", webSelf.conf.logger.replaceWith);

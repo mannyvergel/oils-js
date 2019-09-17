@@ -8,7 +8,7 @@ const customResponse = function() {
   return function(req, res, next) {
 
       //redirect trailing e.g. '/hello/' to '/hello' 
-      if (req.url.substr(-1) == '/' && req.url.length > 1) {
+      if (req.url.substr(-1) === '/' && req.url.length > 1) {
          res.redirect(301, req.url.slice(0, -1));
          return;
       }

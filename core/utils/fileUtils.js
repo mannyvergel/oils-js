@@ -21,12 +21,12 @@ exports.recurseDir = function(dir, callback, subfolder) {
 
   fs.readdir(pathToSearch, function(err, files) {
     if (err) {
-      throw new Error('Error reading dir ' + pathToSearch);
+      callback(new Error('Error reading dir ' + pathToSearch));
+      return;
     } else {
       for (let i in files) {
         let file = files[i];
         handleFile(true, dir, subfolder, file, callback);
-        
       }
       
     }

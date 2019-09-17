@@ -53,7 +53,7 @@ class Web {
     if (!global.hasOwnProperty('web')) {
       Object.defineProperty(global, 'web', {
         get: function() {
-          if (Object.keys(global._web).length == 1) {
+          if (Object.keys(global._web).length === 1) {
             return web;
           }
 
@@ -77,7 +77,7 @@ class Web {
     this.logger = require('./utils/logger.js')(this);
     
     if (this.conf.customConfigFile) {
-      let customConf = _nvmRequire(path.join(this.conf.baseDir, this.conf.customConfigFile));
+      let customConf = requireNvm(path.join(this.conf.baseDir, this.conf.customConfigFile));
       if (customConf) {
         this.conf = extend(this.conf, customConf);
       }
@@ -85,7 +85,7 @@ class Web {
 
     //zconf: third config path for environmental / more private properties
     if (this.conf.zconf) {
-      let zconf = _nvmRequire(this.conf.zconf);
+      let zconf = requireNvm(this.conf.zconf);
       if (zconf) {
         this.conf = extend(this.conf, zconf);
         console.info('Found zconf.. extending.');
@@ -111,6 +111,10 @@ class Web {
     return require(str);
   }
 
+  requireNvm(str) {
+    return requireNvm(str);
+  }
+
   // EVENTS -----------
   on(eventStr, callback) {
     if (!this.events[eventStr]) {
@@ -130,9 +134,17 @@ class Web {
   }
   // EVENTS end -------
 
-  include(file, secondFileFallback) {
+  include(file) {
+    return require(this.includeFullPath(file));
+  }
+
+  includeNvm(file) {
+    return requireNvm(this.includeFullPath(file));
+  }
+
+  includeFullPath(file) {
     let baseDir = this.conf.baseDir || process.cwd();
-    return require(path.join(this.conf.baseDir, file));
+    return path.join(this.conf.baseDir, file);
   }
 
   //MODELS ------------
@@ -369,7 +381,7 @@ class Web {
     
     app.use(methodOverride());
     let cookieKey = web.conf.secretPassphrase;
-    if (cookieKey == "change-this-it-is-2019!") {
+    if (cookieKey === "change-this-it-is-2019!") {
       throw new Error("Security error. Change conf.secretPassphrase.");
     }
     app.use(cookieParser(cookieKey));
@@ -398,7 +410,8 @@ class Web {
       self.callEvent('loadPlugins');
 
       let confRoutes = self.conf.routes || {};
-      confRoutes = extend(self.include(self.conf.routesFile), confRoutes);
+
+      confRoutes = extend(self.includeNvm(self.conf.routesFile) || {}, confRoutes);
 
       self.conf.routes = confRoutes;
       self._applyRoutes(self.conf.routes);
@@ -540,7 +553,7 @@ class Web {
             alwaysSecure.redirectHandler(req, res);
           } else {  
             let nonStandardPort = '';
-            if (web.conf.https.port != 443) {
+            if (web.conf.https.port !== 443) {
               nonStandardPort = ':' + web.conf.https.port;
             }
             res.writeHead(302, {'Location': 'https://' + req.headers.host.split(':')[0] + nonStandardPort + req.url});
@@ -613,16 +626,19 @@ function _applyRoutes(routes) {
   }
 }
 
-function _nvmRequire(libStr) {
+function requireNvm(libStr) {
   try {
     return require(libStr);
   } catch (er) {
-    if (er.code == 'MODULE_NOT_FOUND') {
+    if (er.code === 'MODULE_NOT_FOUND') {
+      if (console.isDebug) {
+        console.debug('Ignoring file not found through requireNvm', libStr);
+      }
       return null;
     } else {
       throw er;
     }
   }
 
-  console.error("[_nvmRequire] Unexpected end");
+  console.error("[requireNvm] Unexpected end");
 }
