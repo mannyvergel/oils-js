@@ -21,7 +21,7 @@ module.exports = function loadControllers(web, filePath) {
       if (console.isDebug) {
         console.debug(opts.absolutePath + '[file]');
       }
-      let subPath = path.join(subfolder, file);
+      let subPath = subfolder + '/' + file;
       let absPath = opts.absolutePath;
       let controller = null;
       try {
@@ -33,6 +33,7 @@ module.exports = function loadControllers(web, filePath) {
       if (controller.autoRoute !== false) {
         if (file === 'index.js') {
           let subPathWithoutExt = subPath.slice(0, -8);
+
           routeUtils.applyRoute(web, subPathWithoutExt, controller);
 
           if (opts.subfolder) {
@@ -44,6 +45,7 @@ module.exports = function loadControllers(web, filePath) {
           
         } else {
           let subPathWithoutExt = subPath.slice(0, -3);
+
           routeUtils.applyRoute(web, subPathWithoutExt, controller);
         } 
         

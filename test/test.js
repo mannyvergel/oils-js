@@ -9,7 +9,7 @@
 global.BASE_DIR = process.cwd() + '/../tmp/oilsjstest';
 
 try {
-fs.mkdirsSync(global.BASE_DIR);
+  fs.mkdirsSync(global.BASE_DIR);
 } catch(e) {
   
 }
@@ -149,6 +149,20 @@ describe('app', function () {
     http.get("http://127.0.0.1:" + web.conf.port, function(res) {
 
       assert.equal(res.statusCode, 200, 'Status of localhost');
+      done();
+    }).on('error', function(e) {
+      assert.ok(false, 'Error connecting ' + e);
+      done();
+    });
+    
+  });
+
+
+  it('should connect to contact', function (done) {
+    let url = 'http://127.0.0.1:' + web.conf.port + '/contact';
+    http.get(url, function(res) {
+
+      assert.equal(res.statusCode, 200, 'Status of ' + url);
       done();
     }).on('error', function(e) {
       assert.ok(false, 'Error connecting ' + e);
