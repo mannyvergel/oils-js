@@ -41,7 +41,14 @@ function webConnect(web, connIndex) {
 	let dbConf = web.conf.connections[connIndex];
 	let url = dbConf.url;
 	let errFunc = getErrFunc(web, connIndex);
-	web.connections[connIndex].openUri(url, {useNewUrlParser: true, poolSize: web.conf.connectionPoolSize, poolSize: web.conf.connectionPoolSize}, errFunc);
+	web.connections[connIndex].openUri(url, {
+		useNewUrlParser: true,
+		poolSize: web.conf.connectionPoolSize,
+		poolSize: web.conf.connectionPoolSize,
+		useCreateIndex: true,
+		useUnifiedTopology: true,
+		useFindAndModify: false,
+	}, errFunc);
 }
 
 function getErrFunc(web, connIndex) {

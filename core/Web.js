@@ -111,9 +111,9 @@ class Web {
     return require(str);
   }
 
-  requireNvm(str) {
-    return requireNvm(str);
-  }
+  // requireNvm - cannot define this as a utility because it will never work
+  // because it will require from this directory.
+  // use includeNvm instead
 
   // EVENTS -----------
   on(eventStr, callback) {
