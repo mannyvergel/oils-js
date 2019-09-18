@@ -29,7 +29,8 @@ exports.capitalize = function(aStr) {
 }
 
 exports.isEmpty = function(str) {
-	return str === null || str.length === 0;
+  // do not use strict equality for null, to handle undefined
+	return str == null || str.length == 0;
 }
 
 exports.escapeHTML = function(str) {
