@@ -21,11 +21,12 @@ module.exports = function Plugins(web) {
       let plugin = require(web.conf.baseDir + pluginPath);
       try {
         let pluginObj = null;
-        if (!plugin.load) {
+
+        if (web.objectUtils.isClass(plugin)) {
+          pluginObj = plugin;
+        } else {
           pluginObj = class extends Plugin {};
           pluginObj.prototype.load = plugin;
-        } else {
-          pluginObj = plugin;
         }
         
         web.addPlugin(new pluginObj(pluginConf, i));

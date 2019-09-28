@@ -78,7 +78,7 @@ describe('app', function () {
   });
  
   after(async function() {
-    await sleep(2000);
+    await web.sleep(2000);
     console.log("Done with tests.. exiting.");
     process.exit();
   });
@@ -94,7 +94,7 @@ describe('app', function () {
     done();
   });
 
-  it('should have functioning utilities', function (done) {
+  it('should have functioning utilities', async function () {
     assert.equal(web.utils.getMimeType('asd.png'), 'image/png', 'getMimeType not functioning correctly.');
     //assert.notStrictEqual(web.getLetsEncryptLex(), undefined, 'web.getLetsEncryptLex not working');
 
@@ -105,7 +105,9 @@ describe('app', function () {
     assert.notStrictEqual(web.dateUtils, undefined, 'web.dateUtils not found');
     assert.strictEqual(web.dateUtils.formatDate(new Date("April 30 1985"), "YYYYMMDD"), "19850430", 'web.dateUtils.format is invalid');
 
-    done();
+    assert(web.objectUtils.isClass(class extends web.Plugin {}), "web.objectUtils problem");
+
+
   });
 
   it('should have correct globals', function (done) {
@@ -185,9 +187,3 @@ describe('app', function () {
 
  
 });
-
-function sleep(ms) {
-  return new Promise(function(resolve, reject) {
-    setTimeout(resolve, ms);
-  })
-}

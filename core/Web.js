@@ -294,7 +294,6 @@ class Web {
   _getPluginFunction(plugin, webSelf) {
     return function(next) {
       plugin.load(plugin.conf, webSelf, next);
-
     }
   }
 
@@ -610,6 +609,10 @@ Web.prototype.dateUtils = require('./utils/dateUtils.js');
 //collection of common string utilities
 Web.prototype.stringUtils = stringUtils;
 
+Web.prototype.objectUtils = require('./utils/objectUtils.js');
+
+Web.prototype.sleep = sleep;
+
 //web.Plugin.extend..
 Web.prototype.Plugin = require('./Plugin.js');
 
@@ -641,4 +644,10 @@ function requireNvm(libStr) {
   }
 
   console.error("[requireNvm] Unexpected end");
+}
+
+async function sleep(ms) {
+  return new Promise(function(resolve, reject) {
+    return setTimeout(resolve, ms);
+  })
 }
