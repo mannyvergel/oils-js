@@ -14,20 +14,31 @@ module.exports = function customiseNunjucks(nunjucksEnv) {
   nunjucksEnv.addExtension('MarkedExtension', new MarkedExtension());
 }
 
-let marked = require('marked');
+const marked = require('marked');
+
+const createDOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
+
+const window = (new JSDOM('')).window;
+const DOMPurify = createDOMPurify(window);
 
 function MarkedExtension() {
-  
-  marked.setOptions({
+
+  const markedOptions = Object.assign(
+  {
     renderer: new marked.Renderer(),
     gfm: true,
     tables: true,
-    breaks: false,
+    breaks: true,
     pedantic: false,
-    sanitize: false,
+    sanitize: true,
+    sanitizer: DOMPurify.sanitize,
     smartLists: true,
     smartypants: false
-  });
+  }, web.conf.markedOptions
+  );
+  
+  marked.setOptions(markedOptions);
 
   this.tags = ['marked'];
   this.autoescape = false;
