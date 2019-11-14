@@ -501,7 +501,7 @@ class Web {
       if (httpsConfigEnabled) {
         if (web.conf.https.letsEncrypt) {
           
-          let https = self.conf.https.getHttpsServer();
+          let https = web.conf.https.getHttpsServer();
 
           let lex = web.getLetsEncryptLex();
 
@@ -523,7 +523,7 @@ class Web {
 
 
         } else {
-          let https = self.conf.https.getHttpsServer();
+          let https = web.conf.https.getHttpsServer();
           let privateKey = fs.readFileSync(web.conf.https.privateKey, 'utf8');
           let certificate = fs.readFileSync(web.conf.https.certificate, 'utf8');
           let credentials = {key: privateKey, cert: certificate};
