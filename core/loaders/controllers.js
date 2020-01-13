@@ -30,7 +30,14 @@ module.exports = function loadControllers(web, filePath) {
         console.error('Error loading ' + absPath);
         throw e;
       }
-      if (controller.autoRoute !== false) {
+
+      if (controller.route) {
+        let routesToApply = web.objectUtils.isArray(controller.route) ? controller.route : [controller.route];
+
+        for (let route of routesToApply) {
+           routeUtils.applyRoute(web, route, controller);
+        }
+      } else if (controller.autoRoute !== false) {
         if (file === 'index.js') {
           let subPathWithoutExt = subPath.slice(0, -8);
 
