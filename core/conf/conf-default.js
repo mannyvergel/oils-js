@@ -50,6 +50,7 @@ module.exports = function() {
     publicContext: '/', // better to serve static files in a diff directory e.g. /public/
 
     enableCsrfToken: false,
+    validateNoSqlInject: true,
     cookieMaxAge: 2592000000, // 30 days
     secretPassphrase: 'change-this-it-is-2019!',
     defaultRandomStringByteLength: 16, 

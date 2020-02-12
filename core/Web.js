@@ -84,7 +84,13 @@ class Web {
     }
 
     //zconf: third config path for environmental / more private properties
-    if (this.conf.zconf) {
+    if (this.conf.zconf === true) {
+      let customConf = requireNvm(path.join(this.conf.baseDir, 'conf', 'zconf.js'));
+      if (customConf) {
+        console.info('Found zconf... extending.');
+        this.conf = extend(this.conf, customConf);
+      }
+    } else if (this.conf.zconf) {
       let zconf = requireNvm(this.conf.zconf);
       if (zconf) {
         this.conf = extend(this.conf, zconf);
@@ -400,6 +406,32 @@ class Web {
    
     app.use(require('./middleware/custom-response.js')());
     app.use(flash());
+
+    if (web.conf.validateNoSqlInject) {
+      console.log("Adding validation for nosql injection");
+      
+      app.use(function(req, res, next) {
+        //prevent NOSQL injection for mongoose
+        let valid = false;
+        try {
+          validateNoSqlInject(req.query);
+          validateNoSqlInject(req.body);
+          validateNoSqlInject(req.params);
+          valid = true;
+        } catch (ex) {
+          console.error('Error in validation nosql', ex);
+          var ip = req.header('x-forwarded-for') || (req.connection && req.connection.remoteAddress);
+          console.error("[ALERT] Possible NOSQL injection", req.url, req.query, req.body, req.params, ip, req.user);
+          res.status(400).send("Invalid Request");
+        }
+
+        if (valid) {
+          next();
+        }
+
+      });
+    }
+
     require('./loaders/connections.js')(self);
 
     require('./loaders/plugins.js')(self);
@@ -555,7 +587,14 @@ class Web {
             if (web.conf.https.port !== 443) {
               nonStandardPort = ':' + web.conf.https.port;
             }
-            res.writeHead(302, {'Location': 'https://' + req.headers.host.split(':')[0] + nonStandardPort + req.url});
+
+            let hostStr;
+            if (req.headers.host) {
+              hostStr = req.headers.host.split(':')[0]
+            } else {
+              hostStr = req.hostname;
+            }
+            res.writeHead(302, {'Location': 'https://' + hostStr + nonStandardPort + req.url});
             res.end();
           }
         });
@@ -644,6 +683,21 @@ function requireNvm(libStr) {
   }
 
   console.error("[requireNvm] Unexpected end");
+}
+
+function validateNoSqlInject(query) {
+  if (query) {
+    for (let key in query) {
+      if (key.indexOf('$') === 0) {
+        console.error("Invalid key found", key);
+        throw new Error("Invalid request[999]");
+      }
+
+      if (query && typeof query == 'object') {
+        validateNoSqlInject(query[key]);
+      }
+    }
+  }
 }
 
 async function sleep(ms) {
