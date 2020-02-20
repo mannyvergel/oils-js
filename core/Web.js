@@ -688,7 +688,7 @@ function requireNvm(libStr) {
 function validateNoSqlInject(query) {
   if (query) {
     for (let key in query) {
-      if (key.indexOf('$') === 0) {
+      if (key && key[0] === '$') {
         console.error("Invalid key found", key);
         throw new Error("Invalid request[999]");
       }
