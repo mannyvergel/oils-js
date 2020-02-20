@@ -693,7 +693,7 @@ function validateNoSqlInject(query) {
         throw new Error("Invalid request[999]");
       }
 
-      if (query && typeof query == 'object') {
+      if (query[key] && typeof query[key] == 'object') {
         validateNoSqlInject(query[key]);
       }
     }
