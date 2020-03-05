@@ -83,6 +83,12 @@ class Web {
       }
     }
 
+    if (this.conf.pluginsConfPath) {
+      console.log("Reading plugins conf", this.conf.pluginsConfPath);
+      this.conf.plugins = this.conf.plugins || {};
+      this.conf.plugins = extend(this.conf.plugins, web.includeNvm(this.conf.pluginsConfPath));
+    }
+
     //zconf: third config path for environmental / more private properties
     if (this.conf.zconf === true) {
       let customConf = requireNvm(path.join(this.conf.baseDir, 'conf', 'zconf.js'));

@@ -68,6 +68,8 @@ module.exports = function() {
       }
     },
 
+    pluginsConfPath: null,
+
     parserLimit: '3mb'
   } 
 

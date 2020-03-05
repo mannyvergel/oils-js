@@ -1,14 +1,22 @@
 'use strict';
 
-const moment = require('moment');
+const moment = require('moment-timezone');
+
 module.exports = function customiseNunjucks(nunjucksEnv) {
-  nunjucksEnv.addFilter('date', function(date, format) {
+  nunjucksEnv.addFilter('date', function(date, format, timezone) {
     if (!date) {
       return null;
     }
-    
-    let s = moment(date).format(format);
-    return s;
+
+    let timezoneToUse = timezone || web.conf.timezone;
+    let dFormatted;
+    if (timezoneToUse) {
+      dFormatted = moment.tz(date, timezoneToUse).format(format)
+    } else {
+      dFormatted = moment(date).format(format);
+    }
+
+    return dFormatted;
   });
 
   nunjucksEnv.addExtension('MarkedExtension', new MarkedExtension());
