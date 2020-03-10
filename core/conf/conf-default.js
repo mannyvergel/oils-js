@@ -12,6 +12,16 @@ module.exports = function() {
     dataDir: 'data',
     tmpDir: 'data/tmp',
 
+    extendWeb: {
+      enabled: true,
+      path: '/conf/ext',
+      context: {
+        ext: {
+          // put all extensions here
+        }
+      }
+    },
+
     logger: {
       replaceWith: 'winston',
 

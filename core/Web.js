@@ -13,6 +13,7 @@ const csrf = require('csurf');
 const routeUtils = require('./utils/routeUtils');
 const stringUtils = require('./utils/stringUtils.js');
 const callsites = require('callsites');
+const webExtender = require('./loaders/webExtender.js');
 
 /**
 Oils web app
@@ -115,6 +116,10 @@ class Web {
     this.events = {};
     this.modelCache = new Object();
     this.plugins = [];
+
+    if (this.conf.extendWeb && this.conf.extendWeb.enabled) {
+      webExtender.load(this, this.conf.extendWeb.path, this.conf.extendWeb.context);
+    }
   }
 
   //a way to use oils library so no need to re-install
