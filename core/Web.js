@@ -117,6 +117,8 @@ class Web {
     this.modelCache = new Object();
     this.plugins = [];
 
+    this.overrideResponse();
+
     if (this.conf.extendWeb && this.conf.extendWeb.enabled) {
       webExtender.load(this, this.conf.extendWeb.path, this.conf.extendWeb.context);
     }
@@ -126,6 +128,24 @@ class Web {
   //e.g. const moment = web.require('moment');
   require(str) {
     return require(str);
+  }
+
+  overrideResponse() {
+    const web = this;
+    // override default res.render
+    const render = express.response.render;
+
+    express.response.render = function(view, options, callback) {
+      const req = this.req;
+      const res = this;
+
+      web.callEvent('beforeRender', [view, options, callback, req, res])
+      render.apply(this, arguments);
+    };
+
+    // res.renderFile is deprecated, same as res.render
+    // retained for backward compat
+    express.response.renderFile = express.response.render;
   }
 
   // requireNvm - cannot define this as a utility because it will never work
@@ -377,7 +397,11 @@ class Web {
         req.rawBody = buf.toString(encoding || 'utf8');
       }
     }
-    
+
+    if (web.conf.trustProxy) {
+      console.log("Trusting proxy", web.conf.trustProxy);
+      app.set('trust proxy', web.conf.trustProxy);
+    }
 
     app.use(bodyParser.json({limit: web.conf.parserLimit, verify: rawBodySaver}));
     app.use(bodyParser.urlencoded({
@@ -480,15 +504,6 @@ class Web {
     let self = this;
 
     if (!self.lex) {
-      let defaultHttpsConf = require('./conf/conf-https-default.js')(self);
-
-      let defaultLetsEncryptConf = defaultHttpsConf.letsEncrypt || {};
-
-      let confLetsEncrypt = self.conf.https && self.conf.https.letsEncrypt;
-
-      self.conf.https = extend(defaultHttpsConf, self.conf.https || {});
-
-      self.conf.https.letsEncrypt = extend(defaultLetsEncryptConf, confLetsEncrypt || {});
 
       if (!self.conf.https.letsEncrypt.email) {
         throw new Error("conf.https.letsEncrypt.email must not be nil.");
@@ -540,103 +555,60 @@ class Web {
 
       let alwaysSecure = null;
 
-      let httpsConfigEnabled = web.conf.https && web.conf.https.enabled
+      let httpsConfigEnabled = (web.conf.https && web.conf.https.enabled) || web.conf.httpsOpts.httpsEnabled;
+
+      let middlewareToUse = function(anotherMiddleware) {
+        return anotherMiddleware;
+      }
+      
       if (httpsConfigEnabled) {
+        let defaultHttpsConf = require('./conf/conf-https-default.js')(web);
+
+        let defaultLetsEncryptConf = defaultHttpsConf.letsEncrypt || {};
+
+        let confLetsEncrypt = web.conf.https && web.conf.https.letsEncrypt;
+
+        web.conf.https = extend(defaultHttpsConf, web.conf.https || {});
+
+        web.conf.https.letsEncrypt = extend(
+          defaultLetsEncryptConf,
+          confLetsEncrypt || {},
+          web.conf.httpsOpts.letsEncrypt
+        );
+
         if (web.conf.https.letsEncrypt) {
           
           let https = web.conf.https.getHttpsServer();
-
           let lex = web.getLetsEncryptLex();
-
           let httpsPort = web.conf.https.port || 443;
+
+          middlewareToUse = lex.middleware;
           
-          https.createServer(lex.httpsOptions, lex.middleware(web.app))
-            .listen(httpsPort, web.conf.ipAddress, function(err, result) {
-              if (err) {
-                console.error(err);
-              }
-              console.log('%s: Node https server started on %s:%d ...',
-                          Date(Date.now()), web.conf.ipAddress, httpsPort);
-
-              if (cb) {
-                cb(err, result);
-              }
-            });
-
-
+          let httpServer = https.createServer(lex.httpsOptions, middlewareToUse(web.app));
+          startListening(httpServer, {port: httpsPort, ipAddress: web.conf.ipAddress, addtLog: "(HTTPS)"}, cb);
 
         } else {
           let https = web.conf.https.getHttpsServer();
           let privateKey = fs.readFileSync(web.conf.https.privateKey, 'utf8');
           let certificate = fs.readFileSync(web.conf.https.certificate, 'utf8');
           let credentials = {key: privateKey, cert: certificate};
+
           let httpsServer = https.createServer(credentials, web.app);
-
-          httpsServer.listen(web.conf.https.port, web.conf.ipAddress, function(err, result) {
-            if (err) {
-              console.error(err);
-            }
-            console.log('%s: Node https server started on %s:%d ...',
-                        Date(Date.now()), web.conf.ipAddress, web.conf.https.port);
-
-            if (cb) {
-              cb(err, result);
-            }
-          });
+          startListening(httpServer, {port: web.conf.port, ipAddress: web.conf.ipAddress, addtlLog: "(HTTPS)"}, cb);
         }
 
         alwaysSecure = web.conf.https.alwaysSecure;
       }
       
-      if (alwaysSecure && alwaysSecure.enabled) {
-        let httpRedirecter = http.createServer(function(req, res) {
+      if ((alwaysSecure && alwaysSecure.enabled) || web.conf.httpsOpts.alwaysSecure) {
+        let redirectMiddleware = alwaysSecure.redirectHandler 
+          || defaultRedirectToHttpsMiddleware;
 
-          if (alwaysSecure.redirectHandler) {
-            alwaysSecure.redirectHandler(req, res);
-          } else {  
-            let nonStandardPort = '';
-            if (web.conf.https.port !== 443) {
-              nonStandardPort = ':' + web.conf.https.port;
-            }
-
-            let hostStr;
-            if (req.headers.host) {
-              hostStr = req.headers.host.split(':')[0]
-            } else {
-              hostStr = req.hostname;
-            }
-            res.writeHead(302, {'Location': 'https://' + hostStr + nonStandardPort + req.url});
-            res.end();
-          }
-        });
-
-        httpRedirecter.listen(web.conf.port, web.conf.ipAddress, function(err, result) {
-           if (err) {
-              console.error(err);
-            }
-            
-            console.log('%s: http redirecter server started on %s:%d ...',
-                        Date(Date.now()), web.conf.ipAddress, web.conf.port);
-
-            if (cb) {
-              cb(err, result);
-            }
-        });
+        let httpRedirecter = http.createServer(middlewareToUse(redirectMiddleware));
+        startListening(httpRedirecter, {port: web.conf.port, ipAddress: web.conf.ipAddress}, cb);
       } else {
-        let httpServer = http.createServer(web.app);
-        //  Start the app on the specific interface (and port).
-        httpServer.listen(web.conf.port, web.conf.ipAddress, function(err, result) {
-           if (err) {
-              console.error(err);
-            }
-            
-            console.log('%s: Node server started on %s:%d ...',
-                        Date(Date.now()), web.conf.ipAddress, web.conf.port);
-
-            if (cb) {
-              cb(err, result);
-            }
-        });
+        let httpServer = http.createServer(middlewareToUse(web.app));
+        startListening(httpServer, {port: web.conf.port, ipAddress: web.conf.ipAddress}, cb);
       }
 
     });
@@ -716,3 +688,38 @@ async function sleep(ms) {
     return setTimeout(resolve, ms);
   })
 }
+
+
+function startListening(httpServer, {port, ipAddress, addtlLog = ""}, cb) {
+  httpServer.listen(port, ipAddress, function(err, result) {
+     if (err) {
+        console.error(err);
+      }
+      
+      console.log('%s: Node server started on %s:%d %s...',
+                  Date(Date.now()), ipAddress, port, addtlLog);
+
+      if (cb) {
+        cb(err, result);
+      }
+  });
+}
+
+function defaultRedirectToHttpsMiddleware(req, res) {
+  let nonStandardPort = '';
+  let portToUse = (web.conf.httpsOpts.port || web.conf.https.port);
+  if (portToUse !== 443) {
+    nonStandardPort = ':' + portToUse;
+  }
+
+  let hostStr;
+  if (req.headers.host) {
+    hostStr = req.headers.host.split(':')[0]
+  } else {
+    hostStr = req.hostname;
+  }
+  res.writeHead(302, {'Location': 'https://' + hostStr + nonStandardPort + req.url});
+  res.end();
+}
+  
+

@@ -3,7 +3,7 @@
 const path = require('path');
 const isProd = process.env.NODE_ENV === 'production';
 
-module.exports = function() {
+module.exports = function(webSel) {
   let conf = {
     baseDir: process.cwd(),
     isProd: isProd,
@@ -44,6 +44,9 @@ module.exports = function() {
 
     saveRawBody: false,
 
+    // set when behind a trusted proxy, see express' trust proxy settings
+    trustProxy: false,
+
     viewConf: {
       mainTemplate: 'templates/main.html',
       template: 'bootstrap', // zurb or bootstrap, but doesn't make a diff now
@@ -79,6 +82,14 @@ module.exports = function() {
     },
 
     pluginsConfPath: null,
+
+    httpsOpts: {
+      enabled: false,
+      alwaysSecure: false,
+      letsEncrypt: {
+        
+      }
+    },
 
     parserLimit: '3mb'
   } 
