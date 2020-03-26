@@ -137,7 +137,7 @@ class Web {
 
     web.on('beforeRender', web.initBeforeRender)
 
-    express.response.render = function(view, options, callback) {
+    express.response.render = function(view, options = {}, callback) {
       const req = this.req;
       const res = this;
 
@@ -150,11 +150,7 @@ class Web {
     express.response.renderFile = express.response.render;
   }
 
-  initBeforeRender(view, options, callback, req, res) {
-    if (!options) {
-      options = {}
-    }
-
+  initBeforeRender(view, options = {}, callback, req, res) {
     options['_errors'] = req.flash('error');
     options['_warns'] = req.flash('warn');
     options['_infos'] = req.flash('info');
