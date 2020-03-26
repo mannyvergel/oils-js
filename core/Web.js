@@ -151,9 +151,14 @@ class Web {
   }
 
   initBeforeRender(view, options = {}, callback, req, res) {
-    options['_errors'] = req.flash('error');
-    options['_warns'] = req.flash('warn');
-    options['_infos'] = req.flash('info');
+
+    if (req.flash) {
+      // it seems when 500 error is called, flash is not available
+      // after it res.render was moved
+      options['_errors'] = req.flash('error');
+      options['_warns'] = req.flash('warn');
+      options['_infos'] = req.flash('info');
+    }
     options['_conf'] = web.conf.viewConf;
     options['_ext'] = req.ext;
 
