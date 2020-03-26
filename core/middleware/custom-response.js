@@ -2,8 +2,6 @@
 
 const web = global.web;
 const customResponse = function() {
-  //TODO: may need to transfer this later (make sure it's only called once)
-  web.on('beforeRender', initBeforeRender);
 
   return function(req, res, next) {
     req.ext = req.ext || {};
@@ -22,16 +20,3 @@ const customResponse = function() {
 }
 
 module.exports = customResponse;
-
-function initBeforeRender(view, options, callback, req, res) {
-  if (!options) {
-    options = {}
-  }
-
-  options['_errors'] = req.flash('error');
-  options['_warns'] = req.flash('warn');
-  options['_infos'] = req.flash('info');
-  options['_conf'] = web.conf.viewConf;
-  options['_ext'] = req.ext;
-
-};

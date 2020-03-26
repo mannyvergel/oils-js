@@ -135,6 +135,8 @@ class Web {
     // override default res.render
     const render = express.response.render;
 
+    web.on('beforeRender', web.initBeforeRender)
+
     express.response.render = function(view, options, callback) {
       const req = this.req;
       const res = this;
@@ -146,6 +148,19 @@ class Web {
     // res.renderFile is deprecated, same as res.render
     // retained for backward compat
     express.response.renderFile = express.response.render;
+  }
+
+  initBeforeRender(view, options, callback, req, res) {
+    if (!options) {
+      options = {}
+    }
+
+    options['_errors'] = req.flash('error');
+    options['_warns'] = req.flash('warn');
+    options['_infos'] = req.flash('info');
+    options['_conf'] = web.conf.viewConf;
+    options['_ext'] = req.ext;
+
   }
 
   // requireNvm - cannot define this as a utility because it will never work
