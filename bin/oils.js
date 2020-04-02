@@ -2,8 +2,9 @@
 
 'use strict';
 
-let parser = require("nomnom");
-let fs = require('fs-extra');
+const parser = require("nomnom");
+const fs = require('fs');
+const fileUtils = require('../core/utils/fileUtils.js');
 
 parser.command('new')
 .options({
@@ -27,13 +28,12 @@ parser.parse();
 
 function newProject(opts) {
   let folderName = opts.name;
-  //console.log('NEW PROJECT TO ' + folderName);
 
   if (fs.existsSync(folderName)) {
     console.log('Folder name already exists. Aborting.'); 
   } else {
 
-    fs.copySync(__dirname + '/../templates/basic', folderName);
+    fileUtils.copySync(__dirname + '/../templates/basic', folderName);
 
     fs.renameSync(folderName + '/template.gitignore', folderName + '/.gitignore');
 

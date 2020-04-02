@@ -5,11 +5,11 @@ const stringUtils = require('../utils/stringUtils.js');
 const routeUtils = require('../utils/routeUtils.js');
 const path = require('path');
 
-module.exports = function loadControllers(web, filePath) {
+module.exports = async function loadControllers(web, filePath) {
 
   filePath = filePath || path.join(web.conf.baseDir, web.conf.controllersDir);
 
-  fileUtils.recurseDir(filePath, function loadControllerRecurseDir(err, opts) {
+  await fileUtils.handleEachFromDir(filePath, {}, async function controllerFileHandler(err, opts) {
     if (err) {
       console.warn("Error loading controllers::", err);
       return;

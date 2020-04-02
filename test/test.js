@@ -14,8 +14,8 @@ try {
   
 }
 
-const fs = require('fs-extra');
-
+const fs = require('fs');
+const fileUtils = require('../core/utils/fileUtils.js');
 const assert = require("assert");
 
 const oilsBaseDir = global.BASE_DIR + '/node_modules/oils';
@@ -43,35 +43,36 @@ let web;
 describe('app', function () {
   this.timeout(40000);
   before (function (done) {
-  	fs.copySync('./templates/basic', global.BASE_DIR);
+  	fileUtils.copySync('./templates/basic', global.BASE_DIR, {force: true});
 
-    fs.remove(BASE_DIR + '/node_modules', function(err) {
-      try {
-        fs.mkdirSync(BASE_DIR + '/node_modules');
-      } catch(e) {
-        console.log(BASE_DIR + '/node_modules already exists. Skipping create.')
+    fileUtils.removeDirSync(BASE_DIR + '/node_modules');
+    try {
+      fs.mkdirSync(BASE_DIR + '/node_modules');
+    } catch(e) {
+      console.log(BASE_DIR + '/node_modules already exists. Skipping create.')
+    }
+
+    try {
+      fs.mkdirSync(BASE_DIR + '/node_modules/oils')
+    } catch(e) {
+      console.log(BASE_DIR + '/node_modules/oils already exists. Skipping create.')
+    }
+
+    fileUtils.copySync('./',  BASE_DIR + '/node_modules/oils', {force: true});
+
+    let Web = includeOils('/core/Web.js');
+    web = new Web(overrideConf);
+    web.start(function (err, result) {
+      if (err) {
+        done(err);
+      } else {
+        done();
       }
+    });
 
-      try {
-        fs.mkdirSync(BASE_DIR + '/node_modules/oils')
-      } catch(e) {
-        console.log(BASE_DIR + '/node_modules/oils already exists. Skipping create.')
-      }
-
-      fs.copy('./',  BASE_DIR + '/node_modules/oils', function(err) {
-        let Web = includeOils('/core/Web.js');
-        web = new Web(overrideConf);
-        web.start(function (err, result) {
-          if (err) {
-            done(err);
-          } else {
-            done();
-          }
-        });
-      });
 
       
-    });
+
 
     
     

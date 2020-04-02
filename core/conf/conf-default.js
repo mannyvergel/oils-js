@@ -83,6 +83,30 @@ module.exports = function(webSel) {
 
     pluginsConfPath: null,
 
+    saveDb: async function(doc, req, saveOpts) {
+
+      if (!doc) {
+        throw new Error("Document expected [1]");
+      }
+
+      if (!req) {
+        throw new Error("Request expected [2]");
+      }
+
+      if (!doc.isNew) {
+        doc.updateDt = new Date();
+        if (req.user) {
+          doc.updateBy = req.user._id;
+        }
+      } else {
+        if (req.user) {
+          doc.createBy = req.user._id;
+        }
+      }
+
+      await doc.save(saveOpts);
+    },
+
     httpsOpts: {
       enabled: false,
       alwaysSecure: false,

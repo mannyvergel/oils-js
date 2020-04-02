@@ -4,7 +4,6 @@ const extend = Object.assign;
 const express = require('express');
 const domain = require('domain');
 const mongoose = require('mongoose');
-mongoose.Promise = require('bluebird');
 const Schema = mongoose.Schema;
 const flash = require('connect-flash');
 const path = require('path');
@@ -142,7 +141,7 @@ class Web {
       const res = this;
 
       web.callEvent('beforeRender', [view, options, callback, req, res])
-      render.apply(this, arguments);
+      render.apply(this, [view, options, callback]);
     };
 
     // res.renderFile is deprecated, same as res.render
@@ -150,7 +149,7 @@ class Web {
     express.response.renderFile = express.response.render;
   }
 
-  initBeforeRender(view, options = {}, callback, req, res) {
+  initBeforeRender(view, options, callback, req, res) {
 
     if (req.flash) {
       // it seems when 500 error is called, flash is not available
@@ -177,6 +176,7 @@ class Web {
     this.events[eventStr].push(callback);
   }
 
+  // use call if you want async
   callEvent(eventStr, argsArray){
     let myEvents = this.events[eventStr];
     if (myEvents) {
@@ -184,6 +184,21 @@ class Web {
         myEvent.apply(this, argsArray);
       }
     }
+
+  }
+
+  async call(eventStr, argsArray){
+    let myEvents = this.events[eventStr];
+    if (myEvents) {
+      for (let myEvent of myEvents) {
+        try {
+          await myEvent.apply(this, argsArray);
+        } catch (ex) {
+          console.error("Error loading one event", eventStr, ex);
+        }
+      }
+    }
+
   }
   // EVENTS end -------
 
@@ -344,21 +359,25 @@ class Web {
     this.plugins[plugin.id] = plugin;
   }
 
-  _getPluginFunction(plugin, webSelf) {
-    return function(next) {
-      plugin.load(plugin.conf, webSelf, next);
-    }
-  }
-
-  loadPlugins(cb) {
+  async loadPlugins(cb) {
     let self = this;
     let pluginFunctions = [];
-    for (let i in self.plugins) {
-      let plugin = self.plugins[i];
-      pluginFunctions.push(self._getPluginFunction(plugin, self));
 
+    // delete the concept of next in the far future, loading of functions are now async
+    let nextObsolete = function(){};
+
+    for (let pluginId in self.plugins) {
+      let plugin = self.plugins[pluginId];
+      try {
+        await plugin.load(plugin.conf, self, nextObsolete);
+      } catch (ex) {
+        console.error("Error loading plugin", pluginId, ex);
+      }
     }
-    require('./utils/queueLoader.js')(pluginFunctions, [], cb);
+
+    if (cb) {
+      cb();
+    }
   }
 
   //for deprection, use addRoutes whenever possible instead
@@ -389,7 +408,7 @@ class Web {
     }
   }
 
-  initServer() {
+  async initServer(cb) {
     let app = this.app;
     let web = this;
     let self = this;
@@ -465,9 +484,9 @@ class Web {
         //prevent NOSQL injection for mongoose
         let valid = false;
         try {
-          validateNoSqlInject(req.query);
-          validateNoSqlInject(req.body);
-          validateNoSqlInject(req.params);
+          web.validateNoSqlInject(req.query);
+          web.validateNoSqlInject(req.body);
+          web.validateNoSqlInject(req.params);
           valid = true;
         } catch (ex) {
           console.error('Error in validation nosql', ex);
@@ -487,23 +506,24 @@ class Web {
 
     require('./loaders/plugins.js')(self);
     
-    self.loadPlugins(function() {
-      //use this for adding events prior to adding routes
-      self.callEvent('loadPlugins');
+    await self.loadPlugins();
 
-      let confRoutes = self.conf.routes || {};
+    //use this for adding events prior to adding routes
+    await self.call('loadPlugins');
 
-      confRoutes = extend(self.includeNvm(self.conf.routesFile) || {}, confRoutes);
+    let confRoutes = self.conf.routes || {};
 
-      self.conf.routes = confRoutes;
-      self._applyRoutes(self.conf.routes);
-      require('./loaders/controllers')(self);
-      
-      self.callEvent('initServer');
-    });
+    confRoutes = extend(self.includeNvm(self.conf.routesFile) || {}, confRoutes);
+
+    self.conf.routes = confRoutes;
+    self._applyRoutes(self.conf.routes);
+    await require('./loaders/controllers')(self);
 
     app.use(self.conf.publicContext, express.static(path.join(self.conf.baseDir, self.conf.publicDir)));
+    
+    await self.call('initServer');
 
+    
     app.use(function(err, req, res, next){
       res.status(500);
       if (web.conf.handle500) {
@@ -513,7 +533,29 @@ class Web {
       }
       console.error("General error", err);
     });
+
+
+    if (cb) {
+      await cb();
+    }
     
+  }
+
+  validateNoSqlInject(query) {
+    if (query) {
+      for (let key in query) {
+        if (key && key[0] === '$') {
+          console.error("Invalid key found", key);
+          throw new Error("Invalid request [999]");
+        }
+
+        if (query[key] && typeof query[key] == 'object') {
+          this.validateNoSqlInject(query[key]);
+        }
+      }
+    }
+
+    return query;
   }
 
   getLetsEncryptLex() {
@@ -566,66 +608,11 @@ class Web {
     serverDomain.run(function() {
 
       // Initialize the express server and routes.
-      web.initServer();
-      let http = require('http');
+      // we don't await because of unknown behavior with domains
+      web.initServer(function() {
+        startServer(web, cb);
+      });
 
-      let alwaysSecure = null;
-
-      let httpsConfigEnabled = (web.conf.https && web.conf.https.enabled) || web.conf.httpsOpts.httpsEnabled;
-
-      let middlewareToUse = function(anotherMiddleware) {
-        return anotherMiddleware;
-      }
-      
-      if (httpsConfigEnabled) {
-        let defaultHttpsConf = require('./conf/conf-https-default.js')(web);
-
-        let defaultLetsEncryptConf = defaultHttpsConf.letsEncrypt || {};
-
-        let confLetsEncrypt = web.conf.https && web.conf.https.letsEncrypt;
-
-        web.conf.https = extend(defaultHttpsConf, web.conf.https || {});
-
-        web.conf.https.letsEncrypt = extend(
-          defaultLetsEncryptConf,
-          confLetsEncrypt || {},
-          web.conf.httpsOpts.letsEncrypt
-        );
-
-        if (web.conf.https.letsEncrypt) {
-          
-          let https = web.conf.https.getHttpsServer();
-          let lex = web.getLetsEncryptLex();
-          let httpsPort = web.conf.https.port || 443;
-
-          middlewareToUse = lex.middleware;
-          
-          let httpServer = https.createServer(lex.httpsOptions, middlewareToUse(web.app));
-          startListening(httpServer, {port: httpsPort, ipAddress: web.conf.ipAddress, addtLog: "(HTTPS)"}, cb);
-
-        } else {
-          let https = web.conf.https.getHttpsServer();
-          let privateKey = fs.readFileSync(web.conf.https.privateKey, 'utf8');
-          let certificate = fs.readFileSync(web.conf.https.certificate, 'utf8');
-          let credentials = {key: privateKey, cert: certificate};
-
-          let httpsServer = https.createServer(credentials, web.app);
-          startListening(httpServer, {port: web.conf.port, ipAddress: web.conf.ipAddress, addtlLog: "(HTTPS)"}, cb);
-        }
-
-        alwaysSecure = web.conf.https.alwaysSecure;
-      }
-      
-      if ((alwaysSecure && alwaysSecure.enabled) || web.conf.httpsOpts.alwaysSecure) {
-        let redirectMiddleware = alwaysSecure.redirectHandler 
-          || defaultRedirectToHttpsMiddleware;
-
-        let httpRedirecter = http.createServer(middlewareToUse(redirectMiddleware));
-        startListening(httpRedirecter, {port: web.conf.port, ipAddress: web.conf.ipAddress}, cb);
-      } else {
-        let httpServer = http.createServer(middlewareToUse(web.app));
-        startListening(httpServer, {port: web.conf.port, ipAddress: web.conf.ipAddress}, cb);
-      }
 
     });
   }
@@ -684,21 +671,6 @@ function requireNvm(libStr) {
   console.error("[requireNvm] Unexpected end");
 }
 
-function validateNoSqlInject(query) {
-  if (query) {
-    for (let key in query) {
-      if (key && key[0] === '$') {
-        console.error("Invalid key found", key);
-        throw new Error("Invalid request[999]");
-      }
-
-      if (query[key] && typeof query[key] == 'object') {
-        validateNoSqlInject(query[key]);
-      }
-    }
-  }
-}
-
 async function sleep(ms) {
   return new Promise(function(resolve, reject) {
     return setTimeout(resolve, ms);
@@ -736,6 +708,70 @@ function defaultRedirectToHttpsMiddleware(req, res) {
   }
   res.writeHead(302, {'Location': 'https://' + hostStr + nonStandardPort + req.url});
   res.end();
+}
+
+
+function startServer(web, cb) {
+
+  const http = require('http');
+
+  let alwaysSecure = null;
+
+  let httpsConfigEnabled = (web.conf.https && web.conf.https.enabled) || web.conf.httpsOpts.httpsEnabled;
+
+  let middlewareToUse = function(anotherMiddleware) {
+    return anotherMiddleware;
+  }
+  
+  if (httpsConfigEnabled) {
+    let defaultHttpsConf = require('./conf/conf-https-default.js')(web);
+
+    let defaultLetsEncryptConf = defaultHttpsConf.letsEncrypt || {};
+
+    let confLetsEncrypt = web.conf.https && web.conf.https.letsEncrypt;
+
+    web.conf.https = extend(defaultHttpsConf, web.conf.https || {});
+
+    web.conf.https.letsEncrypt = extend(
+      defaultLetsEncryptConf,
+      confLetsEncrypt || {},
+      web.conf.httpsOpts.letsEncrypt
+    );
+
+    if (web.conf.https.letsEncrypt) {
+      
+      let https = web.conf.https.getHttpsServer();
+      let lex = web.getLetsEncryptLex();
+      let httpsPort = web.conf.https.port || 443;
+
+      middlewareToUse = lex.middleware;
+      
+      let httpServer = https.createServer(lex.httpsOptions, middlewareToUse(web.app));
+      startListening(httpServer, {port: httpsPort, ipAddress: web.conf.ipAddress, addtLog: "(HTTPS)"}, cb);
+
+    } else {
+      let https = web.conf.https.getHttpsServer();
+      let privateKey = fs.readFileSync(web.conf.https.privateKey, 'utf8');
+      let certificate = fs.readFileSync(web.conf.https.certificate, 'utf8');
+      let credentials = {key: privateKey, cert: certificate};
+
+      let httpsServer = https.createServer(credentials, web.app);
+      startListening(httpServer, {port: web.conf.port, ipAddress: web.conf.ipAddress, addtlLog: "(HTTPS)"}, cb);
+    }
+
+    alwaysSecure = web.conf.https.alwaysSecure;
+  }
+  
+  if ((alwaysSecure && alwaysSecure.enabled) || web.conf.httpsOpts.alwaysSecure) {
+    let redirectMiddleware = alwaysSecure.redirectHandler 
+      || defaultRedirectToHttpsMiddleware;
+
+    let httpRedirecter = http.createServer(middlewareToUse(redirectMiddleware));
+    startListening(httpRedirecter, {port: web.conf.port, ipAddress: web.conf.ipAddress}, cb);
+  } else {
+    let httpServer = http.createServer(middlewareToUse(web.app));
+    startListening(httpServer, {port: web.conf.port, ipAddress: web.conf.ipAddress}, cb);
+  }
 }
   
 
