@@ -39,14 +39,15 @@ module.exports = async function loadControllers(web, filePath) {
         }
       } else if (controller.autoRoute !== false) {
         if (file === 'index.js') {
-          let subPathWithoutExt = subPath.slice(0, -8);
-
-          routeUtils.applyRoute(web, subPathWithoutExt, controller);
-
+          
           if (opts.subfolder) {
-            //for non root index.js apply no '/'
-            //e.g. http://localhost/admin/ and http://localhost/admi 
-            subPathWithoutExt = subPath.slice(0, -9);
+            // for non root index.js remove the last '/'
+            // e.g. http://localhost/test/ to http://localhost/test 
+            // since we always redirect to non '/'
+            let subPathWithoutExt = subPath.slice(0, -9);
+            routeUtils.applyRoute(web, subPathWithoutExt, controller);
+          } else {
+            let subPathWithoutExt = subPath.slice(0, -8);
             routeUtils.applyRoute(web, subPathWithoutExt, controller);
           }
           
