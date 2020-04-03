@@ -58,7 +58,7 @@ function replaceWithWinstonLogger(webSelf) {
 
     // Create the log directory if it does not exist
     if (!fs.existsSync(logDir)) {
-      web.fileUtils.mkdirsSync(logDir);
+      fs.mkdirSync(logDir, {recursive: true});
     }
     if (webSelf.conf.logger.winston.logToFile.dailyRotate.enabled) {
       let rotateConf = webSelf.conf.logger.winston.logToFile.dailyRotate;
