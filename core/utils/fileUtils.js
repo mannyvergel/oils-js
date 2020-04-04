@@ -99,7 +99,7 @@ exports.handleEachFromDir = async function(dir, {origDir}={}, handler) {
     await handler(null, opts);
 
     if (opts.isDirectory()) {
-      await exports.handleEachFromDir(absPath, {origDir: dir}, handler);
+      await exports.handleEachFromDir(absPath, {origDir: origDir}, handler);
     }
   }
 
