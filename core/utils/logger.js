@@ -54,7 +54,7 @@ function replaceWithWinstonLogger(webSelf) {
   if (webSelf.conf.logger.winston.logToFile.enabled) {
 
     const fs = require('fs');
-    const logDir = webSelf.conf.logger.dir;
+    const logDir = webSelf.conf.logDir || webSelf.conf.logger.dir;
 
     // Create the log directory if it does not exist
     if (!fs.existsSync(logDir)) {

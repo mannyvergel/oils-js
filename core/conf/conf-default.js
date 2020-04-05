@@ -38,9 +38,9 @@ module.exports = function(webSel) {
           }
         }
       },
-
-      dir: 'data/logs',
     },
+    
+    logDir: 'data/logs',
 
     saveRawBody: false,
 
