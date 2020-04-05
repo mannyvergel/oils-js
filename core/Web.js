@@ -73,8 +73,6 @@ class Web {
     //load custom config file
     this.conf = require('./conf/conf-default.js')();
     this.conf = extend(this.conf, conf);
-
-    this.logger = require('./utils/logger.js')(this);
     
     if (this.conf.customConfigFile) {
       let customConf = requireNvm(path.join(this.conf.baseDir, this.conf.customConfigFile));
@@ -105,6 +103,8 @@ class Web {
         console.warn(web.conf.zconf, 'not found. Ignoring.');
       }
     }
+
+    this.logger = require('./utils/logger.js')(this);
 
     console.isDebug = this.conf.isDebug;
     if (console.isDebug) {
