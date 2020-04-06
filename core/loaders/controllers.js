@@ -17,11 +17,11 @@ module.exports = async function loadControllers(web, filePath) {
 
     if (!opts.isDirectory() && stringUtils.endsWith(opts.file, '.js') && !fileUtils.isHidden(opts.file)) {
       let file = opts.file;
-      let subfolder = opts.subfolder;
+      let subfolder = opts.subfolder || "";
       if (console.isDebug) {
         console.debug(opts.absolutePath + '[file]');
       }
-      let subPath = subfolder + '/' + file;
+      let subPath = subfolder.replace(/\\/g, '/') + '/' + file;
       let absPath = opts.absolutePath;
       let controller = null;
       try {
