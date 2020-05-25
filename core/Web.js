@@ -678,17 +678,18 @@ async function sleep(ms) {
 }
 
 
-function startListening(httpServer, {port, ipAddress, addtlLog = ""}, cb) {
+function startListening(httpServer, opts = {}, cb) {
+  const {port, ipAddress, addtlLog = ""} = opts;
   httpServer.listen(port, ipAddress, function(err, result) {
      if (err) {
-        console.error(err);
+        console.error("Error starting node server", err);
+      } else {
+        console.log('%s: Node server started on %s:%d %s...',
+                  Date(Date.now()), ipAddress, port, addtlLog);
       }
       
-      console.log('%s: Node server started on %s:%d %s...',
-                  Date(Date.now()), ipAddress, port, addtlLog);
-
       if (cb) {
-        cb(err, result);
+        cb(err, httpServer, opts);
       }
   });
 }

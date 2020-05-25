@@ -19,6 +19,10 @@ module.exports = function customiseNunjucks(nunjucksEnv) {
     return dFormatted;
   });
 
+  nunjucksEnv.addFilter('formatNum', function(num) {
+    return num && num.toLocaleString();
+  });
+
   nunjucksEnv.addExtension('MarkedExtension', new MarkedExtension());
 }
 
