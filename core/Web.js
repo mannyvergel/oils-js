@@ -161,6 +161,10 @@ class Web {
     options['_conf'] = web.conf.viewConf;
     options['_ext'] = req.ext;
 
+    if (web.conf.enableCsrfToken && req.csrfToken) {
+      options['_csrf'] = req.csrfToken();
+    }
+
   }
 
   // requireNvm - cannot define this as a utility because it will never work
@@ -467,11 +471,26 @@ class Web {
     }));
 
     if (self.conf.enableCsrfToken) {
-      app.use(csrf());
-      app.use(function(req, res, next) {
-        res.locals._csrf = req.csrfToken();
-        next();
-      });
+      let excludePaths = self.conf.enableCsrfToken.excludes;
+      if (excludePaths && excludePaths.length) {
+        app.use(function(req, res, next) {
+          let hasCalledNext = false;
+          for (let path of excludePaths) {
+            if (req.path === path) {
+              next();
+              hasCalledNext = true;
+              break;
+            }
+          }
+
+          if (!hasCalledNext) {
+            csrf()(req, res, next);
+          }
+        })
+      } else {
+        app.use(csrf());
+      }
+      
     }
    
     app.use(require('./middleware/custom-response.js')());
