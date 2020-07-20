@@ -34,6 +34,10 @@ exports.isEmpty = function(str) {
 }
 
 exports.escapeHTML = function(str) {
+  if (str === null || str === undefined) {
+    return '';
+  }
+  
   return escapeHtml(str);
 }
 
