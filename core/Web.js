@@ -421,6 +421,24 @@ class Web {
     let cookieParser = require('cookie-parser');
     let cookieSession = require('cookie-session');
 
+    let httpsConfigEnabled = (web.conf.https && web.conf.https.enabled) || web.conf.httpsOpts.httpsEnabled;
+
+    if (httpsConfigEnabled) {
+      let defaultHttpsConf = require('./conf/conf-https-default.js')(web);
+
+      let defaultLetsEncryptConf = defaultHttpsConf.letsEncrypt || {};
+
+      let confLetsEncrypt = web.conf.https && web.conf.https.letsEncrypt;
+
+      web.conf.https = extend(defaultHttpsConf, web.conf.https || {});
+
+      web.conf.https.letsEncrypt = extend(
+        defaultLetsEncryptConf,
+        confLetsEncrypt || {},
+        web.conf.httpsOpts.letsEncrypt
+      );
+    }
+
   
     let templatesPath = path.join(self.conf.baseDir, self.conf.viewsDir);
 
@@ -744,20 +762,6 @@ function startServer(web, cb) {
   }
   
   if (httpsConfigEnabled) {
-    let defaultHttpsConf = require('./conf/conf-https-default.js')(web);
-
-    let defaultLetsEncryptConf = defaultHttpsConf.letsEncrypt || {};
-
-    let confLetsEncrypt = web.conf.https && web.conf.https.letsEncrypt;
-
-    web.conf.https = extend(defaultHttpsConf, web.conf.https || {});
-
-    web.conf.https.letsEncrypt = extend(
-      defaultLetsEncryptConf,
-      confLetsEncrypt || {},
-      web.conf.httpsOpts.letsEncrypt
-    );
-
     if (web.conf.https.letsEncrypt) {
       
       let https = web.conf.https.getHttpsServer();
