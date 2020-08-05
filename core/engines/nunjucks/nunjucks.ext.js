@@ -43,8 +43,6 @@ function MarkedExtension() {
     tables: true,
     breaks: true,
     pedantic: false,
-    sanitize: true,
-    sanitizer: DOMPurify.sanitize,
     smartLists: true,
     smartypants: false
   }, web.conf.markedOptions
@@ -77,7 +75,7 @@ function MarkedExtension() {
       if (!body) {
         return "";
       }
-      let ret = marked(body());
+      let ret = DOMPurify.sanitize(marked(body()));
 
       return ret;
   };
