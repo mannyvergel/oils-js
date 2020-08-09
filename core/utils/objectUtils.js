@@ -20,3 +20,7 @@ exports.isClass = function(a) {
 exports.isString = function(a) {
   return (!!a) && (typeof a === 'string');
 }
+
+exports.resolvePath = function(object, path, {defaultValue}={}) {
+  return path.split('.').reduce((o, p) => o ? o[p] : defaultValue, object)
+}
