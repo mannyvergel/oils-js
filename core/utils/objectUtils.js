@@ -1,7 +1,7 @@
 'use strict';
 
 exports.isArray = function(a) {
-  return (!!a) && (a.constructor === Array);
+  return Array.isArray(a);
 };
 
 exports.isObject = function(a) {
