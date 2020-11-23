@@ -19,8 +19,8 @@ Oils web app
 */
 class Web {
 
-  constructor(conf) {
-    //global.web = this;
+  constructor(customConf) {
+
     let web = this;
     web.lib = web.lib || {};
 
@@ -35,7 +35,8 @@ class Web {
     if (!global._web) {
       global._web = {};
     }
-    conf = conf || {};
+
+    let conf = {};
 
     if (!conf.baseDir) {
       let tmpBaseDir = __filename.substr(0, __filename.indexOf('node_modules') - 1);
@@ -102,6 +103,10 @@ class Web {
       } else {
         console.warn(web.conf.zconf, 'not found. Ignoring.');
       }
+    }
+
+    if (customConf) {
+      this.conf = extend(this.conf, customConf);
     }
 
     this.logger = require('./utils/logger.js')(this);
