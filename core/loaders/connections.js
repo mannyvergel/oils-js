@@ -1,39 +1,58 @@
 'use strict';
 
 module.exports = function(web) {
+	return new Promise(function(resolve, reject) {
 
-	let conf = web.conf;
+		console.log("");
+		let conf = web.conf;
 
 
-	if (!web.connections) {
-		web.connections = [];
-	}
-
-	let mongoose = web.require('mongoose');
-
-	for (let i in conf.connections) {
-		let dbConf = conf.connections[i];
-		dbConf.showWarning = true;
-
-		if (!web.connections[i]) {
-			
-			web.connections[i] = mongoose.createConnection();
-			
-			if (console.isDebug) {
-			  console.debug('connections.' + i + ' created.');
-			}
-			
-			web.connections[i].on('error', getErrFunc(web, i));
-			
-			web.connections[i].on('open', function() {
-				dbConf.counter = 0;
-				dbConf.showWarning = true;
-			});
-			
-
-			webConnect(web, i);
+		if (!web.connections) {
+			web.connections = [];
 		}
-	}
+
+		let mongoose = web.require('mongoose');
+
+		let totalConnectionsOpen = 0;
+		let totalConnections = 0;
+
+		for (let i in conf.connections) {
+			let dbConf = conf.connections[i];
+			dbConf.showWarning = true;
+
+			if (!web.connections[i]) {
+
+				totalConnections++;
+				
+				web.connections[i] = mongoose.createConnection();
+				
+				if (console.isDebug) {
+				  console.debug('connections.' + i + ' created.');
+				}
+				
+				web.connections[i].on('error', getErrFunc(web, i));
+				
+				web.connections[i].on('open', function() {
+					dbConf.counter = 0;
+					dbConf.showWarning = true;
+
+					totalConnectionsOpen++;
+
+					if (totalConnectionsOpen == totalConnections) {
+						resolve();
+					}
+				});
+				
+
+				webConnect(web, i);
+			}
+		}
+
+		if (totalConnections == 0) {
+			resolve();
+		}
+	});
+	
 
 }
 

@@ -515,6 +515,8 @@ class Web {
       }
       
     }
+
+    await self.call('afterWebMiddleware');
    
     app.use(require('./middleware/custom-response.js')());
     app.use(flash());
@@ -544,7 +546,7 @@ class Web {
       });
     }
 
-    require('./loaders/connections.js')(self);
+    await require('./loaders/connections.js')(self);
 
     require('./loaders/plugins.js')(self);
     
