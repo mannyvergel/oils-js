@@ -1,6 +1,6 @@
 {
   "name": "oils",
-  "version": "7.7.0",
+  "version": "7.8.0",
   "description": "A slightly opinionated web framework built on top of Express 4.",
   "keywords": [
     "OilsJs",
@@ -31,7 +31,7 @@
     "cookie-parser": "^1.4.5",
     "cookie-session": "^1.4.0",
     "csurf": "^1.11.0",
-    "dompurify": "^2.0.8",
+    "dompurify": "^2.2.6",
     "escape-html": "~1.0.3",
     "express": "~4.17.1",
     "greenlock-express": "^2.7.18",
@@ -42,6 +42,7 @@
     "moment": "~2.24.0",
     "moment-timezone": "^0.5.27",
     "mongoose": "^5.10.6",
+    "nanoid": "^3.1.20",
     "nomnom": "1.8.x",
     "nunjucks": "^3.2.1",
     "simple-mime": "0.1.x",

@@ -4,6 +4,9 @@ const objectUtils = require('./objectUtils');
 const domain = require('domain');
 //let web = global.web;
 exports.applyRoute = function(web, route, obj) {
+  if (web.conf.shouldLoadRoute && !(web.conf.shouldLoadRoute(route, obj))) {
+    return;
+  }
   
   if (obj.route) {
     //override autoroute with controller's defined route

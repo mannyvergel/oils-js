@@ -30,18 +30,31 @@ function replaceWithWinstonLogger(webSelf) {
   const {combine, timestamp, printf} = winston.format;
   const SPLAT = Symbol.for('splat');
 
+  const timezoned = () => {
+    let timestampConf = {};
+    if (web.conf.timezone) {
+      timestampConf.timeZone = web.conf.timezone;
+    }
+
+    timestampConf.hour12 = false;
+    timestampConf.timeZoneName = 'short';
+
+    return new Date().toLocaleString('en-GB', timestampConf);
+  }
+
+  let workerInfo = `[worker_${web.id}] `;
 
   const logFormat = combine(
-      timestamp(),
+      timestamp({format: timezoned}),
       printf(({timestamp, level, message, [SPLAT]: args = []}) =>
-          `${timestamp} - ${level}: [${path.basename(process.mainModule.filename)}] ${util.format(message, ...args)}`)
+          `${workerInfo}${timestamp} - ${level}: ${util.format(message, ...args)}`)
   )
 
   const consoleLogFormat = combine(
-      timestamp(),
+      timestamp({format: timezoned}),
       format.colorize(),
       printf(({timestamp, level, message, [SPLAT]: args = []}) =>
-          `${timestamp} - ${level}: [${path.basename(process.mainModule.filename)}] ${util.format(message, ...args)}`),
+          `${workerInfo}${timestamp} - ${level}: ${util.format(message, ...args)}`),
       
   )
 
@@ -54,7 +67,10 @@ function replaceWithWinstonLogger(webSelf) {
   if (webSelf.conf.logger.winston.logToFile.enabled) {
 
     const fs = require('fs');
-    const logDir = webSelf.conf.logDir || webSelf.conf.logger.dir;
+    let logDir = webSelf.conf.logDir || webSelf.conf.logger.dir;
+    if (!web.stringUtils.startsWith(logDir, '/')) {
+      logDir = path.join(web.conf.baseDir, logDir);
+    }
 
     // Create the log directory if it does not exist
     if (!fs.existsSync(logDir)) {

@@ -13,6 +13,20 @@ exports.startsWith = function (str, startsWith){
   return str.indexOf(startsWith) === 0;
 }
 
+exports.startsWithAny = function (str, startsWithAny){
+  if (!str || !startsWithAny) {
+    return false;
+  }
+
+  for (let startsWith of startsWithAny) {
+    if (exports.startsWith(str, startsWith)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 exports.escapeRegexp = function(str) {
 	return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }

@@ -13,6 +13,8 @@ const routeUtils = require('./utils/routeUtils');
 const stringUtils = require('./utils/stringUtils.js');
 const callsites = require('callsites');
 const webExtender = require('./loaders/webExtender.js');
+const {customAlphabet} = require('nanoid/non-secure');
+const nanoidInsecure = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 10)
 
 /**
 Oils web app
@@ -23,6 +25,9 @@ class Web {
 
     let web = this;
     web.lib = web.lib || {};
+
+    let webId = nanoidInsecure();
+    web.id = webId;
 
     Object.defineProperty(web.lib, 'mongoose', {
       get: function() {
