@@ -22,6 +22,7 @@ module.exports = function(webSel) {
       }
     },
 
+    logWorkerId: false,
     logger: {
       replaceWith: 'winston',
 

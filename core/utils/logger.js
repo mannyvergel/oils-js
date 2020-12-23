@@ -23,11 +23,13 @@ function replaceWithWinstonLogger(webSelf) {
   const { createLogger, format, transports } = require('winston');
   require('winston-daily-rotate-file');
 
+  const colorizer = format.colorize();
+
   const path = require('path');
 
   const util = require('util');
-  const winston = require('winston');
-  const {combine, timestamp, printf} = winston.format;
+
+  const {combine, timestamp, printf} = format;
   const SPLAT = Symbol.for('splat');
 
   const timezoned = () => {
@@ -39,22 +41,30 @@ function replaceWithWinstonLogger(webSelf) {
     timestampConf.hour12 = false;
     timestampConf.timeZoneName = 'short';
 
-    return new Date().toLocaleString('en-GB', timestampConf);
+    return (new Date().toLocaleString('en-US', timestampConf)).replace(', ', ' ');
   }
 
-  let workerInfo = `[worker_${web.id}] `;
+  let workerInfo = '';
+
+  if (web.conf.logWorkerId) {
+    workerInfo = `[worker_${web.id}] `;
+  }
+
 
   const logFormat = combine(
       timestamp({format: timezoned}),
-      printf(({timestamp, level, message, [SPLAT]: args = []}) =>
-          `${workerInfo}${timestamp} - ${level}: ${util.format(message, ...args)}`)
+      printf(({timestamp, level, message, [SPLAT]: args = []}) => {
+        let leftSide = `${workerInfo}${timestamp} - ${level}:`;
+        return `${leftSide} ${util.format(message, ...args)}`
+      })
   )
 
   const consoleLogFormat = combine(
       timestamp({format: timezoned}),
-      format.colorize(),
-      printf(({timestamp, level, message, [SPLAT]: args = []}) =>
-          `${workerInfo}${timestamp} - ${level}: ${util.format(message, ...args)}`),
+      printf(({timestamp, level, message, [SPLAT]: args = []}) => {
+        let leftSide = `${workerInfo}${timestamp} - ${level}:`;
+        return`${colorizer.colorize(level, leftSide)} ${util.format(message, ...args)}`
+      }),
       
   )
 
