@@ -470,7 +470,7 @@ class Web {
       app.set('trust proxy', web.conf.trustProxy);
     }
 
-    app.use(bodyParser.json({limit: web.conf.parserLimit, verify: rawBodySaver}));
+    app.use(bodyParser.json({limit: web.conf.parserLimit, verify: rawBodySaver, parameterLimit: web.conf.parserParameterLimit}));
     app.use(bodyParser.urlencoded({
       extended: true,
       limit: web.conf.parserLimit,

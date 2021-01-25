@@ -116,7 +116,9 @@ module.exports = function(webSel) {
       }
     },
 
-    parserLimit: '3mb'
+    parserLimit: '3mb',
+    parserParameterLimit: 2000,
+    
   } 
 
   return conf;
