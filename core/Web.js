@@ -474,7 +474,8 @@ class Web {
     app.use(bodyParser.urlencoded({
       extended: true,
       limit: web.conf.parserLimit,
-      verify: rawBodySaver
+      verify: rawBodySaver,
+      parameterLimit: web.conf.parserParameterLimit
     }));
 
     if (web.conf.saveRawBody) {
@@ -482,7 +483,7 @@ class Web {
       // raw interferes with multer (upload files) 
       // https://github.com/expressjs/multer/issues/523
       // use sparingly or better move to controller level
-      app.use(bodyParser.raw({ verify: rawBodySaver, type: '*/*', limit: web.conf.parserLimit}));
+      app.use(bodyParser.raw({ verify: rawBodySaver, type: '*/*', limit: web.conf.parserLimit, parameterLimit: web.conf.parserParameterLimit}));
     }
 
     
