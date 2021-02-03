@@ -505,7 +505,9 @@ class Web {
         app.use(function(req, res, next) {
           let hasCalledNext = false;
           for (let path of excludePaths) {
-            if (req.path === path) {
+            if ( (path instanceof RegExp && path.test(req.path))
+              || (req.path === path)) {
+
               next();
               hasCalledNext = true;
               break;
