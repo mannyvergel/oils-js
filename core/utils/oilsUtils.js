@@ -60,5 +60,12 @@ module.exports = {
   	res.writeHead(200, {'Content-Type': contentType})
   	res.end(buffer);
 	},
-	getMimeType: getMimeType
+	getMimeType: getMimeType,
+
+	getClientIp: function(req) {
+		let forwarded = req.headers['x-forwarded-for'];
+		let ip = forwarded ? forwarded.split(',')[0].trim() : req.connection.remoteAddress;
+
+		return ip;
+	}
 }

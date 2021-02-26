@@ -154,6 +154,7 @@ describe('app', function () {
       assert.equal(res.statusCode, 200, 'Status of localhost');
       done();
     }).on('error', function(e) {
+      console.log("Error:",e);
       assert.ok(false, 'Error connecting ' + e);
       done();
     });
@@ -168,6 +169,7 @@ describe('app', function () {
       assert.equal(res.statusCode, 200, 'Status of ' + url);
       done();
     }).on('error', function(e) {
+      console.log("Error:",e);
       assert.ok(false, 'Error connecting ' + e);
       done();
     });
@@ -180,6 +182,22 @@ describe('app', function () {
       console.log("Random string generated", randomString);
       assert.ok(!web.stringUtils.isEmpty(randomString), "Error generating random string. Generated " + randomString);
     } catch (ex) {
+      console.log("Error:",ex);
+      assert.ok(false, 'Error generating random str ' + ex);
+    }
+    
+  });
+
+  it('test utils', async function() {
+    try {
+      let req = {headers: {}};
+      req.headers["x-forwarded-for"] = "49.147.91.234, 108.162.245.244";
+
+      let ip = web.utils.getClientIp(req);
+      console.log("Test IP:", ip);
+      assert.ok("49.147.91.234" === ip, "Error getting client IP");
+    } catch (ex) {
+      console.log("Error:",ex);
       assert.ok(false, 'Error generating random str ' + ex);
     }
     
