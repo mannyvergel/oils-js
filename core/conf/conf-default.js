@@ -11,6 +11,7 @@ module.exports = function(webSel) {
 
     dataDir: 'data',
     tmpDir: 'data/tmp',
+    allowedRedirectHosts: [],
 
     extendWeb: {
       enabled: true,

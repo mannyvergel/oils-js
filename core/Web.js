@@ -122,6 +122,9 @@ class Web {
     }
 
     this.app = express();
+
+    fixOpenRedirect(this);
+
     this.events = {};
     this.modelCache = new Object();
     this.plugins = [];
@@ -761,6 +764,42 @@ function defaultRedirectToHttpsMiddleware(req, res) {
   }
   res.writeHead(302, {'Location': 'https://' + hostStr + nonStandardPort + req.url});
   res.end();
+}
+
+function fixOpenRedirect(web) {
+  // Fix for open redirect security
+  let redirectSafe = web.app.response.redirect;
+  web.app.response.redirectSafe = function(url) {
+    return redirectSafe.call(this, url);
+  }
+
+  var addHostOnceFlag = true;
+
+  web.app.response.redirect = function(url) {
+  
+    if (url.indexOf('://') != -1) {
+
+      let req = this.req;
+
+      if (addHostOnceFlag) {
+        var host = req.protocol + '://' + req.headers.host;
+        web.conf.allowedRedirectHosts.push(host);
+        addHostOnceFlag = false;
+        console.log("Added host once: " + host);
+      }
+
+      const found = web.conf.allowedRedirectHosts.find(el => url.indexOf(el) == 0);
+
+      if (!found) {
+        var ip = web.utils.getClientIp(req);
+
+        console.warn("Open redirect was triggered: ", req.method, req.user ? req.user.email : "unsigned user", ip, "accessed", req.url, req.headers['user-agent']);
+        throw new Error("Action not allowed.");
+      }
+
+    }
+    return redirectSafe.call(this, url);
+  }
 }
 
 
