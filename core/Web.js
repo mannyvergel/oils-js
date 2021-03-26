@@ -773,7 +773,8 @@ function fixOpenRedirect(web) {
     return redirectSafe.call(this, url);
   }
 
-  var addHostOnceFlag = true;
+  let addHostOnceFlag = true;
+  let addWwwOnceFlag = true; 
 
   web.app.response.redirect = function(param1, param2) {
 
@@ -790,15 +791,21 @@ function fixOpenRedirect(web) {
       let req = this.req;
 
       if (addHostOnceFlag) {
-        var host = req.protocol + '://' + req.headers.host;
+        let host = req.protocol + '://' + req.headers.host;
         web.conf.allowedRedirectHosts.push(host);
-        if (req.subdomain && !req.subdomains.length) {
-          let wwwHost = req.protocol + '://www.' + req.headers.host;
-          web.conf.allowedRedirectHosts.push(wwwHost);
-        }
 
         addHostOnceFlag = false;
         console.log("Added host once: " + host);
+      }
+
+      if (addWwwOnceFlag) {
+        if (req.subdomains && !req.subdomains.length) {
+          let wwwHost = req.protocol + '://www.' + req.headers.host;
+          web.conf.allowedRedirectHosts.push(wwwHost);
+
+          addWwwOnceFlag = false;
+          console.log("Added www host once: " + wwwHost);
+        }
       }
 
       const found = web.conf.allowedRedirectHosts.find(el => url.indexOf(el) == 0);
