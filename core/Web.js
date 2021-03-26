@@ -775,15 +775,28 @@ function fixOpenRedirect(web) {
 
   var addHostOnceFlag = true;
 
-  web.app.response.redirect = function(url) {
+  web.app.response.redirect = function(param1, param2) {
+
+    let url, status;
+    if (!isNaN(param1)) {
+      status = param1;
+      url = param2;
+    } else {
+      url = param1;
+    }
   
-    if (url.indexOf('://') != -1) {
+    if (url && url.indexOf('://') != -1) {
 
       let req = this.req;
 
       if (addHostOnceFlag) {
         var host = req.protocol + '://' + req.headers.host;
         web.conf.allowedRedirectHosts.push(host);
+        if (req.subdomain && !req.subdomains.length) {
+          let wwwHost = req.protocol + '://www.' + req.headers.host;
+          web.conf.allowedRedirectHosts.push(wwwHost);
+        }
+
         addHostOnceFlag = false;
         console.log("Added host once: " + host);
       }
@@ -793,7 +806,7 @@ function fixOpenRedirect(web) {
       if (!found) {
         var ip = web.utils.getClientIp(req);
 
-        console.warn("Open redirect was triggered: ", req.method, req.user ? req.user.email : "unsigned user", ip, "accessed", req.url, req.headers['user-agent']);
+        console.warn("Open redirect vulnerability was triggered: ", req.method, req.user ? req.user.email : "unsigned user", ip, "accessed", req.url, req.headers['user-agent']);
         throw new Error("Action not allowed.");
       }
 
