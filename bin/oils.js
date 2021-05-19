@@ -2,38 +2,31 @@
 
 'use strict';
 
-const parser = require("nomnom");
+const { program } = require('commander');
 const fs = require('fs');
 const fileUtils = require('../core/utils/fileUtils.js');
 
-parser.command('new')
-.options({
-  name: {
-   position: 1,
-   help: "Project name",
-   required: true
- },
- template: {
-   abbr: 't',
-   help: "Template to use e.g. basic"
- }
-})
-.callback(function(opts) {
-  newProject(opts);
-})
-.help("create new project");
+program
+  .version(require('../package.json').version)
+  .command('new <project_name>')
+  .description('New Project')
+  .option('-t, --template <template>', 'Template to use', 'basic')
+  
+  .action((project_name, options) => {
+    newProject(project_name, options.template)
+  });
 
-parser.parse();
+program.parse(process.argv);
 
 
-function newProject(opts) {
-  let folderName = opts.name;
+function newProject(name, template) {
+  let folderName = name;
 
   if (fs.existsSync(folderName)) {
     console.log('Folder name already exists. Aborting.'); 
   } else {
 
-    fileUtils.copySync(__dirname + '/../templates/basic', folderName);
+    fileUtils.copySync(__dirname + '/../templates/' + template, folderName);
 
     fs.renameSync(folderName + '/template.gitignore', folderName + '/.gitignore');
 
