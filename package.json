@@ -38,7 +38,7 @@
     "greenlock-express": "^2.7.18",
     "greenlock-store-fs": "^3.2.2",
     "jsdom": "^16.7.0",
-    "marked": "^0.8.2",
+    "marked": "^4.0.10",
     "method-override": "~3.0.0",
     "moment": "~2.24.0",
     "moment-timezone": "^0.5.27",
