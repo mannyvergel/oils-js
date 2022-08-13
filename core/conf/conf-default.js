@@ -45,6 +45,10 @@ module.exports = function(webSel) {
     logDir: 'data/logs',
 
     saveRawBody: false,
+    // additional options
+    // saveRawBody: {
+    //   only: ['/paypal-ipn'], // based from req.path
+    // },
 
     // set when behind a trusted proxy, see express' trust proxy settings
     trustProxy: false,
@@ -73,7 +77,7 @@ module.exports = function(webSel) {
     ipAddress: process.env.OILS_IP || '0.0.0.0',
     zconf: path.join(require('os').homedir(), ".oils", "zconf.js"), //e.g. ~/.oils/zconf.js in mac/linux
     isDebug: !isProd,
-    connectionPoolSize: 5,
+    //connectionPoolSize: 5, // removed because it's not supported anymore replaced with maxPoolSize
     connections: {
       // only mongoose connections are support for now
       // you can specify multiple connections and specify the connection in your model.

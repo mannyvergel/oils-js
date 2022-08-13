@@ -75,7 +75,7 @@ function MarkedExtension() {
       if (!body) {
         return "";
       }
-      let ret = DOMPurify.sanitize(marked(body()));
+      let ret = DOMPurify.sanitize(marked.parse(body()));
 
       return ret;
   };

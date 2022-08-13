@@ -486,7 +486,26 @@ class Web {
       // raw interferes with multer (upload files) 
       // https://github.com/expressjs/multer/issues/523
       // use sparingly or better move to controller level
-      app.use(bodyParser.raw({ verify: rawBodySaver, type: '*/*', limit: web.conf.parserLimit, parameterLimit: web.conf.parserParameterLimit}));
+
+      let bodyParserFunc = bodyParser.raw({
+        verify: rawBodySaver,
+        type: '*/*',
+        limit: web.conf.parserLimit,
+        parameterLimit: web.conf.parserParameterLimit
+      });
+      
+      app.use(function(req, res, next) {
+        if (web.conf.saveRawBody.only) {
+          if (!req.path || !web.conf.saveRawBody.only.includes(req.path)) {
+            next();
+            return;
+          }
+        }
+
+        bodyParserFunc(req, res, next);
+
+      });
+      
     }
 
     
