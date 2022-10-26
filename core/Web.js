@@ -832,7 +832,7 @@ function fixOpenRedirect(web) {
       if (!found) {
         var ip = web.utils.getClientIp(req);
 
-        console.warn("Open redirect vulnerability was triggered: ", req.method, req.user ? req.user.email : "unsigned user", ip, "accessed", req.url, req.headers['user-agent']);
+        console.warn("Open redirect vulnerability was triggered: ", url, req.method, req.user ? req.user.email : "unsigned user", ip, "accessed", req.url, req.headers['user-agent']);
         throw new Error("Action not allowed.");
       }
 
