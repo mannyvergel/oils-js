@@ -123,6 +123,10 @@ module.exports = function(webSel) {
 
     parserLimit: '3mb',
     parserParameterLimit: 2000,
+
+    deletedRecsExpiresAfterSeconds: 31536000, // 365 days
+    sessionStoreExpiresAfterSeconds: 604800, // 7 days
+    defaultRowsPerPage: 10,
     
   } 
 
