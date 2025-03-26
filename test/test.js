@@ -25,6 +25,7 @@ let includeOils = function(dir) {
 
 let overrideConf = {
   isDebug: true,
+  enableCsrfToken: true,
   baseDir: global.BASE_DIR,
   https: {
     enabled: false,
@@ -36,8 +37,11 @@ let overrideConf = {
     alwaysSecure: {
       enabled: false
     }
-  }
+  },
+
+  exitTest: true,
 }
+
 
 let web;
 describe('app', function () {
@@ -81,7 +85,10 @@ describe('app', function () {
   after(async function() {
     await web.sleep(2000);
     console.log("Done with tests.. exiting.");
-    process.exit();
+    
+    if (web.conf.exitTest) {
+      process.exit();
+    }
   });
  
   it('should have correct attributes', function (done) {
@@ -159,6 +166,28 @@ describe('app', function () {
       done();
     });
     
+  });
+
+  
+  it('should submit form', async function () {
+
+    if (web.conf.enableCsrfToken) {
+      let res = await fetch(`http://127.0.0.1:${web.conf.port}`, {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          _csrf: web.csrfTokens.create(web.secretCsrf),
+          testData: 'Hello World'
+        }),
+      })
+
+      assert.equal(res.status, 200, 'Form submission');
+      
+    }
+
   });
 
 

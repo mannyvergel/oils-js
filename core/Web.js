@@ -8,7 +8,7 @@ const Schema = mongoose.Schema;
 const flash = require('connect-flash');
 const path = require('path');
 const fs = require('fs');
-const csrf = require('csurf');
+const TokensCsrf = require('csrf')
 const routeUtils = require('./utils/routeUtils');
 const stringUtils = require('./utils/stringUtils.js');
 const callsites = require('callsites');
@@ -121,6 +121,13 @@ class Web {
       console.debug('Oils config: ' + JSON.stringify(this.conf, null, 2));
     }
 
+
+
+    if (this.conf.enableCsrfToken) {
+      this.csrfTokens = new TokensCsrf();
+      this.secretCsrf = web.csrfTokens.secretSync();
+    }
+
     this.app = express();
 
     fixOpenRedirect(this);
@@ -174,8 +181,11 @@ class Web {
     options['_conf'] = web.conf.viewConf;
     options['_ext'] = req.ext;
 
-    if (web.conf.enableCsrfToken && req.csrfToken) {
-      options['_csrf'] = req.csrfToken();
+    if (web.conf.enableCsrfToken) {
+      // Only enable _csrf for controllers with post methods to save performance
+      if (req._oilsController.post) {
+        options['_csrf'] = web.csrfTokens.create(web.secretCsrf);
+      }
     }
 
   }
@@ -522,27 +532,31 @@ class Web {
     }));
 
     if (self.conf.enableCsrfToken) {
-      let excludePaths = self.conf.enableCsrfToken.excludes;
-      if (excludePaths && excludePaths.length) {
-        app.use(function(req, res, next) {
-          let hasCalledNext = false;
-          for (let path of excludePaths) {
-            if ( (path instanceof RegExp && path.test(req.path))
-              || (req.path === path)) {
 
-              next();
-              hasCalledNext = true;
-              break;
+      app.use(function(req, res, next) {
+
+        if (req.method === "POST") {
+          let verifyCsrf = true;
+
+          let excludePaths = self.conf.enableCsrfToken.excludes;
+          if (excludePaths && excludePaths.length) {
+            for (let path of excludePaths) {
+              if ( (path instanceof RegExp && path.test(req.path))
+                || (req.path === path)) {
+                verifyCsrf = false;
+              }
             }
           }
 
-          if (!hasCalledNext) {
-            csrf()(req, res, next);
+          if (verifyCsrf) {
+            if (!web.csrfTokens.verify(web.secretCsrf, req.body._csrf)) {
+              throw new Error("Invalid request (token verification failed)");
+            }
           }
-        })
-      } else {
-        app.use(csrf());
-      }
+        }
+
+        next();
+      });
       
     }
 

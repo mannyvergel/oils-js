@@ -2,10 +2,12 @@
 
 module.exports = {
 	get : function(req, res, next) {
-		
 		res.render('index.html');
-		//res.end('HELLO WORLD!');
-	}
+	},
+
+  post: function(req, res, next) {
+    res.send("OK");
+  }
 }
 
 /** Another sample

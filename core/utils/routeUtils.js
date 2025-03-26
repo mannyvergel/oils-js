@@ -76,6 +76,8 @@ function handleRequest(web, verb, route, obj, controller) {
 function wrapObjToControllerDomain(web, verb, route, obj, controller) {
   let app = web.app;
   return function(req, res, next) {
+    req._oilsController = controller;
+
     let reqd = domain.create();
     reqd.add(req);
     reqd.add(res);
