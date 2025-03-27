@@ -1,6 +1,6 @@
 {
   "name": "oils",
-  "version": "10.0.0",
+  "version": "10.1.0",
   "description": "A slightly opinionated web framework built on top of Express 4.",
   "keywords": [
     "OilsJs",
@@ -29,12 +29,12 @@
     "callsites": "~3.1.0",
     "commander": "^7.2.0",
     "connect-flash": "~0.1.1",
-    "cookie-parser": "^1.4.7",
-    "cookie-session": "^1.4.0",
+    "connect-mongo": "^5.1.0",
     "csrf": "^3.1.0",
     "dompurify": "^3.2.4",
     "escape-html": "~1.0.3",
     "express": "^4.21.2",
+    "express-session": "^1.18.1",
     "greenlock-express": "^2.7.18",
     "greenlock-store-fs": "^3.2.2",
     "jsdom": "^26.0.0",
@@ -42,7 +42,7 @@
     "method-override": "~3.0.0",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.38",
-    "mongoose": "^5.13.23",
+    "mongoose": "^6.13.8",
     "nanoid": "^3.3.11",
     "nunjucks": "^3.2.4",
     "simple-mime": "0.1.x",
@@ -52,7 +52,6 @@
   "devDependencies": {
     "mocha": "^11.1.0"
   },
-  "bundleDependencies": [],
   "private": false,
   "main": "core/Web.js",
   "bin": {

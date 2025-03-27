@@ -77,7 +77,7 @@ module.exports = function(webSel) {
     ipAddress: process.env.OILS_IP || '0.0.0.0',
     zconf: path.join(require('os').homedir(), ".oils", "zconf.js"), //e.g. ~/.oils/zconf.js in mac/linux
     isDebug: !isProd,
-    //connectionPoolSize: 5, // removed because it's not supported anymore replaced with maxPoolSize
+
     connections: {
       // only mongoose connections are support for now
       // you can specify multiple connections and specify the connection in your model.

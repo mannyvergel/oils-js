@@ -150,17 +150,17 @@ class Web {
   }
 
   overrideResponse() {
-    const web = this;
+    const self = this;
     // override default res.render
     const render = express.response.render;
 
-    web.on('beforeRender', web.initBeforeRender)
+    self.on('beforeRender', self.initBeforeRender)
 
     express.response.render = function(view, options = {}, callback) {
       const req = this.req;
       const res = this;
 
-      web.callEvent('beforeRender', [view, options, callback, req, res])
+      self.callEvent('beforeRender', [view, options, callback, req, res])
       render.apply(this, [view, options, callback]);
     };
 
@@ -170,7 +170,7 @@ class Web {
   }
 
   initBeforeRender(view, options, callback, req, res) {
-
+    const self = this;
     if (req.flash) {
       // it seems when 500 error is called, flash is not available
       // after it res.render was moved
@@ -178,16 +178,26 @@ class Web {
       options['_warns'] = req.flash('warn');
       options['_infos'] = req.flash('info');
     }
-    options['_conf'] = web.conf.viewConf;
+    options['_conf'] = self.conf.viewConf;
     options['_ext'] = req.ext;
 
-    if (web.conf.enableCsrfToken) {
+    if (self.conf.enableCsrfToken) {
       // Only enable _csrf for controllers with post methods to save performance
-      if (req._oilsController.post) {
-        options['_csrf'] = web.csrfTokens.create(web.secretCsrf);
+      // Breaking Change:
+      // Can also override by adding enableCsrf: true to controller or setting req.enableCsrf
+      if (req.enableCsrf || (req._oilsController && (req._oilsController.post || req._oilsController.enableCsrf))) {
+        options['_csrf'] = self.genCsrfToken();
       }
     }
 
+  }
+
+  genCsrfToken() {
+    if (!web.conf.enableCsrfToken) {
+      return '';
+    }
+
+    return web.csrfTokens.create(web.secretCsrf);  
   }
 
   // requireNvm - cannot define this as a utility because it will never work
@@ -439,10 +449,10 @@ class Web {
     let app = this.app;
     let web = this;
     let self = this;
-    let bodyParser = require('body-parser');
-    let methodOverride = require('method-override');
-    let cookieParser = require('cookie-parser');
-    let cookieSession = require('cookie-session');
+    const bodyParser = require('body-parser');
+    const methodOverride = require('method-override');
+    const session = require('express-session');
+    const MongoStore = require('connect-mongo');
 
     let httpsConfigEnabled = (web.conf.https && web.conf.https.enabled) || web.conf.httpsOpts.httpsEnabled;
 
@@ -524,12 +534,31 @@ class Web {
     if (cookieKey === "change-this-it-is-2019!") {
       throw new Error("Security error. Change conf.secretPassphrase.");
     }
-    app.use(cookieParser(cookieKey));
-  
-    app.use(cookieSession({keys: [cookieKey], 
-      cookie: {maxAge: self.conf.cookieMaxAge},
-      maxAge: self.conf.cookieMaxAge, //documentation is confusing that's why need to dup
+
+    app.use(session(web.conf.sessionOpts || {
+      name: 'oils-session', // should be okay even with mongo in the same since store should be different per app
+      secret: cookieKey,
+      httpOnly: true,
+      secure: true,
+      maxAge: self.conf.cookieMaxAge,
+      resave: false,
+      saveUninitialized: true,
+
+      // this will create "sessions" collection in the DB
+      // TODO: check for oils support without DB
+      store: MongoStore.create({
+        mongoUrl: web.conf.connections.mainDb.url,
+        touchAfter: 24 * 3600, // https://github.com/jdesboeufs/connect-mongo/issues/152
+      })
     }));
+
+    app.use(function(req, res, next) {
+      // Because of old cookie-session replaced by express-session
+      // TODO: should we deprecate?
+      req.csrfToken = web.genCsrfToken;
+
+      next();
+    })
 
     if (self.conf.enableCsrfToken) {
 
@@ -550,7 +579,7 @@ class Web {
 
           if (verifyCsrf) {
             if (!web.csrfTokens.verify(web.secretCsrf, req.body._csrf)) {
-              throw new Error("Invalid request (token verification failed)");
+              throw new Error("Please try to submit a new form again. Invalid request (token verification failed).");
             }
           }
         }
@@ -664,6 +693,7 @@ class Web {
         throw new Error("Cannot find encrypt server.");
       }
 
+      // check conf-https-default.js for the default function
       if (!self.conf.https.letsEncrypt.approveDomains) {
         throw new Error("conf.https.letsEncrypt.approveDomains must not be nil. See wildcard.js example from greenlock-express");
       }
