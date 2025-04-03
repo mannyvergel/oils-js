@@ -23,17 +23,18 @@ class Web {
 
   constructor(customConf) {
 
-    let web = this;
-    web.lib = web.lib || {};
+    const self = this;
+    const web = self;
+    self.lib = self.lib || {};
 
     let webId = nanoidInsecure();
-    web.id = webId;
+    self.id = webId;
 
-    Object.defineProperty(web.lib, 'mongoose', {
+    Object.defineProperty(self.lib, 'mongoose', {
       get: function() {
         let stack = new Error().stack;
         console.warn("Use web.require('mongoose') instead of calling web.lib..", stack);
-        return require('mongoose');
+        return mongoose;
       }
     });
 
@@ -43,67 +44,78 @@ class Web {
 
     let conf = {};
 
+    let absFilePath = callsites()[1].getFileName();
+    let webBaseDir = path.dirname(absFilePath);
+
+    if (stringUtils.isEmpty(webBaseDir)) {
+      throw new Error("Web's baseDir should not be empty");
+    }
+
+    console.debug('Setting base dir to ', webBaseDir);
+    
     if (!conf.baseDir) {
-      let tmpBaseDir = __filename.substr(0, __filename.indexOf('node_modules') - 1);
-      if (!stringUtils.isEmpty(tmpBaseDir)) {
-        conf.baseDir = tmpBaseDir;
-      }
+      conf.baseDir = webBaseDir;
     }
 
+    // This is to catch multiple declaration of oils web app by checking if the baseDir was already defined
     if (global._web[conf.baseDir]) {
-      throw new Error("Web has been redefined " + conf.baseDir + " vs " + JSON.stringify(callerId.getData()));
+      throw new Error("Web has been redefined: " + conf.baseDir + " vs " + webBaseDir);
     }
 
-    global._web[conf.baseDir] = web;
+    global._web[conf.baseDir] = self;
+    global._webLength = Object.keys(global._web).length;
 
     if (!global.hasOwnProperty('web')) {
       Object.defineProperty(global, 'web', {
         get: function() {
-          if (Object.keys(global._web).length === 1) {
-            return web;
+
+          if (global._webLength === 1) {
+            return self;
           }
 
+          // [1] is the caller before Web
+          let callStr = callsites()[1].getFileName();
+
           for (let i in global._web) {
-            if (stringUtils.startsWith(callsites()[1].getFileName(), i)) {
-              //console.warn('Found new web! ' + i);
+            if (stringUtils.startsWith(callStr, i)) {
               return global._web[i];
             }
           }
 
-          throw new Error("Web cache not found " + JSON.stringify(callerId.getData()));
-          //return web;
+          throw new Error(`Web cache not found: ${currWebBaseDir}.`);
+
         }
       })
     }
  
     //load custom config file
-    this.conf = require('./conf/conf-default.js')();
-    this.conf = extend(this.conf, conf);
+    self.conf = require('./conf/conf-default.js')();
+    self.conf = extend(self.conf, conf);
     
-    if (this.conf.customConfigFile) {
-      let customConf = requireNvm(path.join(this.conf.baseDir, this.conf.customConfigFile));
+    if (self.conf.customConfigFile) {
+      let customConf = requireNvm(path.join(self.conf.baseDir, self.conf.customConfigFile));
       if (customConf) {
-        this.conf = extend(this.conf, customConf);
+        self.conf = extend(self.conf, customConf);
       }
     }
 
-    if (this.conf.pluginsConfPath) {
-      console.log("Reading plugins conf", this.conf.pluginsConfPath);
-      this.conf.plugins = this.conf.plugins || {};
-      this.conf.plugins = extend(this.conf.plugins, web.includeNvm(this.conf.pluginsConfPath));
+    if (self.conf.pluginsConfPath) {
+      console.log("Reading plugins conf", self.conf.pluginsConfPath);
+      self.conf.plugins = self.conf.plugins || {};
+      self.conf.plugins = extend(self.conf.plugins, web.includeNvm(self.conf.pluginsConfPath));
     }
 
     //zconf: third config path for environmental / more private properties
-    if (this.conf.zconf === true) {
-      let customConf = requireNvm(path.join(this.conf.baseDir, 'conf', 'zconf.js'));
+    if (self.conf.zconf === true) {
+      let customConf = requireNvm(path.join(self.conf.baseDir, 'conf', 'zconf.js'));
       if (customConf) {
         console.info('Found zconf... extending.');
-        this.conf = extend(this.conf, customConf);
+        self.conf = extend(self.conf, customConf);
       }
-    } else if (this.conf.zconf) {
-      let zconf = requireNvm(this.conf.zconf);
+    } else if (self.conf.zconf) {
+      let zconf = requireNvm(self.conf.zconf);
       if (zconf) {
-        this.conf = extend(this.conf, zconf);
+        self.conf = extend(self.conf, zconf);
         console.info('Found zconf.. extending.');
       } else {
         console.warn(web.conf.zconf, 'not found. Ignoring.');
@@ -111,36 +123,50 @@ class Web {
     }
 
     if (customConf) {
-      this.conf = extend(this.conf, customConf);
+      self.conf = extend(self.conf, customConf);
     }
 
-    this.logger = require('./utils/logger.js')(this);
+    self.conf.webId = self.id;
 
-    console.isDebug = this.conf.isDebug;
+    // only replace console.log etc once
+    if (Object.keys(global._web).length <= 1) {
+      self.logger = require('./utils/logger.js')(self.conf);
+    } else {
+      for (let i in global._web) {
+        if (global._web[i].logger) {
+          self.logger = global._web[i].logger;
+          break;
+        }
+      }
+    }
+
+    console.isDebug = self.conf.isDebug;
     if (console.isDebug) {
-      console.debug('Oils config: ' + JSON.stringify(this.conf, null, 2));
+      console.debug('Oils config: ' + JSON.stringify(self.conf, null, 2));
     }
 
 
 
-    if (this.conf.enableCsrfToken) {
-      this.csrfTokens = new TokensCsrf();
-      this.secretCsrf = web.csrfTokens.secretSync();
+    if (self.conf.enableCsrfToken) {
+      self.csrfTokens = new TokensCsrf();
+      self.secretCsrf = web.csrfTokens.secretSync();
     }
 
-    this.app = express();
+    self.app = express();
 
-    fixOpenRedirect(this);
+    fixOpenRedirect(self);
 
-    this.events = {};
-    this.modelCache = new Object();
-    this.plugins = [];
+    self.events = {};
+    self.modelCache = new Object();
+    self.plugins = [];
 
-    this.overrideResponse();
+    self.overrideResponse();
 
-    if (this.conf.extendWeb && this.conf.extendWeb.enabled) {
-      webExtender.load(this, this.conf.extendWeb.path, this.conf.extendWeb.context);
+    if (self.conf.extendWeb && self.conf.extendWeb.enabled) {
+      webExtender.load(self, self.conf.extendWeb.path, self.conf.extendWeb.context);
     }
+
+    console.log("Done with web constructor")
   }
 
   //a way to use oils library so no need to re-install

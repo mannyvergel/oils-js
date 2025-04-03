@@ -1,8 +1,9 @@
 'use strict';
 
-module.exports = function(webSelf) {
+// avoided passing web itself because it can do a circular loop
+module.exports = function(webConf) {
 
-  if (!webSelf.conf.logger.replaceWith) {
+  if (!webConf.logger.replaceWith) {
     let logger = {};
     logger.info = console.log.bind(logger);
     logger.debug = console.debug.bind(logger);
@@ -10,16 +11,16 @@ module.exports = function(webSelf) {
     logger.error = console.error.bind(logger);
 
     return logger;
-  } else if (webSelf.conf.logger.replaceWith === 'winston') {
-    return replaceWithWinstonLogger(webSelf);
+  } else if (webConf.logger.replaceWith === 'winston') {
+    return replaceWithWinstonLogger(webConf);
   } else {
-    throw new Error("Unsupported logger", webSelf.conf.logger.replaceWith);
+    throw new Error("Unsupported logger", webConf.logger.replaceWith);
   }
   
 }
 
 
-function replaceWithWinstonLogger(webSelf) {
+function replaceWithWinstonLogger(webConf) {
   const { createLogger, format, transports } = require('winston');
   require('winston-daily-rotate-file');
 
@@ -34,8 +35,8 @@ function replaceWithWinstonLogger(webSelf) {
 
   const timezoned = () => {
     let timestampConf = {};
-    if (web.conf.timezone) {
-      timestampConf.timeZone = web.conf.timezone;
+    if (webConf.timezone) {
+      timestampConf.timeZone = webConf.timezone;
     }
 
     timestampConf.hour12 = false;
@@ -46,8 +47,8 @@ function replaceWithWinstonLogger(webSelf) {
 
   let workerInfo = '';
 
-  if (web.conf.logWorkerId) {
-    workerInfo = `[worker_${web.id}] `;
+  if (webConf.logWorkerId) {
+    workerInfo = `[worker_${webConf.webId}] `;
   }
 
 
@@ -74,20 +75,21 @@ function replaceWithWinstonLogger(webSelf) {
     })
   ]
 
-  if (webSelf.conf.logger.winston.logToFile.enabled) {
+  if (webConf.logger.winston.logToFile.enabled) {
 
     const fs = require('fs');
-    let logDir = webSelf.conf.logDir || webSelf.conf.logger.dir;
-    if (!web.stringUtils.startsWith(logDir, '/')) {
-      logDir = path.join(web.conf.baseDir, logDir);
+    let logDir = webConf.logDir || webConf.logger.dir;
+
+    if (logDir.indexOf('/') === 0) {
+      logDir = path.join(webConf.baseDir, logDir);
     }
 
     // Create the log directory if it does not exist
     if (!fs.existsSync(logDir)) {
       fs.mkdirSync(logDir, {recursive: true});
     }
-    if (webSelf.conf.logger.winston.logToFile.dailyRotate.enabled) {
-      let rotateConf = webSelf.conf.logger.winston.logToFile.dailyRotate;
+    if (webConf.logger.winston.logToFile.dailyRotate.enabled) {
+      let rotateConf = webConf.logger.winston.logToFile.dailyRotate;
       rotateConf.filename = `${logDir}/${rotateConf.filenameFormat}`;
 
       const dailyRotateFileTransport = new transports.DailyRotateFile(rotateConf);
@@ -107,7 +109,7 @@ function replaceWithWinstonLogger(webSelf) {
 
   const logger = createLogger({
     // change level if in dev environment versus production
-    level: webSelf.conf.isDebug ? 'debug' : 'info',
+    level: webConf.isDebug ? 'debug' : 'info',
     format: logFormat,
     transports: myTransports
   });

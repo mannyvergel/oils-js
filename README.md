@@ -1,6 +1,10 @@
 oils
 ======
 
+### Breaking Changes
+
+Check migration.md for more information.
+
 ### What is Oils JS
 
 Oils is a web framework built on top of Express framework. It's very flexible and very simple to use, you'll love it!

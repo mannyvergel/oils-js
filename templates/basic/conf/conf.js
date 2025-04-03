@@ -14,7 +14,7 @@ const conf = {
       url: 'mongodb://localhost:27017/oils'
     }
   },
-  connectionPoolSize: 5,
+  // connectionPoolSize: 5, // removed for now
   enableCsrfToken: true,
   secretPassphrase: 'as9vjas5209ja0w9utq90gjf0a9sj',
   isDebug: (process.env.NODE_ENV != 'production'),
