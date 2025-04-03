@@ -1,6 +1,6 @@
 {
   "name": "oils",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "A slightly opinionated web framework built on top of Express 4.",
   "keywords": [
     "OilsJs",
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "body-parser": "^1.20.2",
-    "callsites": "~4.2.0",
+    "callsites": "~3.1.0",
     "commander": "^7.2.0",
     "connect-flash": "~0.1.1",
     "connect-mongo": "^5.1.0",

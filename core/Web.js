@@ -44,10 +44,14 @@ class Web {
 
     let conf = {};
 
-    let absFilePath = callsites()[1].getFileName();
-    let webBaseDir = path.dirname(absFilePath);
+    let webBaseDir = getBaseDirFromNodeModules(callsites()[0].getFileName());
 
-    if (stringUtils.isEmpty(webBaseDir)) {
+    if (!webBaseDir) {
+      console.warn("Cannot get base dir from callsites, trying dirname");
+      webBaseDir = getBaseDirFromNodeModules(__dirname);  
+    }
+
+    if (!webBaseDir) {
       throw new Error("Web's baseDir should not be empty");
     }
 
@@ -94,6 +98,7 @@ class Web {
     
     if (self.conf.customConfigFile) {
       let customConf = requireNvm(path.join(self.conf.baseDir, self.conf.customConfigFile));
+
       if (customConf) {
         self.conf = extend(self.conf, customConf);
       }
@@ -102,7 +107,7 @@ class Web {
     if (self.conf.pluginsConfPath) {
       console.log("Reading plugins conf", self.conf.pluginsConfPath);
       self.conf.plugins = self.conf.plugins || {};
-      self.conf.plugins = extend(self.conf.plugins, web.includeNvm(self.conf.pluginsConfPath));
+      self.conf.plugins = extend(self.conf.plugins, self.includeNvm(self.conf.pluginsConfPath));
     }
 
     //zconf: third config path for environmental / more private properties
@@ -118,7 +123,7 @@ class Web {
         self.conf = extend(self.conf, zconf);
         console.info('Found zconf.. extending.');
       } else {
-        console.warn(web.conf.zconf, 'not found. Ignoring.');
+        console.warn(self.conf.zconf, 'not found. Ignoring.');
       }
     }
 
@@ -149,7 +154,7 @@ class Web {
 
     if (self.conf.enableCsrfToken) {
       self.csrfTokens = new TokensCsrf();
-      self.secretCsrf = web.csrfTokens.secretSync();
+      self.secretCsrf = self.csrfTokens.secretSync();
     }
 
     self.app = express();
@@ -911,6 +916,9 @@ function fixOpenRedirect(web) {
   }
 }
 
+function getBaseDirFromNodeModules(pathStr) {
+  return pathStr.substr(0, pathStr.indexOf('node_modules') - 1);
+}
 
 function startServer(web, cb) {
 
