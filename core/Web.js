@@ -212,15 +212,40 @@ class Web {
     options['_conf'] = self.conf.viewConf;
     options['_ext'] = req.ext;
 
-    if (self.conf.enableCsrfToken) {
-      // Only enable _csrf for controllers with post methods to save performance
-      // Breaking Change:
-      // Can also override by adding enableCsrf: true to controller or setting req.enableCsrf
-      if (req.enableCsrf || (req._oilsController && (req._oilsController.post || req._oilsController.enableCsrf))) {
-        options['_csrf'] = self.genCsrfToken();
+    
+      
+    // Breaking Change: For post in a different controller,
+    // it should be added enableCsrfToken true in the source controller
+    if (self._shouldEnableCsrf(req)) {
+      options['_csrf'] = self.genCsrfToken();
+    }
+
+  }
+
+  _shouldEnableCsrf(req) {
+    let self = this;
+    if (!self.conf.enableCsrfToken) {
+      return false;
+    }
+
+    if (req._oilsController) {
+      // controller's enableCsrfToken option
+      if (req._oilsController.enableCsrfToken === false) {
+        return false;
+      }
+
+      if (!req._oilsController.post) {
+        // Only enable _csrf for controllers with post methods to save performance
+        return false;
       }
     }
 
+    if (req.enableCsrfToken !== undefined) {
+      // control via req like in wcm plugins
+      return req.enableCsrfToken;
+    }
+
+    return true;
   }
 
   genCsrfToken() {
@@ -596,8 +621,9 @@ class Web {
       app.use(function(req, res, next) {
 
         if (req.method === "POST") {
-          let verifyCsrf = true;
+          let verifyCsrf = self._shouldEnableCsrf(req);
 
+          // excludePaths will override controller's
           let excludePaths = self.conf.enableCsrfToken.excludes;
           if (excludePaths && excludePaths.length) {
             for (let path of excludePaths) {
