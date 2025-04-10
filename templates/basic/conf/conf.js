@@ -15,7 +15,7 @@ const conf = {
     }
   },
   // connectionPoolSize: 5, // removed for now
-  enableCsrfToken: true,
+  enableCsrfToken: true, // change to {universal: true} to enable csrf check for all posts, else it will only be for controllers
   secretPassphrase: 'as9vjas5209ja0w9utq90gjf0a9sj',
   isDebug: (process.env.NODE_ENV != 'production'),
   plugins: {

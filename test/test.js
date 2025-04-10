@@ -39,6 +39,10 @@ let overrideConf = {
     }
   },
 
+  handleCsrfFailure: function(err, req, res) {
+    res.send(500);
+  },
+
   exitTest: true,
 }
 
@@ -185,6 +189,28 @@ describe('app', function () {
       })
 
       assert.equal(res.status, 200, 'Form submission');
+      
+    }
+
+  });
+
+  it('should fail to submit form with invalid token', async function () {
+
+    if (web.conf.enableCsrfToken) {
+      web.conf.suppressRouteError = true;
+      let res = await fetch(`http://127.0.0.1:${web.conf.port}`, {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          _csrf: '',
+          testData: 'Hello World'
+        }),
+      })
+      web.conf.suppressRouteError = false;
+      assert.equal(res.status, 500, 'Form submission with invalid token');
       
     }
 

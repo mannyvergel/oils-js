@@ -2,6 +2,8 @@
 
 const objectUtils = require('./objectUtils');
 const domain = require('domain');
+const path = require('path');
+
 //let web = global.web;
 exports.applyRoute = function(web, route, obj) {
   if (web.conf.shouldLoadRoute && !(web.conf.shouldLoadRoute(route, obj))) {
@@ -29,7 +31,7 @@ exports.applyRoute = function(web, route, obj) {
   
 }
 
-function applyVerbs(web,route, obj, verbs) {
+function applyVerbs(web, route, obj, verbs) {
 
   for (let i in verbs) {
     let verb = verbs[i];
@@ -86,28 +88,39 @@ function wrapObjToControllerDomain(web, verb, route, obj, controller) {
         try {
           controller.onError(req, res, er, app);
         } catch (e) {
-          showError(req, res, e, app);
+          showError(web, req, res, e, app);
         }
         
       } else {
-        showError(req, res, er, app);
+        showError(web, req, res, er, app);
       }
       
     });
 
     reqd.run(async function() {
       try {
+
+        if (verb === "post" || verb === "all") {
+          try {
+            web._handleCsrf(req);
+          } catch (err) {
+            consoleError(web, req, "Error routeUtil's handle csrf:", err);
+            web.conf.handleCsrfFailure(err, req, res);
+            return;
+          }
+        }
+
         await obj(req, res, next);
       } catch(er) {
         if (controller && controller.onError) {
           try {
             controller.onError(req, res, er, app);
           } catch (e) {
-            showError(req, res, e, app);
+            showError(web, req, res, e, app);
           }
           
         } else {
-          showError(req, res, er, app);
+          showError(web, req, res, er, app);
         } 
       }
       
@@ -116,10 +129,20 @@ function wrapObjToControllerDomain(web, verb, route, obj, controller) {
   }
 }
 
-function showError(req, res, er, app) {
+function consoleError(web, req, ...params) {
+  if (!web.conf.suppressRouteError) {
+    console.error(...params);
+  } else {
+    console.warn('Suppressed Router error at:', req.path);
+  }
+}
+
+function showError(web, req, res, er, app) {
   try {
     res.status(500);
-    console.error('Route error at ' + req.url, er);
+
+    consoleError(web, req, 'Route error at ' + req.url, er);
+
     if (web.conf.handle500) {
       web.conf.handle500(er, req, res);
     } else {
@@ -133,6 +156,6 @@ function showError(req, res, er, app) {
     }
 
   } catch (er) {
-    console.error('Error sending 500', er, req.url);
+    consoleError(web, req, 'Error sending 500', er, req.url);
   }
 }

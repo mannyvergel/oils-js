@@ -222,12 +222,46 @@ class Web {
 
   }
 
+  _handleCsrf(req) {
+    let self = this;
+    if (!self.conf.enableCsrfToken) {
+      return;
+    }
+
+    if (req.method === "POST") {
+
+      let verifyCsrf = self._shouldEnableCsrf(req);
+
+      // excludePaths will override controller's
+      let excludePaths = self.conf.enableCsrfToken.excludes;
+      if (excludePaths && excludePaths.length) {
+        for (let path of excludePaths) {
+          if ( (path instanceof RegExp && path.test(req.path))
+            || (req.path === path)) {
+            verifyCsrf = false;
+          }
+        }
+      }
+
+      if (verifyCsrf) {
+        if (!self.csrfTokens.verify(self.secretCsrf, req.body._csrf)) {
+          throw new Error("Please try to submit the form again. Token verification failed.");
+        }
+
+        if (web.conf.isDebug) {
+          console.debug("Successfully verified csrf:", req.body._csrf);
+        }
+      }
+    }
+  }
+
   _shouldEnableCsrf(req) {
     let self = this;
     if (!self.conf.enableCsrfToken) {
       return false;
     }
 
+    // TODO: req._oilsController is undefined when verifying at POST
     if (req._oilsController) {
       // controller's enableCsrfToken option
       if (req._oilsController.enableCsrfToken === false) {
@@ -616,36 +650,6 @@ class Web {
       next();
     })
 
-    if (self.conf.enableCsrfToken) {
-
-      app.use(function(req, res, next) {
-
-        if (req.method === "POST") {
-          let verifyCsrf = self._shouldEnableCsrf(req);
-
-          // excludePaths will override controller's
-          let excludePaths = self.conf.enableCsrfToken.excludes;
-          if (excludePaths && excludePaths.length) {
-            for (let path of excludePaths) {
-              if ( (path instanceof RegExp && path.test(req.path))
-                || (req.path === path)) {
-                verifyCsrf = false;
-              }
-            }
-          }
-
-          if (verifyCsrf) {
-            if (!web.csrfTokens.verify(web.secretCsrf, req.body._csrf)) {
-              throw new Error("Please try to submit a new form again. Invalid request (token verification failed).");
-            }
-          }
-        }
-
-        next();
-      });
-      
-    }
-
     await self.call('afterWebMiddleware');
    
     app.use(require('./middleware/custom-response.js')());
@@ -693,10 +697,29 @@ class Web {
     self._applyRoutes(self.conf.routes);
     await require('./loaders/controllers')(self);
 
-    app.use(self.conf.publicContext, express.static(path.join(self.conf.baseDir, self.conf.publicDir)));
+    if (self.conf.enableCsrfToken && self.conf.enableCsrfToken.universal) {
+
+      app.use(function(req, res, next) {
+
+        try {
+          self._handleCsrf(req);
+          next();
+        } catch (err) {
+          console.error("Error Web's _handleCsrf:", err);
+          web.conf.handleCsrfFailure(err, req, res);
+        }
+        
+      });
+      
+    }
+
+    app.use(self.conf.publicContext, 
+      express.static(
+        path.join(self.conf.baseDir, self.conf.publicDir), {maxAge: self.conf.staticMaxAge}
+      )
+    );
     
     await self.call('initServer');
-
     
     app.use(function(err, req, res, next){
       res.status(500);

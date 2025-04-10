@@ -44,6 +44,9 @@ module.exports = function(webSel) {
     
     logDir: 'data/logs',
 
+    staticMaxAge: isProd ? '30d' : 0,
+    suppressRouteError: false,
+
     saveRawBody: false,
     // additional options
     // saveRawBody: {
@@ -68,7 +71,12 @@ module.exports = function(webSel) {
 
     publicContext: '/', // better to serve static files in a diff directory e.g. /public/
 
-    enableCsrfToken: false,
+    enableCsrfToken: false, // additional opts {universal: true, excludes:[]} (universal is to test non controller posts)
+    handleCsrfFailure: function(err, req, res) {
+      req.flash('error', err.message);
+      res.redirect(req.url);
+    },
+
     validateNoSqlInject: true,
     cookieMaxAge: 2592000000, // 30 days
     secretPassphrase: 'change-this-it-is-2019!',
