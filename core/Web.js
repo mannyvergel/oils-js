@@ -755,7 +755,8 @@ class Web {
     app.use(function(req, res, next) {
       // Because of old cookie-session replaced by express-session
       // TODO: should we deprecate?
-      req.csrfToken = web.genCsrfToken;
+      // It needs to be wrapped in a function for access to to self
+      req.csrfToken = function() {return self.genCsrfToken();}
 
       next();
     })
