@@ -40,7 +40,7 @@ let overrideConf = {
   },
 
   handleCsrfFailure: function(err, req, res) {
-    res.send(500);
+    res.sendStatus(500);
   },
 
   exitTest: true,
@@ -183,7 +183,7 @@ describe('app', function () {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          _csrf: web.csrfTokens.create(web.secretCsrf),
+          _csrf: web.csrfTokens.create(web._getSecretToken()),
           testData: 'Hello World'
         }),
       })

@@ -16,6 +16,19 @@ const webExtender = require('./loaders/webExtender.js');
 const {customAlphabet} = require('nanoid/non-secure');
 const nanoidInsecure = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 10)
 
+// Used for syncing for multiple servers
+const _WebSetting = {
+  name: '_WebSetting', 
+  schema: {
+    // do not support multiple web for now, assume all web setting here are unified
+    key: {type: String, unique: true, index: true},
+    val: {type: String},
+    updateDt: {type: Date, default: Date.now},
+  }
+}
+
+const wsCsrfKey = "CSRF_SECRET";
+
 /**
 Oils web app
 */
@@ -150,13 +163,6 @@ class Web {
       console.debug('Oils config: ' + JSON.stringify(self.conf, null, 2));
     }
 
-
-
-    if (self.conf.enableCsrfToken) {
-      self.csrfTokens = new TokensCsrf();
-      self.secretCsrf = self.csrfTokens.secretSync();
-    }
-
     self.app = express();
 
     fixOpenRedirect(self);
@@ -244,7 +250,7 @@ class Web {
       }
 
       if (verifyCsrf) {
-        if (!self.csrfTokens.verify(self.secretCsrf, req.body._csrf)) {
+        if (!self.csrfTokens.verify(self._getSecretToken(), req.body._csrf)) {
           throw new Error("Please try to submit the form again. Token verification failed.");
         }
 
@@ -282,12 +288,116 @@ class Web {
     return true;
   }
 
+  _getSecretToken() {
+    return this.getWebSettingVal(wsCsrfKey);
+  }
+
+  async _initCsrfSecretToken() {
+
+    let csrfSecretSetting = this.getWebSettingObj(wsCsrfKey);
+
+    // refresh every one day + server restart (does not guarantee one day can be more depending when servers are restarted)
+    if (csrfSecretSetting
+      && Math.abs((new Date()).getTime() - csrfSecretSetting.updateDt.getTime()) < this.conf.csrfSecretRefreshMs) {
+      return csrfSecretSetting.val;
+    }
+
+    let secret = this.csrfTokens.secretSync();
+
+    this.setWebSetting(wsCsrfKey, secret);
+
+    this.conf.isDebug && console.debug("Refreshed csrf secret");
+
+    return secret;
+  }
+
+  async _initWebSettingVals() {
+    await this._initCsrfSecretToken();
+
+    // other web setting init that needs DB sync goes here
+  }
+
+  async _initWebSettingRefresh() {
+    const _WebSettingModel = this._getWebSettingModel();
+    const self = this;
+
+    if (!this.syncedSetting) {
+      self.syncedSetting = {};
+    }
+
+    await this._refreshWebSettings();
+
+    // not moved to refresh loop because we don't need these settings constantly updated (for now)
+    // will just init once on server restart
+    await this._initWebSettingVals();
+    
+    // This is needed because in the case of multiple servers, not restarting one will result in out-of-sync
+    setInterval(() => {self._refreshWebSettings();}, self.conf.refreshWebSettingInt);
+
+  }
+
+  async _refreshWebSettings() {
+    const _WebSettingModel = this._getWebSettingModel();
+
+    let arrKeyVals = await _WebSettingModel.find({}).lean().exec();
+    for (let keyVal of arrKeyVals) {
+      this.syncedSetting[keyVal.key] = keyVal;
+    }
+
+    this.conf.isDebug && console.debug("Web setting refreshed:", Object.keys(this.syncedSetting));
+  }
+
+  _getWebSettingModel() {
+    return this.modelCache['_WebSetting'] || this.includeModelObj(_WebSetting)
+  }
+
+  getWebSettingObj(key) {
+    if (!this.syncedSetting) {
+      throw new Error("Web setting not yet initialized. Only usable after connection has been initiated.");
+    }
+
+    let webSetting = this.syncedSetting[key];
+ 
+    return webSetting;
+  }
+
+  getWebSettingVal(key) {
+    return this.getWebSettingObj(key).val;
+  }
+
+  setWebSetting(key, val) {
+    let ws = this.syncedSetting[key];
+    let origVal = ws && ws.val;
+
+    if (val !== origVal) {
+      this.syncedSetting[key] = {key: key, val: val, updateDt: new Date()};
+
+      // async; should be okay not to wait since this is cached, and other servers are at an interval
+      this._updateSettingToDb(key, val);
+    }
+  }
+
+  async _updateSettingToDb(key, val) {
+    const _WebSettingModel = this._getWebSettingModel();
+    let webSetting = this.syncedSetting[key];
+
+    if (!webSetting) {
+      throw new Error("Web setting not found: " + key);
+    }
+
+    let webSettingDb = await _WebSettingModel
+      .findOneAndUpdate({key: key}, {key: key, val: val, updateDt: new Date()}, {upsert: true})
+      .exec();
+
+    this.conf.isDebug && console.debug("Updated web setting to DB:", key);
+  }
+
   genCsrfToken() {
-    if (!web.conf.enableCsrfToken) {
+    if (!this.conf.enableCsrfToken) {
       return '';
     }
 
-    return web.csrfTokens.create(web.secretCsrf);  
+    return this.csrfTokens.create(this._getSecretToken());  
   }
 
   // requireNvm - cannot define this as a utility because it will never work
@@ -536,9 +646,9 @@ class Web {
   }
 
   async initServer(cb) {
-    let app = this.app;
-    let web = this;
-    let self = this;
+    const app = this.app;
+    const web = this;
+    const self = this;
     const bodyParser = require('body-parser');
     const methodOverride = require('method-override');
     const session = require('express-session');
@@ -682,6 +792,12 @@ class Web {
 
     await require('./loaders/connections.js')(self);
 
+    if (self.conf.enableCsrfToken) {
+      self.csrfTokens = new TokensCsrf();
+    }
+
+    await self._initWebSettingRefresh();
+
     require('./loaders/plugins.js')(self);
     
     await self.loadPlugins();
@@ -722,7 +838,7 @@ class Web {
     await self.call('initServer');
     
     app.use(function(err, req, res, next){
-      res.status(500);
+      res.sendStatus(500);
       if (web.conf.handle500) {
         web.conf.handle500(err, req, res, next);
       } else {

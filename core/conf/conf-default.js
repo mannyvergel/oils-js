@@ -72,10 +72,13 @@ module.exports = function(webSel) {
     publicContext: '/', // better to serve static files in a diff directory e.g. /public/
 
     enableCsrfToken: false, // additional opts {universal: true, excludes:[]} (universal is to test non controller posts)
+    csrfSecretRefreshMs: 86400000, // 1 day in ms
     handleCsrfFailure: function(err, req, res) {
       req.flash('error', err.message);
       res.redirect(req.url);
     },
+
+    refreshWebSettingInt: 60000,
 
     validateNoSqlInject: true,
     cookieMaxAge: 2592000000, // 30 days

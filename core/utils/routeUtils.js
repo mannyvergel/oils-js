@@ -139,7 +139,7 @@ function consoleError(web, req, ...params) {
 
 function showError(web, req, res, er, app) {
   try {
-    res.status(500);
+    res.sendStatus(500);
 
     consoleError(web, req, 'Route error at ' + req.url, er);
 
