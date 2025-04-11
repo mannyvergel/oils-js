@@ -293,6 +293,9 @@ class Web {
   }
 
   async _initCsrfSecretToken() {
+    if (!this.conf.enableCsrfToken) {
+      return;
+    }
 
     let csrfSecretSetting = this.getWebSettingObj(wsCsrfKey);
 
