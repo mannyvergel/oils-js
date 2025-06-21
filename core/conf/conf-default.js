@@ -138,6 +138,8 @@ module.exports = function(webSel) {
     deletedRecsExpiresAfterSeconds: 31536000, // 365 days
     sessionStoreExpiresAfterSeconds: 604800, // 7 days
     defaultRowsPerPage: 10,
+
+    bypassSession: false, // useful e.g. for API servers, avoid session handling for perf and lessen db processing
     
   } 
 

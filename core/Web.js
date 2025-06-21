@@ -57,11 +57,16 @@ class Web {
 
     let conf = {};
 
-    let webBaseDir = getBaseDirFromNodeModules(callsites()[0].getFileName());
+    let webBaseDir = customConf.baseDir || getBaseDirFromNodeModules(callsites()[0].getFileName());
 
     if (!webBaseDir) {
       console.warn("Cannot get base dir from callsites, trying dirname");
       webBaseDir = getBaseDirFromNodeModules(__dirname);  
+    }
+
+    if (!webBaseDir) {
+      console.warn("Cannot get base dir. Last resort: process dir");
+      webBaseDir = process.cwd();
     }
 
     if (!webBaseDir) {
@@ -99,7 +104,7 @@ class Web {
             }
           }
 
-          throw new Error(`Web cache not found: ${currWebBaseDir}.`);
+          throw new Error(`Web cache not found: ${conf.baseDir}.`);
 
         }
       })
@@ -654,7 +659,6 @@ class Web {
     const self = this;
     const bodyParser = require('body-parser');
     const methodOverride = require('method-override');
-    const session = require('express-session');
     const MongoStore = require('connect-mongo');
 
     let httpsConfigEnabled = (web.conf.https && web.conf.https.enabled) || web.conf.httpsOpts.httpsEnabled;
@@ -738,22 +742,31 @@ class Web {
       throw new Error("Security error. Change conf.secretPassphrase.");
     }
 
-    app.use(session(web.conf.sessionOpts || {
-      name: 'oils-session', // should be okay even with mongo in the same since store should be different per app
-      secret: cookieKey,
-      httpOnly: true,
-      secure: true,
-      maxAge: self.conf.cookieMaxAge,
-      resave: false,
-      saveUninitialized: true,
+    if (!web.conf.bypassSession) {
+      const session = require('express-session');
+      app.use(session(web.conf.sessionOpts || {
+        name: 'oils-session', // should be okay even with mongo in the same since store should be different per app
+        secret: cookieKey,
+        httpOnly: true,
+        secure: true,
+        maxAge: self.conf.cookieMaxAge,
+        resave: false,
+        saveUninitialized: true,
 
-      // this will create "sessions" collection in the DB
-      // TODO: check for oils support without DB
-      store: MongoStore.create({
-        mongoUrl: web.conf.connections.mainDb.url,
-        touchAfter: 24 * 3600, // https://github.com/jdesboeufs/connect-mongo/issues/152
+        // this will create "sessions" collection in the DB
+        // TODO: check for oils support without DB
+        store: MongoStore.create({
+          mongoUrl: web.conf.connections.mainDb.url,
+          touchAfter: 24 * 3600, // https://github.com/jdesboeufs/connect-mongo/issues/152
+        })
+      }));
+    } else {
+      app.use(function(req, res, next) {
+        req.session = {};
+        next();
       })
-    }));
+      console.warn("Skipping session handling due to bypassSession: true");
+    }
 
     app.use(function(req, res, next) {
       // Because of old cookie-session replaced by express-session
@@ -767,7 +780,17 @@ class Web {
     await self.call('afterWebMiddleware');
    
     app.use(require('./middleware/custom-response.js')());
-    app.use(flash());
+
+    if (!web.conf.bypassSession) {
+      app.use(flash());
+    } else {
+      app.use(function(req, res, next) {
+        req.flash = function(){console.warn("req.flash is disabled due to config")};
+        next();
+      })
+
+      console.warn("Skipping flash handling due to bypassSession: true");
+    }
 
     if (web.conf.validateNoSqlInject) {
       console.log("Adding validation for nosql injection");
