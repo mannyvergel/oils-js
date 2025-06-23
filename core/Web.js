@@ -744,14 +744,10 @@ class Web {
 
     if (!web.conf.bypassSession) {
       const session = require('express-session');
-      app.use(session(web.conf.sessionOpts || {
+
+      let initSessionOpts = {
         name: 'oils-session', // should be okay even with mongo in the same since store should be different per app
         secret: cookieKey,
-        httpOnly: true,
-        secure: true,
-        maxAge: self.conf.cookieMaxAge,
-        resave: false,
-        saveUninitialized: true,
 
         // this will create "sessions" collection in the DB
         // TODO: check for oils support without DB
@@ -759,7 +755,11 @@ class Web {
           mongoUrl: web.conf.connections.mainDb.url,
           touchAfter: 24 * 3600, // https://github.com/jdesboeufs/connect-mongo/issues/152
         })
-      }));
+      };
+
+      Object.assign(initSessionOpts, web.conf.sessionOpts)
+
+      app.use(session(initSessionOpts));
     } else {
       app.use(function(req, res, next) {
         req.session = {};

@@ -81,7 +81,7 @@ module.exports = function(webSel) {
     refreshWebSettingInt: 60000,
 
     validateNoSqlInject: true,
-    cookieMaxAge: 2592000000, // 30 days
+
     secretPassphrase: 'change-this-it-is-2019!',
     defaultRandomStringByteLength: 16, 
     port: process.env.OILS_PORT ? parseInt(process.env.OILS_PORT) : 8080,
@@ -140,7 +140,15 @@ module.exports = function(webSel) {
     defaultRowsPerPage: 10,
 
     bypassSession: false, // useful e.g. for API servers, avoid session handling for perf and lessen db processing
-    
+
+    sessionOpts: {
+      httpOnly: true,
+      secure: true,
+      maxAge: 2592000000, // 30 days
+      resave: false,
+      saveUninitialized: false, // set to false to prevent too many sessions stored
+    },
+
   } 
 
   return conf;
