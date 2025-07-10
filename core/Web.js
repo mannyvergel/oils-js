@@ -34,7 +34,7 @@ Oils web app
 */
 class Web {
 
-  constructor(customConf) {
+  constructor(customConf = {}) {
 
     const self = this;
     const web = self;
