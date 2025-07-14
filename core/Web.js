@@ -188,7 +188,11 @@ class Web {
   //a way to use oils library so no need to re-install
   //e.g. const moment = web.require('moment');
   require(str) {
-    return require(str);
+    try {
+      return require(str);
+    } catch (err) {
+      throw new Error("Error web.require path: " + str);
+    }
   }
 
   overrideResponse() {
@@ -447,8 +451,12 @@ class Web {
   }
   // EVENTS end -------
 
-  include(file) {
-    return require(this.includeFullPath(file));
+  include(filePath) {
+    try {
+      return require(this.includeFullPath(filePath));
+    } catch (err) {
+      throw new Error("Error web.include path: " + filePath);
+    }
   }
 
   includeNvm(file) {

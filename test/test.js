@@ -103,6 +103,7 @@ describe('app', function () {
     assert.notStrictEqual(web.include, undefined, 'web.include not found');
     assert.notStrictEqual(web.includeModel, undefined, 'web.includeModel not found');
     assert.notStrictEqual(web.require('moment'), null, 'web.require not working');
+    assert.notStrictEqual(web.include('/conf/routes.js'), null, 'web.include not working');
     done();
   });
 
