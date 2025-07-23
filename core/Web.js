@@ -343,6 +343,7 @@ class Web {
     // will just init once on server restart
     await this._initWebSettingVals();
     
+    // TODO: implement Model.watch but double check for perf / mem consumption issue(s) -- only available for clustered
     // This is needed because in the case of multiple servers, not restarting one will result in out-of-sync
     setInterval(() => {self._refreshWebSettings();}, self.conf.refreshWebSettingInt);
 
@@ -633,10 +634,10 @@ class Web {
     }
   }
 
-  //for deprection, use addRoutes whenever possible instead
   applyRoutes(routes) {
     let stack = new Error().stack;
-    console.warn("Consider using web.addRoutes instead of applyRoutes.", stack);
+
+    // removed deprecation warning since there is a legit use case to apply routes separately from addRoutes
     this._applyRoutes(routes);
   }
 
@@ -873,13 +874,16 @@ class Web {
     await self.call('initServer');
     
     app.use(function(err, req, res, next){
-      res.sendStatus(500);
-      if (web.conf.handle500) {
-        web.conf.handle500(err, req, res, next);
-      } else {
-        res.send("This is embarrassing.");
+      try {
+        if (web.conf.handle500) {
+          web.conf.handle500(err, req, res, next);
+        } else {
+          res.status(500).send("This is embarrassing.");
+        }
+        console.error("General error", err);
+      } catch (err) {
+        console.error('Critical error at error handling, please fix:', err);
       }
-      console.error("General error", err);
     });
 
 

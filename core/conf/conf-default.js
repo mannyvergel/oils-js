@@ -149,6 +149,8 @@ module.exports = function(webSel) {
       saveUninitialized: false, // set to false to prevent too many sessions stored
     },
 
+    handle500: null, // see braziw-template
+
   } 
 
   return conf;

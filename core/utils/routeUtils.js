@@ -139,7 +139,6 @@ function consoleError(web, req, ...params) {
 
 function showError(web, req, res, er, app) {
   try {
-    res.sendStatus(500);
 
     consoleError(web, req, 'Route error at ' + req.url, er);
 
@@ -147,12 +146,11 @@ function showError(web, req, res, er, app) {
       web.conf.handle500(er, req, res);
     } else {
       if (console.isDebug) {
-        res.write(er.stack);
+        res.status(500).send(er.stack);
       } else {
         //show to end users
-        res.write('An unexpected error has occurred.');
+        res.status(500).send('An unexpected error has occurred.');
       }
-      res.end();
     }
 
   } catch (er) {
