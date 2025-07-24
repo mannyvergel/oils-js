@@ -191,7 +191,7 @@ class Web {
     try {
       return require(str);
     } catch (err) {
-      throw new Error("Error web.require path: " + str);
+      throw new Error("Error web.require path: " + str, { cause: err });
     }
   }
 
@@ -456,7 +456,7 @@ class Web {
     try {
       return require(this.includeFullPath(filePath));
     } catch (err) {
-      throw new Error("Error web.include path: " + filePath);
+      throw new Error("Error web.include path: " + filePath, { cause: err });
     }
   }
 
@@ -951,10 +951,7 @@ class Web {
   start(cb) {
     let serverDomain = domain.create();
     serverDomain.on('error', function(err) {
-      console.error('Server domain caught an exception: ' + err);
-      if (err) {
-        console.error(err.stack);
-      }
+      console.error('Server domain caught an exception:', err);
     });
 
     let web = this;
