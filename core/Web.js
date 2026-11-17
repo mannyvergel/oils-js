@@ -456,6 +456,7 @@ class Web {
     try {
       return require(this.includeFullPath(filePath));
     } catch (err) {
+      console.error("Error in web.include:", err);
       throw new Error("Error web.include path: " + filePath, { cause: err });
     }
   }

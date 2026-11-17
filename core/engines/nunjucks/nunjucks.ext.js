@@ -26,7 +26,7 @@ module.exports = function customiseNunjucks(nunjucksEnv) {
   nunjucksEnv.addExtension('MarkedExtension', new MarkedExtension());
 }
 
-const marked = require('marked');
+const markdownit = require('markdown-it');
 
 const createDOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom');
@@ -37,18 +37,12 @@ const DOMPurify = createDOMPurify(window);
 function MarkedExtension() {
 
   const markedOptions = Object.assign(
-  {
-    renderer: new marked.Renderer(),
-    gfm: true,
-    tables: true,
-    breaks: true,
-    pedantic: false,
-    smartLists: true,
-    smartypants: false
+  { 
+    html: true,
   }, web.conf.markedOptions
   );
-  
-  marked.setOptions(markedOptions);
+
+  const marked = markdownit(markedOptions)
 
   this.tags = ['marked'];
   this.autoescape = false;
@@ -75,7 +69,7 @@ function MarkedExtension() {
       if (!body) {
         return "";
       }
-      let ret = DOMPurify.sanitize(marked.parse(body()));
+      let ret = DOMPurify.sanitize(marked.render(body()));
 
       return ret;
   };
